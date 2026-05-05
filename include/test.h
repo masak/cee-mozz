@@ -34,23 +34,25 @@ static i32 mt_failed = 0;
     } \
 } while (0)
 
-#define ASSERT_EQ(expected, actual) do { \
-    if ((expected) != (actual)) { \
+#define ASSERT_EQ(actual, expected) do { \
+    i64 expected_value = (expected); \
+    i64 actual_value = (actual); \
+    if (expected_value != actual_value) { \
         fprintf( \
             stderr, \
-            MT_RED "    ASSERT_EQ failed at %s:%d: expected %s, got %s" \
+            MT_RED "    ASSERT_EQ failed at %s:%d: expected %lld, got %lld" \
             MT_RESET "\n", \
             __FILE__, \
             __LINE__, \
-            #expected, \
-            #actual \
+            expected_value, \
+            actual_value \
         ); \
         mt_failed++; \
         return; \
     } \
 } while (0)
 
-#define ASSERT_STR_EQ(expected, actual) do { \
+#define ASSERT_STR_EQ(actual, expected) do { \
     if (strcmp((expected), (actual)) != 0) { \
         fprintf( \
             stderr, \
