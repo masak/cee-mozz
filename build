@@ -1,3 +1,0 @@
-#! /bin/bash
-clang -std=c11 -Wall -Wextra -pedantic -g -O0 -o main src/main.c
-
