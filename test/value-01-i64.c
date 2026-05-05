@@ -46,6 +46,49 @@ void large_opposite_values(void) {
     ASSERT_I64_ADD(INT64_MAX, INT64_MIN, -1);
 }
 
+#define ASSERT_I64_SUBTRACT(xv, yv, zv) do { \
+    Arena arena; \
+    arena_init(&arena); \
+    size_t x = i64_new(&arena, xv); \
+    size_t y = i64_new(&arena, yv); \
+    size_t z = i64_subtract(&arena, x, y); \
+    i64 actual = i64_resolve(&arena, z)->payload; \
+    i64 expected = zv; \
+    ASSERT_EQ(actual, expected); \
+} while (0)
+
+void positive_subtraction(void) {
+    ASSERT_I64_SUBTRACT(5, 3, 2);
+}
+
+void negative_subtraction_result(void) {
+    ASSERT_I64_SUBTRACT(3, 5, -2);
+}
+
+void negative_minus_negative(void) {
+    ASSERT_I64_SUBTRACT(-10, -4, -6);
+}
+
+void subtracting_zero(void) {
+    ASSERT_I64_SUBTRACT(42, 0, 42);
+}
+
+void zero_minus_something(void) {
+    ASSERT_I64_SUBTRACT(0, 5, -5);
+}
+
+void negative_overflow_subtraction(void) {
+    ASSERT_I64_SUBTRACT(INT64_MIN, 1, INT64_MAX);
+}
+
+void positive_overflow_subtraction(void) {
+    ASSERT_I64_SUBTRACT(INT64_MAX, -2, INT64_MIN + 1);
+}
+
+void big_self_subtraction(void) {
+    ASSERT_I64_SUBTRACT(INT64_MAX, INT64_MAX, 0);
+}
+
 int main(void) {
     RUN_TEST(positive_addition);
     RUN_TEST(negative_addition);
@@ -55,6 +98,14 @@ int main(void) {
     RUN_TEST(maximum_negative_overflow);
     RUN_TEST(large_value_that_does_not_overflow);
     RUN_TEST(large_opposite_values);
+    RUN_TEST(positive_subtraction);
+    RUN_TEST(negative_subtraction_result);
+    RUN_TEST(negative_minus_negative);
+    RUN_TEST(subtracting_zero);
+    RUN_TEST(zero_minus_something);
+    RUN_TEST(negative_overflow_subtraction);
+    RUN_TEST(positive_overflow_subtraction);
+    RUN_TEST(big_self_subtraction);
     TEST_SUMMARY();
 }
 
