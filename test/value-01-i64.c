@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "../include/i64-value.h"
 #include "../include/test.h"
 
@@ -11,9 +13,6 @@
     i64 expected = zv; \
     ASSERT_EQ(actual, expected); \
 } while (0)
-
-long long i64_max = 9223372036854775807LL;
-long long i64_min = -9223372036854775807LL - 1;
 
 void positive_addition(void) {
     ASSERT_I64_ADD(1, 2, 3);
@@ -32,19 +31,19 @@ void adding_zero(void) {
 }
 
 void maximum_positive_overflow(void) {
-    ASSERT_I64_ADD(i64_max, 1, i64_min);
+    ASSERT_I64_ADD(INT64_MAX, 1, INT64_MIN);
 }
 
 void maximum_negative_overflow(void) {
-    ASSERT_I64_ADD(i64_min, -1, i64_max);
+    ASSERT_I64_ADD(INT64_MIN, -1, INT64_MAX);
 }
 
 void large_value_that_does_not_overflow(void) {
-    ASSERT_I64_ADD(i64_max - 1, 1, i64_max);
+    ASSERT_I64_ADD(INT64_MAX - 1, 1, INT64_MAX);
 }
 
 void large_opposite_values(void) {
-    ASSERT_I64_ADD(i64_max, i64_min, -1);
+    ASSERT_I64_ADD(INT64_MAX, INT64_MIN, -1);
 }
 
 int main(void) {
