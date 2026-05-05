@@ -89,6 +89,49 @@ void big_self_subtraction(void) {
     ASSERT_I64_SUBTRACT(INT64_MAX, INT64_MAX, 0);
 }
 
+#define ASSERT_I64_MULTIPLY(xv, yv, zv) do { \
+    Arena arena; \
+    arena_init(&arena); \
+    size_t x = i64_new(&arena, xv); \
+    size_t y = i64_new(&arena, yv); \
+    size_t z = i64_multiply(&arena, x, y); \
+    i64 actual = i64_resolve(&arena, z)->payload; \
+    i64 expected = zv; \
+    ASSERT_EQ(actual, expected); \
+} while (0)
+
+void positive_multiplication(void) {
+    ASSERT_I64_MULTIPLY(6, 7, 42);
+}
+
+void negative_times_negative_is_positive(void) {
+    ASSERT_I64_MULTIPLY(-6, -7, 42);
+}
+
+void mixed_signs_multiplication(void) {
+    ASSERT_I64_MULTIPLY(-6, 7, -42);
+}
+
+void multiply_by_zero(void) {
+    ASSERT_I64_MULTIPLY(42, 0, 0);
+}
+
+void multiply_by_one(void) {
+    ASSERT_I64_MULTIPLY(-42, 1, -42);
+}
+
+void large_positive_times_large_positive(void) {
+    ASSERT_I64_MULTIPLY(3037000500LL, 3037000500LL, -9223372036709301616LL);
+}
+
+void special_min_overflow(void) {
+    ASSERT_I64_MULTIPLY(INT64_MIN, -1, INT64_MIN);
+}
+
+void extreme_values_that_just_overflow(void) {
+    ASSERT_I64_MULTIPLY(4294967296LL, 2147483648LL, INT64_MIN);
+}
+
 int main(void) {
     RUN_TEST(positive_addition);
     RUN_TEST(negative_addition);
@@ -106,6 +149,14 @@ int main(void) {
     RUN_TEST(negative_overflow_subtraction);
     RUN_TEST(positive_overflow_subtraction);
     RUN_TEST(big_self_subtraction);
+    RUN_TEST(positive_multiplication);
+    RUN_TEST(negative_times_negative_is_positive);
+    RUN_TEST(mixed_signs_multiplication);
+    RUN_TEST(multiply_by_zero);
+    RUN_TEST(multiply_by_one);
+    RUN_TEST(large_positive_times_large_positive);
+    RUN_TEST(special_min_overflow);
+    RUN_TEST(extreme_values_that_just_overflow);
     TEST_SUMMARY();
 }
 

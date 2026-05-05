@@ -82,13 +82,21 @@ static i32 mt_failed = 0;
 } while (0)
 
 #define TEST_SUMMARY() do { \
-    printf( \
-        "\n%s%d/%d tests passed%s\n", \
-        mt_failed > 0 ? MT_RED : MT_GREEN, \
-        mt_passed, \
-        mt_run, \
-        MT_RESET \
-    ); \
+    if (mt_failed > 0) { \
+        printf( \
+            "\n%s%d test%s failed%s\n", \
+            MT_RED, \
+            mt_failed, \
+            mt_failed > 1 ? "s" : "", \
+            MT_RESET \
+        ); \
+    } else { \
+        printf( \
+            "\n%sAll tests passed%s\n", \
+            MT_GREEN, \
+            MT_RESET \
+        ); \
+    } \
     return mt_failed > 0 ? 1 : 0; \
 } while (0)
 

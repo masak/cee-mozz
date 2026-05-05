@@ -25,3 +25,9 @@ size_t i64_subtract(Arena *a, size_t m, size_t n) {
     return i64_new(a, lhs->payload - rhs->payload);
 }
 
+size_t i64_multiply(Arena *a, size_t m, size_t n) {
+    I64Value *lhs = i64_resolve(a, m);
+    I64Value *rhs = i64_resolve(a, n);
+    return i64_new(a, lhs->payload * rhs->payload);
+}
+
