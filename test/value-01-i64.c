@@ -132,6 +132,50 @@ void extreme_values_that_just_overflow(void) {
     ASSERT_I64_MULTIPLY(4294967296LL, 2147483648LL, INT64_MIN);
 }
 
+#define ASSERT_I64_DIVIDE(xv, yv, zv, wv) do { \
+    Arena arena; \
+    arena_init(&arena); \
+    size_t x = i64_new(&arena, xv); \
+    size_t y = i64_new(&arena, yv); \
+    size_t z = i64_new(&arena, zv); \
+    size_t w = i64_divide(&arena, x, y, z); \
+    i64 actual = i64_resolve(&arena, w)->payload; \
+    i64 expected = wv; \
+    ASSERT_EQ(actual, expected); \
+} while (0)
+
+void positive_exact_division() {
+    ASSERT_I64_DIVIDE(42, 6, 999, 7);
+}
+
+void positive_floored_division() {
+    ASSERT_I64_DIVIDE(17, 5, 999, 3);
+}
+
+void negative_floored_division() {
+    ASSERT_I64_DIVIDE(-17, 5, 999, -4);
+}
+
+void positive_numerator_negative_denominator_floored() {
+    ASSERT_I64_DIVIDE(17, -5, 999, -4);
+}
+
+void negative_div_negative_is_positive_floored() {
+    ASSERT_I64_DIVIDE(-17, -5, 999, 3);
+}
+
+void denominator_is_zero_fallback() {
+    ASSERT_I64_DIVIDE(42, 0, -1, -1);
+}
+
+void zero_numerator() {
+    ASSERT_I64_DIVIDE(0, 5, 999, 0);
+}
+
+void min_divide_overflow_trap() {
+    ASSERT_I64_DIVIDE(INT64_MIN, -1, 999, INT64_MIN);
+}
+
 int main(void) {
     RUN_TEST(positive_addition);
     RUN_TEST(negative_addition);
@@ -157,6 +201,14 @@ int main(void) {
     RUN_TEST(large_positive_times_large_positive);
     RUN_TEST(special_min_overflow);
     RUN_TEST(extreme_values_that_just_overflow);
+    RUN_TEST(positive_exact_division);
+    RUN_TEST(positive_floored_division);
+    RUN_TEST(negative_floored_division);
+    RUN_TEST(positive_numerator_negative_denominator_floored);
+    RUN_TEST(negative_div_negative_is_positive_floored);
+    RUN_TEST(denominator_is_zero_fallback);
+    RUN_TEST(zero_numerator);
+    RUN_TEST(min_divide_overflow_trap);
     TEST_SUMMARY();
 }
 

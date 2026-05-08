@@ -15,6 +15,7 @@ I64Value *i64_resolve(Arena *a, size_t offset);
 size_t i64_add(Arena *a, size_t m, size_t n);
 size_t i64_subtract(Arena *a, size_t m, size_t n);
 size_t i64_multiply(Arena *a, size_t m, size_t n);
+size_t i64_divide(Arena *a, size_t m, size_t n, size_t fallback);
 
 #endif
 

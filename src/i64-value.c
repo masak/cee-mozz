@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include "../include/i64-value.h"
 
 size_t i64_new(Arena *a, i64 payload) {
@@ -29,5 +31,30 @@ size_t i64_multiply(Arena *a, size_t m, size_t n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
     return i64_new(a, lhs->payload * rhs->payload);
+}
+
+size_t i64_divide(Arena *a, size_t m, size_t n, size_t fallback) {
+    I64Value *numerator = i64_resolve(a, m);
+    I64Value *denominator = i64_resolve(a, n);
+
+    if (denominator->payload == 0) {
+        return fallback;
+    }
+
+    i64 num = numerator->payload;
+    i64 den = denominator->payload;
+    i64 quotient = num / den;
+    i64 remainder = num % den;
+
+    // C does truncating division (round towards 0), but we want flooring
+    // division in Mozzarella (round towards negative infinity).
+    // This whole thing (including calculating `remainder`) gets optimized to
+    // a single `idiv` instruction under clang with -O1 or -O2.
+    bool negative_result = (num < 0) != (den < 0);
+    if (remainder != 0 && negative_result) {
+        quotient -= 1;
+    }
+
+    return i64_new(a, quotient);
 }
 
