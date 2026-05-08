@@ -176,6 +176,50 @@ void min_divide_overflow_trap() {
     ASSERT_I64_DIVIDE(INT64_MIN, -1, 999, 999);
 }
 
+#define ASSERT_I64_MODULO(xv, yv, zv, wv) do { \
+    Arena arena; \
+    arena_init(&arena); \
+    size_t x = i64_new(&arena, xv); \
+    size_t y = i64_new(&arena, yv); \
+    size_t z = i64_new(&arena, zv); \
+    size_t w = i64_modulo(&arena, x, y, z); \
+    i64 actual = i64_resolve(&arena, w)->payload; \
+    i64 expected = wv; \
+    ASSERT_EQ(actual, expected); \
+} while (0)
+
+void positive_modulo_exact() {
+    ASSERT_I64_MODULO(42, 6, 999, 0);
+}
+
+void positive_modulo_with_remainder() {
+    ASSERT_I64_MODULO(17, 5, 999, 2);
+}
+
+void negative_mod_positive() {
+    ASSERT_I64_MODULO(-17, 5, 999, 3);
+}
+
+void positive_mod_negative() {
+    ASSERT_I64_MODULO(17, -5, 999, -3);
+}
+
+void negative_mod_negative() {
+    ASSERT_I64_MODULO(-17, -5, 999, -2);
+}
+
+void mod_denominator_zero_fallback() {
+    ASSERT_I64_MODULO(42, 0, -1, -1);
+}
+
+void zero_mod_positive() {
+    ASSERT_I64_MODULO(0, 5, 999, 0);
+}
+
+void minimum_mod_negative_one() {
+    ASSERT_I64_MODULO(INT64_MIN, -1, 999, 0);
+}
+
 int main(void) {
     RUN_TEST(positive_addition);
     RUN_TEST(negative_addition);
@@ -209,6 +253,14 @@ int main(void) {
     RUN_TEST(denominator_is_zero_fallback);
     RUN_TEST(zero_numerator);
     RUN_TEST(min_divide_overflow_trap);
+    RUN_TEST(positive_modulo_exact);
+    RUN_TEST(positive_modulo_with_remainder);
+    RUN_TEST(negative_mod_positive);
+    RUN_TEST(positive_mod_negative);
+    RUN_TEST(negative_mod_negative);
+    RUN_TEST(mod_denominator_zero_fallback);
+    RUN_TEST(zero_mod_positive);
+    RUN_TEST(minimum_mod_negative_one);
     TEST_SUMMARY();
 }
 
