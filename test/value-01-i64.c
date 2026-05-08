@@ -173,7 +173,7 @@ void zero_numerator() {
 }
 
 void min_divide_overflow_trap() {
-    ASSERT_I64_DIVIDE(INT64_MIN, -1, 999, INT64_MIN);
+    ASSERT_I64_DIVIDE(INT64_MIN, -1, 999, 999);
 }
 
 int main(void) {

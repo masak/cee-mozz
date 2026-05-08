@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "../include/i64-value.h"
 
@@ -37,12 +38,17 @@ size_t i64_divide(Arena *a, size_t m, size_t n, size_t fallback) {
     I64Value *numerator = i64_resolve(a, m);
     I64Value *denominator = i64_resolve(a, n);
 
-    if (denominator->payload == 0) {
+    i64 num = numerator->payload;
+    i64 den = denominator->payload;
+
+    if (den == 0) {
         return fallback;
     }
 
-    i64 num = numerator->payload;
-    i64 den = denominator->payload;
+    if (num == INT64_MIN && den == -1) {
+        return fallback;
+    }
+
     i64 quotient = num / den;
     i64 remainder = num % den;
 
