@@ -1,6 +1,8 @@
 #ifndef I64_VALUE_H
 #define I64_VALUE_H
 
+#include <stdbool.h>
+
 #include "arena.h"
 #include "typedefs.h"
 
@@ -11,6 +13,7 @@ typedef struct {
 
 size_t i64_new(Arena *a, i64 payload);
 I64Value *i64_resolve(Arena *a, size_t offset);
+bool i64_validate(Arena *a, size_t offset);
 
 size_t i64_add(Arena *a, size_t m, size_t n);
 size_t i64_subtract(Arena *a, size_t m, size_t n);

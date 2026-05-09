@@ -220,6 +220,22 @@ void minimum_mod_negative_one() {
     ASSERT_I64_MODULO(INT64_MIN, -1, 999, 0);
 }
 
+#define ASSERT_I64_VALIDATE(xv) do { \
+    Arena arena; \
+    arena_init(&arena); \
+    size_t x = i64_new(&arena, xv); \
+    bool actual = i64_validate(&arena, x); \
+    ASSERT(actual); \
+} while (0)
+
+void validate_some_i64s() {
+    ASSERT_I64_VALIDATE(0);
+    ASSERT_I64_VALIDATE(5);
+    ASSERT_I64_VALIDATE(-17);
+    ASSERT_I64_VALIDATE(INT64_MAX);
+    ASSERT_I64_VALIDATE(INT64_MIN);
+}
+
 int main(void) {
     RUN_TEST(positive_addition);
     RUN_TEST(negative_addition);
@@ -261,6 +277,7 @@ int main(void) {
     RUN_TEST(mod_denominator_zero_fallback);
     RUN_TEST(zero_mod_positive);
     RUN_TEST(minimum_mod_negative_one);
+    RUN_TEST(validate_some_i64s);
     TEST_SUMMARY();
 }
 

@@ -2,10 +2,11 @@
 #include <stdint.h>
 
 #include "../include/i64-value.h"
+#include "../include/types.h"
 
 size_t i64_new(Arena *a, i64 payload) {
     I64Value *i64_value = arena_alloc(a, sizeof(I64Value), alignof(I64Value));
-    i64_value->tag = 0;
+    i64_value->tag = TAG_I64;
     i64_value->payload = payload;
     return (size_t)((unsigned char *)i64_value - a->bytes);
 }
@@ -14,6 +15,12 @@ size_t i64_new(Arena *a, i64 payload) {
 I64Value *i64_resolve(Arena *a, size_t offset) {
     assert(offset <= ARENA_SIZE - sizeof(I64Value));
     return (I64Value *)(a->bytes + offset);
+}
+
+bool i64_validate(Arena *a, size_t offset) {
+    (void)a;
+    assert(offset <= ARENA_SIZE - sizeof(I64Value));
+    return true;
 }
 
 size_t i64_add(Arena *a, size_t m, size_t n) {
