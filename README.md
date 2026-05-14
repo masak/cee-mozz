@@ -9,7 +9,7 @@ Only planning as far as the value types so far.
 | Type | Definition | Validation | Operations |
 |------|------------|------------|------------|
 | `I64Value` | ✅ | ✅ | ✅ `add sub mul floordiv mod` |
-| `AsciiStrValue` | ✅ | | `to_string` |
+| `AsciiStrValue` | ✅ | | `concat to_string` |
 | `BoolValue` | | | `to_bool` |
 | `NoneValue` | | | |
 | `ArrayValue` | | | |
