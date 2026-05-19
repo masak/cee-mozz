@@ -23,3 +23,6 @@ Only planning as far as the value types so far.
 A later, more detailed plan will also include running VM instructions; first
 individually, and then as part of stored bytecode.
 
+## Design documents
+
+- [Instructions](https://github.com/masak/cee-mozz/blob/main/docs/01-instructions.md)
