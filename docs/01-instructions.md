@@ -95,9 +95,17 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 
 ## Control
 
-| bytes         | instruction          | description        |
-|---------------|----------------------|--------------------|
-| `80 -- aa aa` | `jmp <aaaa>`         | unconditional jump |
-| `81 r1 aa aa` | `jmp <aaaa> if <r1>` | conditional jump   |
-| `82 r1 -- --` | `ret <r1>`           | return             |
+| bytes         | instruction          | description           |
+|---------------|----------------------|-----------------------|
+| `80 -- aa aa` | `jmp <aaaa>`         | unconditional jump    |
+| `81 r1 aa aa` | `jmp <aaaa> if <r1>` | conditional jump      |
+| `82 r1 -- --` | `ret <r1>`           | return                |
+| `83 r1 -- --` | `Proc.exit(<r1>)`    | exit with status code |
+
+## Input/output
+
+| bytes         | instruction           | description            |
+|---------------|-----------------------|------------------------|
+| `84 r1 -- --` | `print(<r1>)`         | print string + newline |
+| `85 tr r1 --` | `<tr> = prompt(<r1>)` | prompt and input       |
 
