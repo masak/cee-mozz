@@ -79,18 +79,19 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 
 ## Func
 
-| bytes         | instruction            | description                       |
-|---------------|------------------------|-----------------------------------|
-| `20 tr r1 r2` | `<tr> = <r1>(...<r2>)` | call Func with Array of arguments |
+| bytes         | instruction              | description                    |
+|---------------|--------------------------|--------------------------------|
+| `20 tr r1 r2` | `<tr> = <r1>(...<r2>)`   | call Func with arguments Array |
+| `21 -- r1 r2` | `tailcall <r1>(...<r2>)` | tailcall                       |
 
 ## SyntaxNode
 
 | bytes         | instruction                           | description        |
 |---------------|---------------------------------------|--------------------|
-| `21 tr r1 --` | `<tr> = SyntaxNode.init(...<r1>)`     | assign SyntaxNode  |
-| `22 tr r1 --` | `<tr> = SyntaxNode.IntNode(...<r1>)`  | ...IntNode (Int)   |
-| `23 tr r1 --` | `<tr> = SyntaxNode.StrNode(...<r1>)`  | ...StrNode (Str)   |
-| `24 tr r1 --` | `<tr> = SyntaxNode.BoolNode(...<r1>)` | ...BoolNode (Bool) |
+| `22 tr r1 --` | `<tr> = SyntaxNode.init(...<r1>)`     | assign SyntaxNode  |
+| `23 tr r1 --` | `<tr> = SyntaxNode.IntNode(...<r1>)`  | ...IntNode (Int)   |
+| `24 tr r1 --` | `<tr> = SyntaxNode.StrNode(...<r1>)`  | ...StrNode (Str)   |
+| `25 tr r1 --` | `<tr> = SyntaxNode.BoolNode(...<r1>)` | ...BoolNode (Bool) |
 
 ## Control
 
