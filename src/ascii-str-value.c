@@ -4,8 +4,8 @@
 #include "../include/typedefs.h"
 #include "../include/types.h"
 
-size_t ascii_str_new(Arena *a, char *payload) {
-    u64 length_in_bytes = strlen(payload);
+size_t ascii_str_new(Arena *a, Str *str) {
+    u64 length_in_bytes = str->length_in_bytes;
     AsciiStrValue *ascii_str_value = arena_alloc(
         a,
         sizeof(AsciiStrValue) + length_in_bytes,
@@ -13,7 +13,7 @@ size_t ascii_str_new(Arena *a, char *payload) {
     );
     ascii_str_value->tag = TAG_ASCII_STR;
     ascii_str_value->length_in_bytes = length_in_bytes;
-    memcpy(ascii_str_value->payload, payload, length_in_bytes);
+    memcpy(ascii_str_value->payload, str->payload, length_in_bytes);
     return (size_t)((unsigned char *)ascii_str_value - a->bytes);
 }
 

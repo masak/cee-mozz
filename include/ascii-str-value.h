@@ -2,6 +2,7 @@
 #define ASCII_STR_VALUE_H
 
 #include "arena.h"
+#include "str.h"
 #include "typedefs.h"
 
 typedef struct {
@@ -10,7 +11,7 @@ typedef struct {
     char payload[];
 } AsciiStrValue;
 
-size_t ascii_str_new(Arena *a, char *payload);
+size_t ascii_str_new(Arena *a, Str *str);
 AsciiStrValue *ascii_str_resolve(Arena *a, size_t offset);
 
 #endif
