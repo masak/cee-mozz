@@ -13,6 +13,7 @@ Only planning as far as the value types so far.
 | `BoolValue` | | | `to_bool` |
 | `NoneValue` | | | |
 | `ArrayValue` | | | |
+| `ArrayElements` | | | |
 | `FuncValue` | | | |
 | `MacroValue` | | | |
 | `SyntaxNodeValue` | | | |
