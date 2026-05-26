@@ -27,8 +27,8 @@ defining the various types of the runtime:
 
 ## Design documents
 
-- Value types (not yet written)
-- [Instructions](https://github.com/masak/cee-mozz/blob/main/docs/01-instructions.md)
+- [Value types](https://github.com/masak/cee-mozz/blob/main/docs/01-value-types.md)
+- [Instructions](https://github.com/masak/cee-mozz/blob/main/docs/02-instructions.md)
 - Instruction semantics (not yet written)
 - Execution (not yet written)
 

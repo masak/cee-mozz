@@ -1,0 +1,173 @@
+# Value types
+
+Listed in approximate order from small/simple to large/complex.
+
+# I64Value
+
+A signed 64-bit integer. (See also `IntValue` below for arbitrary-precision
+integers.)
+
+```
+.------.-------------.
+| 0x01 | i64 payload |
+'------'-------------'
+```
+
+# AsciiStrValue
+
+A sequence of ASCII characters. (See also `StrValue` and `SmallStrValue`
+below.)
+
+```
+.------.----------------.---------------.
+| 0x02 | length (bytes) | bytes payload |
+'------'----------------'---------------'
+```
+
+# BoolValue
+
+A single boolean value, `true` or `false`.
+
+```
+.------.-------------.
+| 0x03 | i64 payload |
+'------'-------------'
+```
+
+# NoneValue
+
+A unique singleton value, `none`.
+
+```
+.------.
+| 0x04 |
+'------'
+```
+
+# UninitializedValue
+
+A non-value indicating something (a variable, an array element, or an object
+slot) is not yet initialized.
+
+```
+.------.
+| 0x05 |
+'------'
+```
+
+# ArrayValue
+
+A sequence of (mutable) cells. The sequence can grow or shrink while retaining
+its "object identity".
+
+```
+.------.-------------------.--------------------------.
+| 0x06 | length (elements) | pointer to ArrayElements |
+'------'-------------------'--------------------------'
+```
+
+# ArrayElements
+
+A sequence of (mutable) cells. This sequence can not grow or shrink; instead
+of growing it when needed, we allocate a new one, and reassign the ArrayValue's
+pointer to it.
+
+```
+.------.---------------------.----------------------------.
+| 0x07 | capacity (elements) | (element) pointers payload |
+'------'---------------------'----------------------------'
+```
+
+# FuncValue
+
+A callable function. Current design follows Mozzarella v1.0 conventions,
+without support for optional parameters, rest parameters, parameter defaults,
+or named parameters.
+
+```
+.------.--------.------.--------------.--------------.--------.--------------.
+| 0x08 | param# | reg# | inttable ptr | strtable ptr | instr# | instructions |
+'------'--------'------'--------------'--------------'--------'--------------'
+```
+
+Each instruction is 4 bytes long. The instruction format is described in
+`docs/02-instructions.md`.
+
+# MacroValue
+
+A callable macro.
+
+```
+.------.--------.------.--------------.--------------.--------.--------------.
+| 0x09 | param# | reg# | inttable ptr | strtable ptr | instr# | instructions |
+'------'--------'------'--------------'--------------'--------'--------------'
+```
+
+# SyntaxNodeValue
+
+Represents a syntax node. In cee-mozz, we use this value both internally in
+the compiler, and as reflected "runtime" values.
+
+```
+.------.----------------.------------------------.--------.----------.
+| 0x0a | kind (str ptr) | payload (int/str/bool) | child# | children |
+'------'----------------'------------------------'--------'----------'
+```
+
+# IntValue
+
+An arbitrary-precision integer. (See also `I64Value` above.)
+
+```
+.------.------.---------------.--------------.
+| 0x0b | sign | length (u64s) | u64s payload |
+'------'------.---------------'--------------'
+```
+
+# StrValue
+
+A sequence of UTF-8-encoded Unicode code points. (See also `AsciiStrValue`
+above and `SmallStrValue` below.)
+
+```
+.------.----------------.----------------------.--------------.
+| 0x0c | length (bytes) | length (code points) | utf8 payload |
+'------'----------------'----------------------'--------------'
+```
+
+# SmallStrValue
+
+A sequence of UTF-8-encoded Unicode code points. At most 8 bytes in length.
+Padded with `\0` bytes at the start. (See also `AsciiStrValue` and `StrValue`
+above.)
+
+```
+.------.---------------------.
+| 0x0d | 8-byte utf8 payload |
+'------'---------------------'
+```
+
+# IntTable
+
+An indexable sequence of integers. (`IntValue` or `I64Value`.) Used in
+`FuncValue` and `MacroValue` when instructions need to load integer values from
+somewhere.
+
+```
+.------.---------------.------------------------.
+| 0x0e | length (ints) | (int) pointers payload |
+'------'---------------'------------------------'
+```
+
+# StrTable
+
+An indexable sequence of strings. (`AsciiStrValue`, `StrValue`, or
+`SmallStrValue`.) Used in `FuncValue` and `MacroValue` when instructions need
+to load string values from somewhere.
+
+```
+.------.---------------.------------------------.
+| 0x0f | length (strs) | (str) pointers payload |
+'------'---------------'------------------------'
+```
+
