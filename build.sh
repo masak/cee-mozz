@@ -1,17 +1,20 @@
 #! /bin/bash
 set -e
 
-echo 'Building src/arena.c ...'
-clang -c -std=c11 -Wall -Wextra -pedantic -g -O0 -o build/arena.o src/arena.c
-echo 'Building src/i64-value.c ...'
-clang -c -std=c11 -Wall -Wextra -pedantic -g -O0 -o build/i64-value.o \
-    src/i64-value.c
-echo 'Building src/ascii-str-value.c ...'
-clang -c -std=c11 -Wall -Wextra -pedantic -g -O0 -o build/ascii-str-value.o \
-    src/ascii-str-value.c
-echo 'Building test/value-01-i64.c ...'
-clang -c -std=c11 -Wall -Wextra -pedantic -g -O0 -o build/value-01-i64.o \
-    test/value-01-i64.c
+build_c_file() {
+    local src="$1"
+    local name="${src##*/}"
+    name="${name%.c}"
+    local obj="build/${name}.o"
+
+    echo "Building ${src} ..."
+    clang -c -std=c11 -Wall -Wextra -pedantic -g -O0 -o "${obj}" "${src}"
+}
+
+build_c_file "src/arena.c"
+build_c_file "src/i64-value.c"
+build_c_file "src/ascii-str-value.c"
+build_c_file "test/value-01-i64.c"
 
 echo 'Linking ...'
 clang \
