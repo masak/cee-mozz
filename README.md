@@ -20,8 +20,8 @@ Only planning as far as the value types so far.
 | `IntValue` | | | |
 | `StrValue` | | | |
 | `SmallStrValue` | | | |
-| `IntIndex` | | | |
-| `StrIndex` | | | |
+| `IntTable` | | | |
+| `StrTable` | | | |
 
 A later, more detailed plan will also include running VM instructions; first
 individually, and then as part of stored bytecode.
