@@ -12,6 +12,7 @@ Only planning as far as the value types so far.
 | `AsciiStrValue` | ✅ | | `concat to_string` |
 | `BoolValue` | | | `to_bool` |
 | `NoneValue` | | | |
+| `UninitializedValue` | | | |
 | `ArrayValue` | | | |
 | `ArrayElements` | | | |
 | `FuncValue` | | | |
