@@ -7,6 +7,8 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 | `tr` | target register    |
 | `ii` | index in Int table |
 | `ss` | index in Str table |
+| `ee` | "outer env" steps  |
+| `oo` | offset in env      |
 | `aa` | address            |
 | `--` | unused             |
 
@@ -84,14 +86,21 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 | `20 tr r1 r2` | `<tr> = <r1>(...<r2>)`   | call Func with arguments Array |
 | `21 -- r1 r2` | `tailcall <r1>(...<r2>)` | tailcall                       |
 
+## Environment
+
+| bytes         | instruction               | description            |
+|---------------|---------------------------|------------------------|
+| `22 tr ee oo` | `<tr> = load(<ee>, <oo>)` | load from environment  |
+| `23 r1 ee oo` | `store(<r1>, <ee>, <oo>)` | store into environment |
+
 ## SyntaxNode
 
 | bytes         | instruction                           | description        |
 |---------------|---------------------------------------|--------------------|
-| `22 tr r1 --` | `<tr> = SyntaxNode.init(...<r1>)`     | assign SyntaxNode  |
-| `23 tr r1 --` | `<tr> = SyntaxNode.IntNode(...<r1>)`  | ...IntNode (Int)   |
-| `24 tr r1 --` | `<tr> = SyntaxNode.StrNode(...<r1>)`  | ...StrNode (Str)   |
-| `25 tr r1 --` | `<tr> = SyntaxNode.BoolNode(...<r1>)` | ...BoolNode (Bool) |
+| `24 tr r1 --` | `<tr> = SyntaxNode.init(...<r1>)`     | assign SyntaxNode  |
+| `25 tr r1 --` | `<tr> = SyntaxNode.IntNode(...<r1>)`  | ...IntNode (Int)   |
+| `26 tr r1 --` | `<tr> = SyntaxNode.StrNode(...<r1>)`  | ...StrNode (Str)   |
+| `27 tr r1 --` | `<tr> = SyntaxNode.BoolNode(...<r1>)` | ...BoolNode (Bool) |
 
 ## Control
 
