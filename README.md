@@ -18,6 +18,8 @@ defining the various types of the runtime:
 | `ArrayElements` | | | |
 | `FuncValue` | | | |
 | `MacroValue` | | | |
+| `Environment` | | | |
+| `CodeUnit` | | | |
 | `SyntaxNodeValue` | | | |
 | `IntValue` | | | |
 | `StrValue` | | | |

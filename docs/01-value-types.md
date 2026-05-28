@@ -85,9 +85,9 @@ without support for optional parameters, rest parameters, parameter defaults,
 or named parameters.
 
 ```
-.------.--------.------.--------------.--------------.--------.--------------.
-| 0x08 | param# | reg# | inttable ptr | strtable ptr | instr# | instructions |
-'------'--------'------'--------------'--------------'--------'--------------'
+.------.-----.----------.
+| 0x08 | env | codeunit |
+'------'-----'----------'
 ```
 
 Each instruction is 4 bytes long. The instruction format is described in
@@ -98,9 +98,35 @@ Each instruction is 4 bytes long. The instruction format is described in
 A callable macro.
 
 ```
-.------.--------.------.--------------.--------------.--------.--------------.
-| 0x09 | param# | reg# | inttable ptr | strtable ptr | instr# | instructions |
-'------'--------'------'--------------'--------------'--------'--------------'
+.------.-----.----------.
+| 0x09 | env | codeunit |
+'------'-----'----------'
+```
+
+# Environment
+
+```
+.------.-------------.---------.
+| 0x0a | entry count | entries |
+'------'-------------'---------'
+```
+
+Each entry is worth two u64s:
+
+```
+.-----------------.------------.
+| entry writable? | entry cell |
+'-----------------'------------'
+```
+
+# CodeUnit
+
+```
+.------.-----------------.----------------.--------------.--------------.
+| 0x0b | parameter count | register count | inttable ptr | strtable ptr |
+'------+-------------+---+---------+------+-------+------'--------------'
+       | environment | instr count | instructions |
+       '-------------'-------------'--------------'
 ```
 
 # SyntaxNodeValue
@@ -110,7 +136,7 @@ the compiler, and as reflected "runtime" values.
 
 ```
 .------.----------------.------------------------.--------.----------.
-| 0x0a | kind (str ptr) | payload (int/str/bool) | child# | children |
+| 0x0c | kind (str ptr) | payload (int/str/bool) | child# | children |
 '------'----------------'------------------------'--------'----------'
 ```
 
@@ -120,7 +146,7 @@ An arbitrary-precision integer. (See also `I64Value` above.)
 
 ```
 .------.------.---------------.--------------.
-| 0x0b | sign | length (u64s) | u64s payload |
+| 0x0d | sign | length (u64s) | u64s payload |
 '------'------.---------------'--------------'
 ```
 
@@ -131,7 +157,7 @@ above and `SmallStrValue` below.)
 
 ```
 .------.----------------.----------------------.--------------.
-| 0x0c | length (bytes) | length (code points) | utf8 payload |
+| 0x0e | length (bytes) | length (code points) | utf8 payload |
 '------'----------------'----------------------'--------------'
 ```
 
@@ -143,7 +169,7 @@ above.)
 
 ```
 .------.---------------------.
-| 0x0d | 8-byte utf8 payload |
+| 0x0f | 8-byte utf8 payload |
 '------'---------------------'
 ```
 
@@ -155,7 +181,7 @@ somewhere.
 
 ```
 .------.---------------.------------------------.
-| 0x0e | length (ints) | (int) pointers payload |
+| 0x10 | length (ints) | (int) pointers payload |
 '------'---------------'------------------------'
 ```
 
@@ -167,7 +193,7 @@ to load string values from somewhere.
 
 ```
 .------.---------------.------------------------.
-| 0x0f | length (strs) | (str) pointers payload |
+| 0x11 | length (strs) | (str) pointers payload |
 '------'---------------'------------------------'
 ```
 
