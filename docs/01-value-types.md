@@ -2,6 +2,9 @@
 
 Listed in approximate order from small/simple to large/complex.
 
+First-class types (which are allowed in registers) have names ending in
+"Value". The rest are second-class types.
+
 # I64Value
 
 A signed 64-bit integer. (See also `IntValue` below for arbitrary-precision
