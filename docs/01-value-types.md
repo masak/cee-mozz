@@ -109,9 +109,9 @@ A callable macro.
 # Environment
 
 ```
-.------.-------------.---------.
-| 0x0a | entry count | entries |
-'------'-------------'---------'
+.------.-----------.-------------.---------.
+| 0x0a | outer env | entry count | entries |
+'------'-----------'-------------'---------'
 ```
 
 Each entry is worth two u64s:
