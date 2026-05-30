@@ -2,60 +2,61 @@
 
 Instruction format: `xx yy zz ww`; four bytes (32 bits)
 
-| abbr | meaning            |
-|------|--------------------|
-| `tr` | target register    |
-| `ii` | index in Int table |
-| `ss` | index in Str table |
-| `ee` | "outer env" steps  |
-| `oo` | offset in env      |
-| `aa` | address            |
-| `--` | unused             |
+| abbr | meaning             |
+|------|---------------------|
+| `tr` | target register     |
+| `ii` | index in Int table  |
+| `ss` | index in Str table  |
+| `cc` | index in Code table |
+| `ee` | "outer env" steps   |
+| `oo` | offset in env       |
+| `aa` | address             |
+| `--` | unused              |
 
 ## Assign
 
-| bytes         | instruction              | description         |
-|---------------|--------------------------|---------------------|
-| `00 tr r1 --` | `<tr> = <r1>`            | assign register     |
-| `01 tr ii ii` | `<tr> = Int_index(iiii)` | assign Int constant |
-| `02 tr ss ss` | `<tr> = Str_index(ssss)` | assign Str constant |
-| `03 tr -- --` | `<tr> = true`            | assign true         |
-| `04 tr -- --` | `<tr> = false`           | assign false        |
-| `05 tr -- --` | `<tr> = none`            | assign none         |
+| bytes         | instruction   | description         |
+|---------------|---------------|---------------------|
+| `00 tr r1 --` | `<tr> = <r1>` | assign register     |
 
 ## Int
 
 | bytes         | instruction                   | description               |
 |---------------|-------------------------------|---------------------------|
-| `06 r1 -- --` | `Int.assert(<r1>)`            | assert type Int           |
-| `07 tr r1 r2` | `<tr> = Int.add(<r1>, <r2>)`  | add (Int, Int)            |
-| `08 tr r1 --` | `<tr> = Int.negate(<r1>)`     | negate (Int)              |
-| `09 tr r1 r2` | `<tr> = Int.sub(<r1>, <r2>)`  | subtract (Int, Int)       |
-| `0a tr r1 r2` | `<tr> = Int.mul(<r1>, <r2>)`  | multiply (Int, Int)       |
-| `0b tr r1 r2` | `<tr> = Int.idiv(<r1>, <r2>)` | divide (Int, Int) [error] |
-| `0c tr r2 r2` | `<tr> = Int.mod(<r1>, <r2>)`  | modulo (Int, Int) [error] |
+| `01 r1 -- --` | `Int.assert(<r1>)`            | assert type Int           |
+| `02 tr ii ii` | `<tr> = Int.const(iiii)`      | assign Int constant       |
+| `03 tr r1 r2` | `<tr> = Int.add(<r1>, <r2>)`  | add (Int, Int)            |
+| `04 tr r1 --` | `<tr> = Int.negate(<r1>)`     | negate (Int)              |
+| `05 tr r1 r2` | `<tr> = Int.sub(<r1>, <r2>)`  | subtract (Int, Int)       |
+| `06 tr r1 r2` | `<tr> = Int.mul(<r1>, <r2>)`  | multiply (Int, Int)       |
+| `07 tr r1 r2` | `<tr> = Int.idiv(<r1>, <r2>)` | divide (Int, Int) [error] |
+| `08 tr r2 r2` | `<tr> = Int.mod(<r1>, <r2>)`  | modulo (Int, Int) [error] |
 
 ## Str
 
 | bytes         | instruction                     | description            |
 |---------------|---------------------------------|------------------------|
-| `0d r1 -- --` | `Str.assert(<r1>)`              | assert type Str        |
-| `0e tr r1 --` | `<tr> = stringify(<r1>)`        | stringify (any)        |
-| `0f tr r1 r2` | `<tr> = Str.concat(<r1>, <r2>)` | concatenate (any, any) |
+| `09 r1 -- --` | `Str.assert(<r1>)`              | assert type Str        |
+| `0a tr ss ss` | `<tr> = Str.const(ssss)`        | assign Str constant    |
+| `0b tr r1 --` | `<tr> = stringify(<r1>)`        | stringify (any)        |
+| `0c tr r1 r2` | `<tr> = Str.concat(<r1>, <r2>)` | concatenate (any, any) |
 
 ## Bool
 
 | bytes         | instruction            | description          |
 |---------------|------------------------|----------------------|
-| `10 r1 -- --` | `Bool.assert(<r1>)`    | assert type Bool     |
-| `11 tr r1 --` | `<tr> = boolify(<r1>)` | boolify (any)        |
-| `12 tr r1 --` | `<tr> = not(<r1>)`     | boolean negate (any) |
+| `0d r1 -- --` | `Bool.assert(<r1>)`    | assert type Bool     |
+| `0e tr -- --` | `<tr> = true`          | assign true          |
+| `0f tr -- --` | `<tr> = false`         | assign false         |
+| `10 tr r1 --` | `<tr> = boolify(<r1>)` | boolify (any)        |
+| `11 tr r1 --` | `<tr> = not(<r1>)`     | boolean negate (any) |
 
 ## None
 
 | bytes         | instruction         | description      |
 |---------------|---------------------|------------------|
-| `13 r1 -- --` | `None.assert(<r1>)` | assert type None |
+| `12 r1 -- --` | `None.assert(<r1>)` | assert type None |
+| `13 tr -- --` | `<tr> = none`       | assign none      |
 
 ## Comparison
 
@@ -83,24 +84,31 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 
 | bytes         | instruction              | description                    |
 |---------------|--------------------------|--------------------------------|
-| `20 tr r1 r2` | `<tr> = <r1>(...<r2>)`   | call Func with arguments Array |
-| `21 -- r1 r2` | `tailcall <r1>(...<r2>)` | tailcall                       |
+| `20 tr cc cc` | `<tr> = Func.init(cccc)` | initialize Func                |
+| `21 tr r1 r2` | `<tr> = <r1>(...<r2>)`   | call Func with arguments Array |
+| `22 -- r1 r2` | `tailcall <r1>(...<r2>)` | tailcall                       |
+
+## Macro
+
+| bytes         | instruction               | description      |
+|---------------|---------------------------|------------------|
+| `23 tr cc cc` | `<tr> = Macro.init(cccc)` | initialize Macro |
 
 ## Environment
 
 | bytes         | instruction               | description            |
 |---------------|---------------------------|------------------------|
-| `22 tr ee oo` | `<tr> = load(<ee>, <oo>)` | load from environment  |
-| `23 r1 ee oo` | `store(<r1>, <ee>, <oo>)` | store into environment |
+| `24 tr ee oo` | `<tr> = load(<ee>, <oo>)` | load from environment  |
+| `25 r1 ee oo` | `store(<r1>, <ee>, <oo>)` | store into environment |
 
 ## SyntaxNode
 
 | bytes         | instruction                           | description        |
 |---------------|---------------------------------------|--------------------|
-| `24 tr r1 --` | `<tr> = SyntaxNode.init(...<r1>)`     | assign SyntaxNode  |
-| `25 tr r1 --` | `<tr> = SyntaxNode.IntNode(...<r1>)`  | ...IntNode (Int)   |
-| `26 tr r1 --` | `<tr> = SyntaxNode.StrNode(...<r1>)`  | ...StrNode (Str)   |
-| `27 tr r1 --` | `<tr> = SyntaxNode.BoolNode(...<r1>)` | ...BoolNode (Bool) |
+| `26 tr r1 --` | `<tr> = SyntaxNode.init(...<r1>)`     | assign SyntaxNode  |
+| `27 tr r1 --` | `<tr> = SyntaxNode.IntNode(...<r1>)`  | ...IntNode (Int)   |
+| `28 tr r1 --` | `<tr> = SyntaxNode.StrNode(...<r1>)`  | ...StrNode (Str)   |
+| `29 tr r1 --` | `<tr> = SyntaxNode.BoolNode(...<r1>)` | ...BoolNode (Bool) |
 
 ## Control
 

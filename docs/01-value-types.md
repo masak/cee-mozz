@@ -125,11 +125,13 @@ Each entry is worth two u64s:
 # CodeUnit
 
 ```
-.------.-----------------.----------------.--------------.--------------.
-| 0x0b | parameter count | register count | inttable ptr | strtable ptr |
-'------+-------------+---+---------+------+-------+------'--------------'
-       | environment | instr count | instructions |
-       '-------------'-------------'--------------'
+.------.-----------------.----------------.------------.
+| 0x0b | parameter count | register count | env length |
+'------+--------------+--+-----------+----+----------+-'
+       | inttable ptr | strtable ptr | codetable ptr |
+       +-------------++-------------++---------------'
+       | instr count | instructions |
+       '-------------'--------------'
 ```
 
 # SyntaxNodeValue
@@ -179,8 +181,7 @@ above.)
 # IntTable
 
 An indexable sequence of integers. (`IntValue` or `I64Value`.) Used in
-`FuncValue` and `MacroValue` when instructions need to load integer values from
-somewhere.
+`CodeUnit` when instructions need to load integer values from somewhere.
 
 ```
 .------.---------------.------------------------.
@@ -191,12 +192,23 @@ somewhere.
 # StrTable
 
 An indexable sequence of strings. (`AsciiStrValue`, `StrValue`, or
-`SmallStrValue`.) Used in `FuncValue` and `MacroValue` when instructions need
-to load string values from somewhere.
+`SmallStrValue`.) Used in `CodeUnit` when instructions need to load string
+values from somewhere.
 
 ```
 .------.---------------.------------------------.
 | 0x11 | length (strs) | (str) pointers payload |
 '------'---------------'------------------------'
+```
+
+# CodeTable
+
+An indexable sequence of code units. Used in `CodeUnit` when instructions need
+to create a new `FuncValue` or `MacroValue`.
+
+```
+.------.--------------------.-----------------------------.
+| 0x12 | length (codeunits) | (codeunit) pointers payload |
+'------'--------------------'-----------------------------'
 ```
 

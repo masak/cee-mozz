@@ -26,6 +26,7 @@ defining the various types of the runtime:
 | `SmallStrValue` | | | |
 | `IntTable` | | | |
 | `StrTable` | | | |
+| `CodeTable` | | | |
 
 ## Design documents
 
