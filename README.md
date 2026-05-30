@@ -32,8 +32,11 @@ defining the various types of the runtime:
 
 - [Value types](https://github.com/masak/cee-mozz/blob/main/docs/01-value-types.md)
 - [Instructions](https://github.com/masak/cee-mozz/blob/main/docs/02-instructions.md)
+- Environments (tbw)
 - Instruction semantics (tbw)
 - Execution of functions (tbw)
 - Execution of a program (tbw)
+- Converting AST to instructions (tbw)
+- Three types of compilation unit (tbw)
 - Mark-and-sweep garbage collection (tbw)
 
