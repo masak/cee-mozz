@@ -32,7 +32,7 @@ defining the various types of the runtime:
 
 - [Value types](https://github.com/masak/cee-mozz/blob/main/docs/01-value-types.md)
 - [Instructions](https://github.com/masak/cee-mozz/blob/main/docs/02-instructions.md)
-- Environments (tbw)
+- [Environments](https://github.com/masak/cee-mozz/blob/main/docs/03-environments.md)
 - Instruction semantics (tbw)
 - Execution of functions (tbw)
 - Execution of a program (tbw)
