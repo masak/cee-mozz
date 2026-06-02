@@ -13,6 +13,7 @@ typedef struct {
 
 size_t ascii_str_new(Arena *a, Str *str);
 AsciiStrValue *ascii_str_resolve(Arena *a, size_t offset);
+size_t ascii_str_concat(Arena *a, size_t offset1, size_t offset2);
 
 #endif
 

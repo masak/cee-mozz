@@ -23,3 +23,24 @@ AsciiStrValue *ascii_str_resolve(Arena *a, size_t offset) {
     return (AsciiStrValue *)(a->bytes + offset);
 }
 
+size_t ascii_str_concat(Arena *a, size_t offset1, size_t offset2) {
+    AsciiStrValue *lhs = ascii_str_resolve(a, offset1);
+    AsciiStrValue *rhs = ascii_str_resolve(a, offset2);
+
+    u64 length_in_bytes = lhs->length_in_bytes + rhs->length_in_bytes;
+    u64 total_size = sizeof(AsciiStrValue) + length_in_bytes;
+
+    AsciiStrValue *result = arena_alloc(a, total_size, alignof(AsciiStrValue));
+    result->tag = TAG_ASCII_STR;
+    result->length_in_bytes = length_in_bytes;
+
+    memcpy(result->payload, lhs->payload, lhs->length_in_bytes);
+    memcpy(
+        result->payload + lhs->length_in_bytes,
+        rhs->payload,
+        rhs->length_in_bytes
+    );
+
+    return (size_t)((unsigned char *)result - a->bytes);
+}
+
