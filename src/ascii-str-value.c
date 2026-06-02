@@ -1,8 +1,11 @@
+#include <stdio.h>
 #include <string.h>
 
 #include "../include/ascii-str-value.h"
+#include "../include/i64-value.h"
 #include "../include/typedefs.h"
 #include "../include/types.h"
+#include "../include/value.h"
 
 size_t ascii_str_new(Arena *a, Str *str) {
     u64 length_in_bytes = str->length_in_bytes;
@@ -42,5 +45,42 @@ size_t ascii_str_concat(Arena *a, size_t offset1, size_t offset2) {
     );
 
     return (size_t)((unsigned char *)result - a->bytes);
+}
+
+/* Convert any supported value to its AsciiStrValue representation */
+size_t generic_to_str(Arena *a, size_t offset) {
+    switch (value_tag(a, offset)) {
+        case TAG_I64: {
+            I64Value *value = i64_resolve(a, offset);
+
+            /* i64 range: -9223372036854775808 .. 9223372036854775807
+             * maximum string length is 20 characters (19 digits + sign). */
+            char buffer[32];
+            int n = snprintf(
+                buffer,
+                sizeof(buffer),
+                "%lld",
+                (long long)value->payload
+            );
+            assert(n > 0 && (size_t)n < sizeof(buffer));
+
+            size_t length = (size_t)n;
+            AsciiStrValue *result = arena_alloc(
+                a,
+                sizeof(AsciiStrValue) + length,
+                alignof(AsciiStrValue)
+            );
+            result->tag = TAG_ASCII_STR;
+            result->length_in_bytes = (u64)length;
+            memcpy(result->payload, buffer, length);
+
+            return (size_t)((unsigned char *)result - a->bytes);
+        }
+        case TAG_ASCII_STR:
+            return offset;
+        default:
+            assert(0 && "unsupported type tag in generic_to_str");
+            return 0; /* unreachable */
+    }
 }
 
