@@ -10,7 +10,7 @@ defining the various types of the runtime:
 | Type | Definition | Validation | Operations |
 |------|------------|------------|------------|
 | `I64Value` | ✅ | ✅ | ✅ `add sub mul floordiv mod` |
-| `AsciiStrValue` | ✅ | | `concat to_string` |
+| `AsciiStrValue` | ✅ | ✅ | ✅ `concat to_string` |
 | `BoolValue` | | | `to_bool` |
 | `NoneValue` | | | |
 | `UninitializedValue` | | | |
