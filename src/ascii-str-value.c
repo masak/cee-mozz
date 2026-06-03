@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -24,6 +25,22 @@ size_t ascii_str_new(Arena *a, Str *str) {
 AsciiStrValue *ascii_str_resolve(Arena *a, size_t offset) {
     assert(offset <= ARENA_SIZE - sizeof(AsciiStrValue));
     return (AsciiStrValue *)(a->bytes + offset);
+}
+
+bool ascii_str_validate(Arena *a, size_t offset) {
+    AsciiStrValue *value = ascii_str_resolve(a, offset);
+
+    assert(
+        offset + sizeof(AsciiStrValue) + value->length_in_bytes <= ARENA_SIZE
+    );
+
+    for (u64 i = 0; i < value->length_in_bytes; i++) {
+        unsigned char c = (unsigned char)value->payload[i];
+        if (c > 127) {
+            return false;
+        }
+    }
+    return true;
 }
 
 size_t ascii_str_concat(Arena *a, size_t offset1, size_t offset2) {
