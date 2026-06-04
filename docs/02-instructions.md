@@ -71,14 +71,14 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 
 ## Array
 
-| bytes         | instruction               | description                    |
-|---------------|---------------------------|--------------------------------|
-| `1a r1 -- --` | `Array.assert(<r1>)`      | assert type Array              |
-| `1b tr r1 --` | `<tr> = Array.init(<r1>)` | initialize array, Int capacity |
-| `1c tr r1 --` | `<tr>.push(<r1>)`         | add element to end of array    |
-| `1d tr r1 r2` | `<tr> = <r1>[<r2>]`       | index (Array, Int)             |
-| `1e tr r1 r2` | `<tr>[<r1>] = <r2>`       | assign index (Array, Int)      |
-| `1f r1 -- --` | `<r1>.length()`           | get length of Array            |
+| bytes         | instruction                 | description                  |
+|---------------|-----------------------------|------------------------------|
+| `1a r1 -- --` | `Array.assert(<r1>)`        | assert type Array            |
+| `1b tr r1 --` | `<tr> = Array.init(<r1>)`   | initialize array, Int cap    |
+| `1c tr r1 --` | `<tr>.push(<r1>)`           | add element to end of array  |
+| `1d tr r1 r2` | `<tr> = <r1>[<r2>]`         | index (Array, Int)           |
+| `1e tr r1 r2` | `<tr>[<r1>] = <r2>`         | assign index (Array, Int)    |
+| `1f tr r1 --` | `<tr> = Array.length(<r1>)` | get number of elements       |
 
 ## Func
 
