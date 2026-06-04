@@ -80,36 +80,37 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 | `1d tr r1 r2` | `<tr> = <r1>[<r2>]`         | index (Array, Int)           |
 | `1e tr r1 r2` | `<tr>[<r1>] = <r2>`         | assign index (Array, Int)    |
 | `1f tr r1 --` | `<tr> = Array.length(<r1>)` | get number of elements       |
+| `20 tr r1 r2` | `<tr> = Array.concat(<r1>, <r2>)` | concatenate (Array, Array) |
 
 ## Func
 
 | bytes         | instruction              | description                    |
 |---------------|--------------------------|--------------------------------|
-| `20 tr cc cc` | `<tr> = Func.init(cccc)` | initialize Func                |
-| `21 tr r1 r2` | `<tr> = <r1>(...<r2>)`   | call Func with arguments Array |
-| `22 -- r1 r2` | `tailcall <r1>(...<r2>)` | tailcall                       |
+| `21 tr cc cc` | `<tr> = Func.init(cccc)` | initialize Func                |
+| `22 tr r1 r2` | `<tr> = <r1>(...<r2>)`   | call Func with arguments Array |
+| `23 -- r1 r2` | `tailcall <r1>(...<r2>)` | tailcall                       |
 
 ## Macro
 
 | bytes         | instruction               | description      |
 |---------------|---------------------------|------------------|
-| `23 tr cc cc` | `<tr> = Macro.init(cccc)` | initialize Macro |
+| `24 tr cc cc` | `<tr> = Macro.init(cccc)` | initialize Macro |
 
 ## Environment
 
 | bytes         | instruction               | description            |
 |---------------|---------------------------|------------------------|
-| `24 tr ee oo` | `<tr> = load(<ee>, <oo>)` | load from environment  |
-| `25 r1 ee oo` | `store(<r1>, <ee>, <oo>)` | store into environment |
+| `25 tr ee oo` | `<tr> = load(<ee>, <oo>)` | load from environment  |
+| `26 r1 ee oo` | `store(<r1>, <ee>, <oo>)` | store into environment |
 
 ## SyntaxNode
 
 | bytes         | instruction                           | description        |
 |---------------|---------------------------------------|--------------------|
-| `26 tr r1 --` | `<tr> = SyntaxNode.init(...<r1>)`     | assign SyntaxNode  |
-| `27 tr r1 --` | `<tr> = SyntaxNode.IntNode(...<r1>)`  | ...IntNode (Int)   |
-| `28 tr r1 --` | `<tr> = SyntaxNode.StrNode(...<r1>)`  | ...StrNode (Str)   |
-| `29 tr r1 --` | `<tr> = SyntaxNode.BoolNode(...<r1>)` | ...BoolNode (Bool) |
+| `27 tr r1 --` | `<tr> = SyntaxNode.init(...<r1>)`     | assign SyntaxNode  |
+| `28 tr r1 --` | `<tr> = SyntaxNode.IntNode(...<r1>)`  | ...IntNode (Int)   |
+| `29 tr r1 --` | `<tr> = SyntaxNode.StrNode(...<r1>)`  | ...StrNode (Str)   |
+| `2a tr r1 --` | `<tr> = SyntaxNode.BoolNode(...<r1>)` | ...BoolNode (Bool) |
 
 ## Control
 
