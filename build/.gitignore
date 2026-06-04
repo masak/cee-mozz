@@ -1,4 +1,5 @@
 *.o
 value-01-i64
 value-02-ascii-str
+value-06-array
 

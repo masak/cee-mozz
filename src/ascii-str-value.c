@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../include/arena.h"
 #include "../include/ascii-str-value.h"
 #include "../include/i64-value.h"
 #include "../include/typedefs.h"

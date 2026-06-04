@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "../include/arena.h"
 #include "../include/i64-value.h"
 #include "../include/types.h"
 

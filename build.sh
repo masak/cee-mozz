@@ -15,8 +15,10 @@ build_c_file "src/arena.c"
 build_c_file "src/value.c"
 build_c_file "src/i64-value.c"
 build_c_file "src/ascii-str-value.c"
+build_c_file "src/array-value.c"
 build_c_file "test/value-01-i64.c"
 build_c_file "test/value-02-ascii-str.c"
+build_c_file "test/value-06-array.c"
 
 echo 'Linking ...'
 clang \
@@ -24,6 +26,7 @@ clang \
     build/value.o \
     build/i64-value.o \
     build/ascii-str-value.o \
+    build/array-value.o \
     build/value-01-i64.o \
     -o build/value-01-i64
 clang \
@@ -31,6 +34,15 @@ clang \
     build/value.o \
     build/i64-value.o \
     build/ascii-str-value.o \
+    build/array-value.o \
     build/value-02-ascii-str.o \
     -o build/value-02-ascii-str
+clang \
+    build/arena.o \
+    build/value.o \
+    build/i64-value.o \
+    build/ascii-str-value.o \
+    build/array-value.o \
+    build/value-06-array.o \
+    -o build/value-06-array
 
