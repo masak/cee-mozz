@@ -14,8 +14,8 @@ defining the various types of the runtime:
 | `BoolValue` | | | `to_bool` |
 | `NoneValue` | | | |
 | `UninitializedValue` | | | |
-| `ArrayValue` | | | |
-| `ArrayElements` | | | |
+| `ArrayValue` | ✅ | ✅ | ✅ `push get set length concat` |
+| `ArrayElements` | ✅ | ✅ | ✅ |
 | `FuncValue` | | | |
 | `MacroValue` | | | |
 | `Environment` | | | |
