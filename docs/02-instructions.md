@@ -10,7 +10,8 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 | `cc` | index in Code table |
 | `ee` | "outer env" steps   |
 | `oo` | offset in env       |
-| `aa` | address             |
+| `aa` | instruction address |
+| `pp` | u16 capacity        |
 | `--` | unused              |
 
 ## Assign
@@ -74,7 +75,7 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 | bytes         | instruction                 | description                  |
 |---------------|-----------------------------|------------------------------|
 | `1a r1 -- --` | `Array.assert(<r1>)`        | assert type Array            |
-| `1b tr r1 --` | `<tr> = Array.init(<r1>)`   | initialize array, Int cap    |
+| `1b tr pp pp` | `<tr> = Array.init(pppp)`   | initialize array, u16 cap    |
 | `1c tr r1 --` | `<tr>.push(<r1>)`           | add element to end of array  |
 | `1d tr r1 r2` | `<tr> = <r1>[<r2>]`         | index (Array, Int)           |
 | `1e tr r1 r2` | `<tr>[<r1>] = <r2>`         | assign index (Array, Int)    |
