@@ -6,16 +6,6 @@
 
 #include "typedefs.h"
 
-#ifdef _WIN32
-#define MT_RED      ""
-#define MT_GREEN    ""
-#define MT_RESET    ""
-#else
-#define MT_RED      "\033[0;31m"
-#define MT_GREEN    "\033[0;32m"
-#define MT_RESET    "\033[0m"
-#endif
-
 static i32 mt_run = 0;
 static i32 mt_passed = 0;
 static i32 mt_failed = 0;
@@ -24,7 +14,7 @@ static i32 mt_failed = 0;
     if (!(cond)) { \
         fprintf( \
             stderr, \
-            MT_RED "    ASSERT failed at %s:%d: %s" MT_RESET "\n", \
+            "    ASSERT failed at %s:%d: %s\n", \
             __FILE__, \
             __LINE__, \
             #cond \
@@ -40,8 +30,7 @@ static i32 mt_failed = 0;
     if (expected_value != actual_value) { \
         fprintf( \
             stderr, \
-            MT_RED "    ASSERT_EQ failed at %s:%d: expected %lld, got %lld" \
-            MT_RESET "\n", \
+            "    ASSERT_EQ failed at %s:%d: expected %lld, got %lld\n", \
             __FILE__, \
             __LINE__, \
             expected_value, \
@@ -56,8 +45,8 @@ static i32 mt_failed = 0;
     if (strcmp((expected), (actual)) != 0) { \
         fprintf( \
             stderr, \
-            MT_RED "    ASSERT_STR_EQ failed at %s:%d:\n" \
-            "      expected: \"%s\"\n      actual:   \"%s\"" MT_RESET "\n", \
+            "    ASSERT_STR_EQ failed at %s:%d:\n" \
+            "      expected: \"%s\"\n      actual:   \"%s\"\n", \
             __FILE__, \
             __LINE__, \
             (expected), \
@@ -74,27 +63,23 @@ static i32 mt_failed = 0;
     name(); \
     mt_run++; \
     if (mt_failed == _fails_before) { \
-        printf(MT_GREEN "[PASS]" MT_RESET "\n"); \
+        printf("[PASS]\n"); \
         mt_passed++; \
     } else { \
-        printf(MT_RED "[FAIL]" MT_RESET "\n"); \
+        printf("[FAIL]\n"); \
     } \
 } while (0)
 
 #define TEST_SUMMARY() do { \
     if (mt_failed > 0) { \
         printf( \
-            "\n%s%d test%s failed%s\n", \
-            MT_RED, \
+            "\n%d test%s failed\n", \
             mt_failed, \
-            mt_failed > 1 ? "s" : "", \
-            MT_RESET \
+            mt_failed > 1 ? "s" : "" \
         ); \
     } else { \
         printf( \
-            "\n%sAll tests passed%s\n", \
-            MT_GREEN, \
-            MT_RESET \
+            "\nAll tests passed\n" \
         ); \
     } \
     return mt_failed > 0 ? 1 : 0; \
