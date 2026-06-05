@@ -9,7 +9,7 @@
 #include "../include/types.h"
 #include "../include/value.h"
 
-size_t ascii_str_new(Arena *a, Str *str) {
+size_t ascii_str_new(Arena *a, s8 *str) {
     u64 length_in_bytes = str->length_in_bytes;
     AsciiStrValue *ascii_str_value = arena_alloc(
         a,

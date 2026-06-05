@@ -3,8 +3,8 @@
 
 #include "../include/ascii-str-value.h"
 #include "../include/i64-value.h"
-#include "../include/str.h"
 #include "../include/test.h"
+#include "../include/typedefs.h"
 #include "../include/types.h"
 
 /* Compare an AsciiStrValue's payload against an expected C string */
@@ -22,8 +22,8 @@
 #define ASSERT_ASCII_STR_NEW(s, expected) do { \
     Arena arena; \
     arena_init(&arena); \
-    Str *str = STR(s); \
-    size_t offset = ascii_str_new(&arena, str); \
+    s8 str = s8(s); \
+    size_t offset = ascii_str_new(&arena, &str); \
     AsciiStrValue *val = ascii_str_resolve(&arena, offset); \
     ASSERT_EQ(val->tag, TAG_ASCII_STR); \
     ASSERT_ASCII_STR_EQ(val, expected); \
@@ -44,8 +44,8 @@
 #define ASSERT_STR_IDENTITY(s) do { \
     Arena arena; \
     arena_init(&arena); \
-    Str *str = STR(s); \
-    size_t str_offset = ascii_str_new(&arena, str); \
+    s8 str = s8(s); \
+    size_t str_offset = ascii_str_new(&arena, &str); \
     size_t result_offset = generic_to_str(&arena, str_offset); \
     ASSERT_EQ(result_offset, str_offset); \
 } while (0)
@@ -73,8 +73,8 @@ void create_with_special_characters(void) {
 void concat_two_strings(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, STR("hello"));
-    size_t n = ascii_str_new(&arena, STR("world"));
+    size_t m = ascii_str_new(&arena, &s8("hello"));
+    size_t n = ascii_str_new(&arena, &s8("world"));
     size_t result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_EQ(val->tag, TAG_ASCII_STR);
@@ -84,8 +84,8 @@ void concat_two_strings(void) {
 void concat_with_empty_left(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, STR(""));
-    size_t n = ascii_str_new(&arena, STR("world"));
+    size_t m = ascii_str_new(&arena, &s8(""));
+    size_t n = ascii_str_new(&arena, &s8("world"));
     size_t result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_EQ(val->tag, TAG_ASCII_STR);
@@ -95,8 +95,8 @@ void concat_with_empty_left(void) {
 void concat_with_empty_right(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, STR("hello"));
-    size_t n = ascii_str_new(&arena, STR(""));
+    size_t m = ascii_str_new(&arena, &s8("hello"));
+    size_t n = ascii_str_new(&arena, &s8(""));
     size_t result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_EQ(val->tag, TAG_ASCII_STR);
@@ -106,8 +106,8 @@ void concat_with_empty_right(void) {
 void concat_both_empty(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, STR(""));
-    size_t n = ascii_str_new(&arena, STR(""));
+    size_t m = ascii_str_new(&arena, &s8(""));
+    size_t n = ascii_str_new(&arena, &s8(""));
     size_t result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_EQ(val->tag, TAG_ASCII_STR);
@@ -117,9 +117,9 @@ void concat_both_empty(void) {
 void concat_multiple(void) {
     Arena arena;
     arena_init(&arena);
-    size_t a = ascii_str_new(&arena, STR("a"));
-    size_t b = ascii_str_new(&arena, STR("b"));
-    size_t c = ascii_str_new(&arena, STR("c"));
+    size_t a = ascii_str_new(&arena, &s8("a"));
+    size_t b = ascii_str_new(&arena, &s8("b"));
+    size_t c = ascii_str_new(&arena, &s8("c"));
     size_t ab = ascii_str_concat(&arena, a, b);
     size_t abc = ascii_str_concat(&arena, ab, c);
     AsciiStrValue *val = ascii_str_resolve(&arena, abc);
@@ -129,8 +129,8 @@ void concat_multiple(void) {
 void concat_preserves_lengths(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, STR("hello"));
-    size_t n = ascii_str_new(&arena, STR("world"));
+    size_t m = ascii_str_new(&arena, &s8("hello"));
+    size_t n = ascii_str_new(&arena, &s8("world"));
     AsciiStrValue *lhs = ascii_str_resolve(&arena, m);
     AsciiStrValue *rhs = ascii_str_resolve(&arena, n);
     size_t result = ascii_str_concat(&arena, m, n);
@@ -144,8 +144,8 @@ void concat_preserves_lengths(void) {
 void concat_creates_distinct_values(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, STR("x"));
-    size_t n = ascii_str_new(&arena, STR("y"));
+    size_t m = ascii_str_new(&arena, &s8("x"));
+    size_t n = ascii_str_new(&arena, &s8("y"));
     size_t result = ascii_str_concat(&arena, m, n);
     ASSERT(result != m);
     ASSERT(result != n);
@@ -203,7 +203,7 @@ void to_str_identity_for_empty_ascii_str(void) {
 void to_str_identity_returns_same_offset(void) {
     Arena arena;
     arena_init(&arena);
-    size_t offset = ascii_str_new(&arena, STR("unchanged"));
+    size_t offset = ascii_str_new(&arena, &s8("unchanged"));
     size_t result = generic_to_str(&arena, offset);
     ASSERT_EQ(result, offset);
 }

@@ -4,7 +4,6 @@
 #include <stdbool.h>
 
 #include "arena.h"
-#include "str.h"
 #include "typedefs.h"
 
 typedef struct {
@@ -13,7 +12,7 @@ typedef struct {
     char payload[];
 } AsciiStrValue;
 
-size_t ascii_str_new(Arena *a, Str *str);
+size_t ascii_str_new(Arena *a, s8 *str);
 AsciiStrValue *ascii_str_resolve(Arena *a, size_t offset);
 bool ascii_str_validate(Arena *a, size_t offset);
 
