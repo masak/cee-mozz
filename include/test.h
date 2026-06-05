@@ -73,14 +73,12 @@ static i32 mt_failed = 0;
 #define TEST_SUMMARY() do { \
     if (mt_failed > 0) { \
         printf( \
-            "\n%d test%s failed\n", \
+            "%d test%s failed\n\n", \
             mt_failed, \
             mt_failed > 1 ? "s" : "" \
         ); \
     } else { \
-        printf( \
-            "\nAll tests passed\n" \
-        ); \
+        printf("All tests passed\n\n"); \
     } \
     return mt_failed > 0 ? 1 : 0; \
 } while (0)
