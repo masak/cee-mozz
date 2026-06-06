@@ -61,7 +61,7 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 
 ## Comparison
 
-| bytes         | insturction                | description  |
+| bytes         | instruction                | description  |
 |---------------|----------------------------|--------------|
 | `14 tr r1 r2` | `<tr> = cmpLt(<r1>, <r2>)` | compare (<)  |
 | `15 tr r1 r2` | `<tr> = cmpLe(<r1>, <r2>)` | compare (<=) |
