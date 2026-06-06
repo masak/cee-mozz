@@ -4,37 +4,37 @@
 #include "../include/arena.h"
 #include "../include/codeunit.h"
 #include "../include/environment.h"
-#include "../include/func-value.h"
+#include "../include/macro-value.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
 
-Offset func_new(Arena *a, Offset env_offset, Offset codeunit_offset) {
-    FuncValue *func_value = arena_alloc(
+Offset macro_new(Arena *a, Offset env_offset, Offset codeunit_offset) {
+    MacroValue *macro_value = arena_alloc(
         a,
-        sizeof(FuncValue),
-        alignof(FuncValue)
+        sizeof(MacroValue),
+        alignof(MacroValue)
     );
-    func_value->tag = TAG_FUNC;
-    func_value->env_offset = env_offset;
-    func_value->codeunit_offset = codeunit_offset;
-    return (Offset)((unsigned char *)func_value - a->bytes);
+    macro_value->tag = TAG_MACRO;
+    macro_value->env_offset = env_offset;
+    macro_value->codeunit_offset = codeunit_offset;
+    return (Offset)((unsigned char *)macro_value - a->bytes);
 }
 
-FuncValue *func_resolve(Arena *a, Offset offset) {
-    assert(offset <= ARENA_SIZE - sizeof(FuncValue));
-    return (FuncValue *)(a->bytes + offset);
+MacroValue *macro_resolve(Arena *a, Offset offset) {
+    assert(offset <= ARENA_SIZE - sizeof(MacroValue));
+    return (MacroValue *)(a->bytes + offset);
 }
 
-bool func_validate(Arena *a, Offset offset, SeenSet *seenset) {
+bool macro_validate(Arena *a, Offset offset, SeenSet *seenset) {
     if (seen(seenset, offset)) {
         return true;
     }
     seenset_add(seenset, offset);
 
-    assert(offset <= ARENA_SIZE - sizeof(FuncValue));
-    FuncValue *func_value = func_resolve(a, offset);
+    assert(offset <= ARENA_SIZE - sizeof(MacroValue));
+    MacroValue *macro_value = macro_resolve(a, offset);
 
-    Offset env_offset = func_value->env_offset;
+    Offset env_offset = macro_value->env_offset;
     if (env_offset > ARENA_SIZE - sizeof(Environment)) {
         return false;
     }
@@ -43,7 +43,7 @@ bool func_validate(Arena *a, Offset offset, SeenSet *seenset) {
         return false;
     }
 
-    Offset codeunit_offset = func_value->codeunit_offset;
+    Offset codeunit_offset = macro_value->codeunit_offset;
     if (codeunit_offset > ARENA_SIZE - sizeof(CodeUnit)) {
         return false;
     }

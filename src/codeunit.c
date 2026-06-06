@@ -5,7 +5,6 @@
 #include "../include/arena.h"
 #include "../include/codeunit.h"
 #include "../include/environment.h"
-#include "../include/func-value.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
 

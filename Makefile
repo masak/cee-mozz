@@ -11,6 +11,7 @@ SRC_OBJS = \
  build/ascii-str-value.o \
  build/array-value.o \
  build/func-value.o \
+ build/macro-value.o \
  build/environment.o \
  build/codeunit.o \
  build/seenset.o
@@ -62,10 +63,13 @@ build/array-value.o: src/array-value.c include/array-value.h include/arena.h inc
 build/func-value.o: src/func-value.c include/arena.h include/codeunit.h include/environment.h include/func-value.h include/seenset.h include/tags.h
 	$(CC) $(CFLAGS) -c -o $@ src/func-value.c
 
+build/macro-value.o: src/macro-value.c include/arena.h include/codeunit.h include/environment.h include/macro-value.h include/seenset.h include/tags.h
+	$(CC) $(CFLAGS) -c -o $@ src/macro-value.c
+
 build/environment.o: src/environment.c include/arena.h include/environment.h include/seenset.h include/typedefs.h include/tags.h
 	$(CC) $(CFLAGS) -c -o $@ src/environment.c
 
-build/codeunit.o: src/codeunit.c include/arena.h include/codeunit.h include/environment.h include/func-value.h include/seenset.h include/tags.h
+build/codeunit.o: src/codeunit.c include/arena.h include/codeunit.h include/environment.h include/seenset.h include/tags.h
 	$(CC) $(CFLAGS) -c -o $@ src/codeunit.c
 
 build/seenset.o: src/seenset.c include/arena.h include/seenset.h include/typedefs.h

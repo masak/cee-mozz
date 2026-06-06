@@ -17,7 +17,7 @@ defining the various types of the runtime:
 | `ArrayValue` | ✅ | ✅ | ✅ `push get set length concat` |
 | `ArrayElements` | ✅ | ✅ | ✅ |
 | `FuncValue` | ✅ | (✅) | ✅ |
-| `MacroValue` | | | |
+| `MacroValue` | ✅ | (✅) | ✅ |
 | `Environment` | ✅ | (✅) | ✅ |
 | `CodeUnit` | ✅ | (✅) | ✅ |
 | `SyntaxNodeValue` | | | |
