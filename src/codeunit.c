@@ -19,7 +19,12 @@ Offset codeunit_new(
     u64 instr_count,
     Instruction instructions[]
 ) {
-    CodeUnit *codeunit = arena_alloc(a, sizeof(CodeUnit), alignof(CodeUnit));
+    size_t instructions_size = instr_count * sizeof(Instruction);
+    CodeUnit *codeunit = arena_alloc(
+        a,
+        sizeof(CodeUnit) + instructions_size,
+        alignof(CodeUnit)
+    );
     codeunit->tag = TAG_CODE_UNIT;
     codeunit->parameter_count = parameter_count;
     codeunit->register_count = register_count;
@@ -28,11 +33,7 @@ Offset codeunit_new(
     codeunit->strtable_offset = strtable_offset;
     codeunit->codetable_offset = codetable_offset;
     codeunit->instr_count = instr_count;
-    memcpy(
-        codeunit->instructions,
-        instructions,
-        instr_count * sizeof(Instruction)
-    );
+    memcpy(codeunit->instructions, instructions, instructions_size);
 
     return (Offset)((unsigned char *)codeunit - a->bytes);
 }

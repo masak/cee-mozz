@@ -13,12 +13,16 @@ Offset environment_new(
     u64 entry_count,
     EnvEntry entries[]
 ) {
-    Environment *environment
-        = arena_alloc(a, sizeof(Environment), alignof(Environment));
+    size_t entries_size = entry_count * sizeof(EnvEntry);
+    Environment *environment = arena_alloc(
+        a,
+        sizeof(Environment) + entries_size,
+        alignof(Environment)
+    );
     environment->tag = TAG_ENVIRONMENT;
     environment->outer_env_offset = outer_env_offset;
     environment->entry_count = entry_count;
-    memcpy(environment->entries, entries, entry_count * sizeof(EnvEntry));
+    memcpy(environment->entries, entries, entries_size);
 
     return (Offset)((unsigned char *)environment - a->bytes);
 }

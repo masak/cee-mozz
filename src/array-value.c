@@ -155,10 +155,10 @@ Offset array_concat(Arena *a, Offset array_offset1, Offset array_offset2) {
 }
 
 Offset array_elements_new(Arena *a, u64 capacity) {
-    size_t elements_size = sizeof(ArrayElements) + capacity * sizeof(Offset);
+    size_t elements_size = capacity * sizeof(Offset);
     ArrayElements *elems = arena_alloc(
         a,
-        elements_size,
+        sizeof(ArrayElements) + elements_size,
         alignof(ArrayElements)
     );
     elems->tag = TAG_ARRAY_ELEMENTS;
