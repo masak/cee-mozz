@@ -12,7 +12,8 @@ SRC_OBJS = \
  build/array-value.o \
  build/func-value.o \
  build/environment.o \
- build/codeunit.o
+ build/codeunit.o \
+ build/seenset.o
 
 TEST_EXECUTABLES = \
  build/value-01-i64 \
@@ -66,6 +67,9 @@ build/environment.o: src/environment.c include/arena.h include/environment.h inc
 
 build/codeunit.o: src/codeunit.c include/arena.h include/codeunit.h include/environment.h include/func-value.h include/tags.h
 	$(CC) $(CFLAGS) -c -o $@ src/codeunit.c
+
+build/seenset.o: src/seenset.c include/arena.h include/seenset.h include/typedefs.h
+	$(CC) $(CFLAGS) -c -o $@ src/seenset.c
 
 # -----------------------------------------------------------------------------
 # Test objects
