@@ -12,6 +12,8 @@ typedef struct {
     size_t used;
 } Arena;
 
+typedef size_t Offset;
+
 void arena_init(Arena *a);
 void *arena_alloc(Arena *a, size_t size, size_t align);
 

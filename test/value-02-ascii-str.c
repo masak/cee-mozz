@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "../include/arena.h"
 #include "../include/ascii-str-value.h"
 #include "../include/i64-value.h"
 #include "../include/test.h"
@@ -23,7 +24,7 @@
     Arena arena; \
     arena_init(&arena); \
     s8 str = s8(s); \
-    size_t offset = ascii_str_new(&arena, &str); \
+    Offset offset = ascii_str_new(&arena, &str); \
     AsciiStrValue *val = ascii_str_resolve(&arena, offset); \
     ASSERT_EQ(val->tag, TAG_ASCII_STR); \
     ASSERT_ASCII_STR_EQ(val, expected); \
@@ -33,8 +34,8 @@
 #define ASSERT_I64_TO_STR(xv, expected) do { \
     Arena arena; \
     arena_init(&arena); \
-    size_t i64_offset = i64_new(&arena, xv); \
-    size_t str_offset = generic_to_str(&arena, i64_offset); \
+    Offset i64_offset = i64_new(&arena, xv); \
+    Offset str_offset = generic_to_str(&arena, i64_offset); \
     AsciiStrValue *val = ascii_str_resolve(&arena, str_offset); \
     ASSERT_EQ(val->tag, TAG_ASCII_STR); \
     ASSERT_ASCII_STR_EQ(val, expected); \
@@ -45,8 +46,8 @@
     Arena arena; \
     arena_init(&arena); \
     s8 str = s8(s); \
-    size_t str_offset = ascii_str_new(&arena, &str); \
-    size_t result_offset = generic_to_str(&arena, str_offset); \
+    Offset str_offset = ascii_str_new(&arena, &str); \
+    Offset result_offset = generic_to_str(&arena, str_offset); \
     ASSERT_EQ(result_offset, str_offset); \
 } while (0)
 
@@ -73,9 +74,9 @@ void create_with_special_characters(void) {
 void concat_two_strings(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, &s8("hello"));
-    size_t n = ascii_str_new(&arena, &s8("world"));
-    size_t result = ascii_str_concat(&arena, m, n);
+    Offset m = ascii_str_new(&arena, &s8("hello"));
+    Offset n = ascii_str_new(&arena, &s8("world"));
+    Offset result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "helloworld");
@@ -84,9 +85,9 @@ void concat_two_strings(void) {
 void concat_with_empty_left(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, &s8(""));
-    size_t n = ascii_str_new(&arena, &s8("world"));
-    size_t result = ascii_str_concat(&arena, m, n);
+    Offset m = ascii_str_new(&arena, &s8(""));
+    Offset n = ascii_str_new(&arena, &s8("world"));
+    Offset result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "world");
@@ -95,9 +96,9 @@ void concat_with_empty_left(void) {
 void concat_with_empty_right(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, &s8("hello"));
-    size_t n = ascii_str_new(&arena, &s8(""));
-    size_t result = ascii_str_concat(&arena, m, n);
+    Offset m = ascii_str_new(&arena, &s8("hello"));
+    Offset n = ascii_str_new(&arena, &s8(""));
+    Offset result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "hello");
@@ -106,9 +107,9 @@ void concat_with_empty_right(void) {
 void concat_both_empty(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, &s8(""));
-    size_t n = ascii_str_new(&arena, &s8(""));
-    size_t result = ascii_str_concat(&arena, m, n);
+    Offset m = ascii_str_new(&arena, &s8(""));
+    Offset n = ascii_str_new(&arena, &s8(""));
+    Offset result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "");
@@ -117,11 +118,11 @@ void concat_both_empty(void) {
 void concat_multiple(void) {
     Arena arena;
     arena_init(&arena);
-    size_t a = ascii_str_new(&arena, &s8("a"));
-    size_t b = ascii_str_new(&arena, &s8("b"));
-    size_t c = ascii_str_new(&arena, &s8("c"));
-    size_t ab = ascii_str_concat(&arena, a, b);
-    size_t abc = ascii_str_concat(&arena, ab, c);
+    Offset a = ascii_str_new(&arena, &s8("a"));
+    Offset b = ascii_str_new(&arena, &s8("b"));
+    Offset c = ascii_str_new(&arena, &s8("c"));
+    Offset ab = ascii_str_concat(&arena, a, b);
+    Offset abc = ascii_str_concat(&arena, ab, c);
     AsciiStrValue *val = ascii_str_resolve(&arena, abc);
     ASSERT_ASCII_STR_EQ(val, "abc");
 }
@@ -129,11 +130,11 @@ void concat_multiple(void) {
 void concat_preserves_lengths(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, &s8("hello"));
-    size_t n = ascii_str_new(&arena, &s8("world"));
+    Offset m = ascii_str_new(&arena, &s8("hello"));
+    Offset n = ascii_str_new(&arena, &s8("world"));
     AsciiStrValue *lhs = ascii_str_resolve(&arena, m);
     AsciiStrValue *rhs = ascii_str_resolve(&arena, n);
-    size_t result = ascii_str_concat(&arena, m, n);
+    Offset result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_EQ(
         val->length_in_bytes,
@@ -144,9 +145,9 @@ void concat_preserves_lengths(void) {
 void concat_creates_distinct_values(void) {
     Arena arena;
     arena_init(&arena);
-    size_t m = ascii_str_new(&arena, &s8("x"));
-    size_t n = ascii_str_new(&arena, &s8("y"));
-    size_t result = ascii_str_concat(&arena, m, n);
+    Offset m = ascii_str_new(&arena, &s8("x"));
+    Offset n = ascii_str_new(&arena, &s8("y"));
+    Offset result = ascii_str_concat(&arena, m, n);
     ASSERT(result != m);
     ASSERT(result != n);
 }
@@ -186,8 +187,8 @@ void to_str_from_min_i64(void) {
 void to_str_from_i64_creates_new_value(void) {
     Arena arena;
     arena_init(&arena);
-    size_t i64_offset = i64_new(&arena, 42);
-    size_t str_offset = generic_to_str(&arena, i64_offset);
+    Offset i64_offset = i64_new(&arena, 42);
+    Offset str_offset = generic_to_str(&arena, i64_offset);
     ASSERT(str_offset != i64_offset);
     ASSERT_EQ(ascii_str_resolve(&arena, str_offset)->tag, TAG_ASCII_STR);
 }
@@ -203,8 +204,8 @@ void to_str_identity_for_empty_ascii_str(void) {
 void to_str_identity_returns_same_offset(void) {
     Arena arena;
     arena_init(&arena);
-    size_t offset = ascii_str_new(&arena, &s8("unchanged"));
-    size_t result = generic_to_str(&arena, offset);
+    Offset offset = ascii_str_new(&arena, &s8("unchanged"));
+    Offset result = generic_to_str(&arena, offset);
     ASSERT_EQ(result, offset);
 }
 

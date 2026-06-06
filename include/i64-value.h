@@ -11,15 +11,15 @@ typedef struct {
     i64 payload;
 } I64Value;
 
-size_t i64_new(Arena *a, i64 payload);
-I64Value *i64_resolve(Arena *a, size_t offset);
-bool i64_validate(Arena *a, size_t offset);
+Offset i64_new(Arena *a, i64 payload);
+I64Value *i64_resolve(Arena *a, Offset offset);
+bool i64_validate(Arena *a, Offset offset);
 
-size_t i64_add(Arena *a, size_t m, size_t n);
-size_t i64_subtract(Arena *a, size_t m, size_t n);
-size_t i64_multiply(Arena *a, size_t m, size_t n);
-size_t i64_divide(Arena *a, size_t m, size_t n, size_t fallback);
-size_t i64_modulo(Arena *a, size_t m, size_t n, size_t fallback);
+Offset i64_add(Arena *a, Offset m, Offset n);
+Offset i64_subtract(Arena *a, Offset m, Offset n);
+Offset i64_multiply(Arena *a, Offset m, Offset n);
+Offset i64_divide(Arena *a, Offset m, Offset n, Offset fallback);
+Offset i64_modulo(Arena *a, Offset m, Offset n, Offset fallback);
 
 #endif
 

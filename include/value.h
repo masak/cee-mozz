@@ -8,7 +8,7 @@ typedef struct {
     u64 tag;
 } Value;
 
-u64 value_tag(Arena *a, size_t offset);
+u64 value_tag(Arena *a, Offset offset);
 
 #endif
 

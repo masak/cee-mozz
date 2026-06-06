@@ -5,44 +5,44 @@
 #include "../include/i64-value.h"
 #include "../include/tags.h"
 
-size_t i64_new(Arena *a, i64 payload) {
+Offset i64_new(Arena *a, i64 payload) {
     I64Value *i64_value = arena_alloc(a, sizeof(I64Value), alignof(I64Value));
     i64_value->tag = TAG_I64;
     i64_value->payload = payload;
-    return (size_t)((unsigned char *)i64_value - a->bytes);
+    return (Offset)((unsigned char *)i64_value - a->bytes);
 }
 
 /* Resolve an offset back to a pointer. */
-I64Value *i64_resolve(Arena *a, size_t offset) {
+I64Value *i64_resolve(Arena *a, Offset offset) {
     assert(offset <= ARENA_SIZE - sizeof(I64Value));
     return (I64Value *)(a->bytes + offset);
 }
 
-bool i64_validate(Arena *a, size_t offset) {
+bool i64_validate(Arena *a, Offset offset) {
     (void)a;
     assert(offset <= ARENA_SIZE - sizeof(I64Value));
     return true;
 }
 
-size_t i64_add(Arena *a, size_t m, size_t n) {
+Offset i64_add(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
     return i64_new(a, lhs->payload + rhs->payload);
 }
 
-size_t i64_subtract(Arena *a, size_t m, size_t n) {
+Offset i64_subtract(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
     return i64_new(a, lhs->payload - rhs->payload);
 }
 
-size_t i64_multiply(Arena *a, size_t m, size_t n) {
+Offset i64_multiply(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
     return i64_new(a, lhs->payload * rhs->payload);
 }
 
-size_t i64_divide(Arena *a, size_t m, size_t n, size_t fallback) {
+Offset i64_divide(Arena *a, Offset m, Offset n, Offset fallback) {
     I64Value *numerator = i64_resolve(a, m);
     I64Value *denominator = i64_resolve(a, n);
 
@@ -72,7 +72,7 @@ size_t i64_divide(Arena *a, size_t m, size_t n, size_t fallback) {
     return i64_new(a, quotient);
 }
 
-size_t i64_modulo(Arena *a, size_t m, size_t n, size_t fallback) {
+Offset i64_modulo(Arena *a, Offset m, Offset n, Offset fallback) {
     I64Value *numerator = i64_resolve(a, m);
     I64Value *denominator = i64_resolve(a, n);
 

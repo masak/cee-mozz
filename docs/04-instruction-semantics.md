@@ -69,7 +69,7 @@ reg[tr] = int_add(reg[r1], reg[r2]);
 Instruction: `<tr> = Int.negate(<r1>)`
 
 ```c
-size_t zero = /* initialize zero */;
+Offset zero = /* initialize zero */;
 reg[tr] = int_subtract(zero, reg[r1]);
 ```
 

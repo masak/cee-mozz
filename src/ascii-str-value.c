@@ -9,7 +9,7 @@
 #include "../include/tags.h"
 #include "../include/value.h"
 
-size_t ascii_str_new(Arena *a, s8 *str) {
+Offset ascii_str_new(Arena *a, s8 *str) {
     u64 length_in_bytes = str->length_in_bytes;
     AsciiStrValue *ascii_str_value = arena_alloc(
         a,
@@ -19,16 +19,15 @@ size_t ascii_str_new(Arena *a, s8 *str) {
     ascii_str_value->tag = TAG_ASCII_STR;
     ascii_str_value->length_in_bytes = length_in_bytes;
     memcpy(ascii_str_value->payload, str->payload, length_in_bytes);
-    return (size_t)((unsigned char *)ascii_str_value - a->bytes);
+    return (Offset)((unsigned char *)ascii_str_value - a->bytes);
 }
 
-/* Resolve an offset back to a pointer. */
-AsciiStrValue *ascii_str_resolve(Arena *a, size_t offset) {
+AsciiStrValue *ascii_str_resolve(Arena *a, Offset offset) {
     assert(offset <= ARENA_SIZE - sizeof(AsciiStrValue));
     return (AsciiStrValue *)(a->bytes + offset);
 }
 
-bool ascii_str_validate(Arena *a, size_t offset) {
+bool ascii_str_validate(Arena *a, Offset offset) {
     AsciiStrValue *value = ascii_str_resolve(a, offset);
 
     assert(
@@ -44,7 +43,7 @@ bool ascii_str_validate(Arena *a, size_t offset) {
     return true;
 }
 
-size_t ascii_str_concat(Arena *a, size_t offset1, size_t offset2) {
+Offset ascii_str_concat(Arena *a, Offset offset1, Offset offset2) {
     AsciiStrValue *lhs = ascii_str_resolve(a, offset1);
     AsciiStrValue *rhs = ascii_str_resolve(a, offset2);
 
@@ -62,11 +61,11 @@ size_t ascii_str_concat(Arena *a, size_t offset1, size_t offset2) {
         rhs->length_in_bytes
     );
 
-    return (size_t)((unsigned char *)result - a->bytes);
+    return (Offset)((unsigned char *)result - a->bytes);
 }
 
 /* Convert any supported value to its AsciiStrValue representation */
-size_t generic_to_str(Arena *a, size_t offset) {
+Offset generic_to_str(Arena *a, Offset offset) {
     switch (value_tag(a, offset)) {
         case TAG_I64: {
             I64Value *value = i64_resolve(a, offset);
@@ -92,7 +91,7 @@ size_t generic_to_str(Arena *a, size_t offset) {
             result->length_in_bytes = (u64)length;
             memcpy(result->payload, buffer, length);
 
-            return (size_t)((unsigned char *)result - a->bytes);
+            return (Offset)((unsigned char *)result - a->bytes);
         }
         case TAG_ASCII_STR:
             return offset;

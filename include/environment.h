@@ -8,33 +8,33 @@
 
 typedef struct {
     u64 writable;
-    size_t cell;
+    Offset cell;
 } EnvEntry;
 
 typedef struct {
     u64 tag;
-    size_t outer_env_offset;
+    Offset outer_env_offset;
     u64 entry_count;
     EnvEntry entries[];
 } Environment;
 
-size_t environment_new(
+Offset environment_new(
     Arena *a,
-    size_t outer_env_offset,
+    Offset outer_env_offset,
     u64 entry_count,
     EnvEntry entries[]
 );
-Environment *environment_resolve(Arena *a, size_t offset);
-bool environment_validate(Arena *a, size_t offset);
+Environment *environment_resolve(Arena *a, Offset offset);
+bool environment_validate(Arena *a, Offset offset);
 
-size_t environment_load(Arena *a, size_t env_offset, u64 entry_index);
+Offset environment_load(Arena *a, Offset env_offset, u64 entry_index);
 void environment_store(
     Arena *a,
-    size_t env_offset,
-    size_t value_offset,
+    Offset env_offset,
+    Offset value_offset,
     u64 outer_steps,
     u64 entry_index,
-    size_t fallback_offset
+    Offset fallback_offset
 );
 
 #endif

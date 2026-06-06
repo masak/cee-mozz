@@ -7,9 +7,9 @@
 #include "../include/typedefs.h"
 #include "../include/tags.h"
 
-size_t environment_new(
+Offset environment_new(
     Arena *a,
-    size_t outer_env_offset,
+    Offset outer_env_offset,
     u64 entry_count,
     EnvEntry entries[]
 ) {
@@ -20,15 +20,15 @@ size_t environment_new(
     environment->entry_count = entry_count;
     memcpy(environment->entries, entries, entry_count * sizeof(EnvEntry));
 
-    return (size_t)((unsigned char *)environment - a->bytes);
+    return (Offset)((unsigned char *)environment - a->bytes);
 }
 
-Environment *environment_resolve(Arena *a, size_t offset) {
+Environment *environment_resolve(Arena *a, Offset offset) {
     assert(offset <= ARENA_SIZE - sizeof(Environment));
     return (Environment *)(a->bytes + offset);
 }
 
-bool environment_validate(Arena *a, size_t offset) {
+bool environment_validate(Arena *a, Offset offset) {
     Environment *environment = environment_resolve(a, offset);
     (void) environment;     /* remove this line once we start doing the below
                                things; just hiding the warning for now */

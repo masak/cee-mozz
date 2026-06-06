@@ -1,14 +1,15 @@
 #include <stdint.h>
 
+#include "../include/arena.h"
 #include "../include/i64-value.h"
 #include "../include/test.h"
 
 #define ASSERT_I64_ADD(xv, yv, zv) do { \
     Arena arena; \
     arena_init(&arena); \
-    size_t x = i64_new(&arena, xv); \
-    size_t y = i64_new(&arena, yv); \
-    size_t z = i64_add(&arena, x, y); \
+    Offset x = i64_new(&arena, xv); \
+    Offset y = i64_new(&arena, yv); \
+    Offset z = i64_add(&arena, x, y); \
     i64 actual = i64_resolve(&arena, z)->payload; \
     i64 expected = zv; \
     ASSERT_EQ(actual, expected); \
@@ -49,9 +50,9 @@ void large_opposite_values(void) {
 #define ASSERT_I64_SUBTRACT(xv, yv, zv) do { \
     Arena arena; \
     arena_init(&arena); \
-    size_t x = i64_new(&arena, xv); \
-    size_t y = i64_new(&arena, yv); \
-    size_t z = i64_subtract(&arena, x, y); \
+    Offset x = i64_new(&arena, xv); \
+    Offset y = i64_new(&arena, yv); \
+    Offset z = i64_subtract(&arena, x, y); \
     i64 actual = i64_resolve(&arena, z)->payload; \
     i64 expected = zv; \
     ASSERT_EQ(actual, expected); \
@@ -92,9 +93,9 @@ void big_self_subtraction(void) {
 #define ASSERT_I64_MULTIPLY(xv, yv, zv) do { \
     Arena arena; \
     arena_init(&arena); \
-    size_t x = i64_new(&arena, xv); \
-    size_t y = i64_new(&arena, yv); \
-    size_t z = i64_multiply(&arena, x, y); \
+    Offset x = i64_new(&arena, xv); \
+    Offset y = i64_new(&arena, yv); \
+    Offset z = i64_multiply(&arena, x, y); \
     i64 actual = i64_resolve(&arena, z)->payload; \
     i64 expected = zv; \
     ASSERT_EQ(actual, expected); \
@@ -135,10 +136,10 @@ void extreme_values_that_just_overflow(void) {
 #define ASSERT_I64_DIVIDE(xv, yv, zv, wv) do { \
     Arena arena; \
     arena_init(&arena); \
-    size_t x = i64_new(&arena, xv); \
-    size_t y = i64_new(&arena, yv); \
-    size_t z = i64_new(&arena, zv); \
-    size_t w = i64_divide(&arena, x, y, z); \
+    Offset x = i64_new(&arena, xv); \
+    Offset y = i64_new(&arena, yv); \
+    Offset z = i64_new(&arena, zv); \
+    Offset w = i64_divide(&arena, x, y, z); \
     i64 actual = i64_resolve(&arena, w)->payload; \
     i64 expected = wv; \
     ASSERT_EQ(actual, expected); \
@@ -179,10 +180,10 @@ void min_divide_overflow_trap() {
 #define ASSERT_I64_MODULO(xv, yv, zv, wv) do { \
     Arena arena; \
     arena_init(&arena); \
-    size_t x = i64_new(&arena, xv); \
-    size_t y = i64_new(&arena, yv); \
-    size_t z = i64_new(&arena, zv); \
-    size_t w = i64_modulo(&arena, x, y, z); \
+    Offset x = i64_new(&arena, xv); \
+    Offset y = i64_new(&arena, yv); \
+    Offset z = i64_new(&arena, zv); \
+    Offset w = i64_modulo(&arena, x, y, z); \
     i64 actual = i64_resolve(&arena, w)->payload; \
     i64 expected = wv; \
     ASSERT_EQ(actual, expected); \
@@ -223,7 +224,7 @@ void minimum_mod_negative_one() {
 #define ASSERT_I64_VALIDATE(xv) do { \
     Arena arena; \
     arena_init(&arena); \
-    size_t x = i64_new(&arena, xv); \
+    Offset x = i64_new(&arena, xv); \
     bool actual = i64_validate(&arena, x); \
     ASSERT(actual); \
 } while (0)

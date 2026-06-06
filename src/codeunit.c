@@ -8,14 +8,14 @@
 #include "../include/func-value.h"
 #include "../include/tags.h"
 
-size_t codeunit_new(
+Offset codeunit_new(
     Arena *a,
     u64 parameter_count,
     u64 register_count,
     u64 env_length,
-    size_t inttable_offset,
-    size_t strtable_offset,
-    size_t codetable_offset,
+    Offset inttable_offset,
+    Offset strtable_offset,
+    Offset codetable_offset,
     u64 instr_count,
     Instruction instructions[]
 ) {
@@ -34,15 +34,15 @@ size_t codeunit_new(
         instr_count * sizeof(Instruction)
     );
 
-    return (size_t)((unsigned char *)codeunit - a->bytes);
+    return (Offset)((unsigned char *)codeunit - a->bytes);
 }
 
-CodeUnit *codeunit_resolve(Arena *a, size_t offset) {
+CodeUnit *codeunit_resolve(Arena *a, Offset offset) {
     assert(offset <= ARENA_SIZE - sizeof(CodeUnit));
     return (CodeUnit *)(a->bytes + offset);
 }
 
-bool codeunit_validate(Arena *a, size_t offset) {
+bool codeunit_validate(Arena *a, Offset offset) {
     assert(offset <= ARENA_SIZE - sizeof(CodeUnit));
     CodeUnit *codeunit = codeunit_resolve(a, offset);
 

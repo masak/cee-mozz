@@ -8,13 +8,13 @@
 
 typedef struct {
     u64 tag;
-    size_t env_offset;
-    size_t codeunit_offset;
+    Offset env_offset;
+    Offset codeunit_offset;
 } FuncValue;
 
-size_t func_new(Arena *a, size_t env_offset, size_t codeunit_offset);
-FuncValue *func_resolve(Arena *a, size_t offset);
-bool func_validate(Arena *a, size_t offset);
+Offset func_new(Arena *a, Offset env_offset, Offset codeunit_offset);
+FuncValue *func_resolve(Arena *a, Offset offset);
+bool func_validate(Arena *a, Offset offset);
 
 #endif
 

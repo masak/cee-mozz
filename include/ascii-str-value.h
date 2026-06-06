@@ -12,12 +12,12 @@ typedef struct {
     char payload[];
 } AsciiStrValue;
 
-size_t ascii_str_new(Arena *a, s8 *str);
-AsciiStrValue *ascii_str_resolve(Arena *a, size_t offset);
-bool ascii_str_validate(Arena *a, size_t offset);
+Offset ascii_str_new(Arena *a, s8 *str);
+AsciiStrValue *ascii_str_resolve(Arena *a, Offset offset);
+bool ascii_str_validate(Arena *a, Offset offset);
 
-size_t ascii_str_concat(Arena *a, size_t offset1, size_t offset2);
-size_t generic_to_str(Arena *a, size_t offset);
+Offset ascii_str_concat(Arena *a, Offset offset1, Offset offset2);
+Offset generic_to_str(Arena *a, Offset offset);
 
 #endif
 

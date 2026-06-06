@@ -7,7 +7,7 @@
 #include "../include/func-value.h"
 #include "../include/tags.h"
 
-size_t func_new(Arena *a, size_t env_offset, size_t codeunit_offset) {
+Offset func_new(Arena *a, Offset env_offset, Offset codeunit_offset) {
     FuncValue *func_value = arena_alloc(
         a,
         sizeof(FuncValue),
@@ -16,19 +16,19 @@ size_t func_new(Arena *a, size_t env_offset, size_t codeunit_offset) {
     func_value->tag = TAG_FUNC;
     func_value->env_offset = env_offset;
     func_value->codeunit_offset = codeunit_offset;
-    return (size_t)((unsigned char *)func_value - a->bytes);
+    return (Offset)((unsigned char *)func_value - a->bytes);
 }
 
-FuncValue *func_resolve(Arena *a, size_t offset) {
+FuncValue *func_resolve(Arena *a, Offset offset) {
     assert(offset <= ARENA_SIZE - sizeof(FuncValue));
     return (FuncValue *)(a->bytes + offset);
 }
 
-bool func_validate(Arena *a, size_t offset) {
+bool func_validate(Arena *a, Offset offset) {
     assert(offset <= ARENA_SIZE - sizeof(FuncValue));
     FuncValue *func_value = func_resolve(a, offset);
 
-    size_t env_offset = func_value->env_offset;
+    Offset env_offset = func_value->env_offset;
     if (env_offset > ARENA_SIZE - sizeof(Environment)) {
         return false;
     }
@@ -37,7 +37,7 @@ bool func_validate(Arena *a, size_t offset) {
         return false;
     }
 
-    size_t codeunit_offset = func_value->codeunit_offset;
+    Offset codeunit_offset = func_value->codeunit_offset;
     if (codeunit_offset > ARENA_SIZE - sizeof(CodeUnit)) {
         return false;
     }

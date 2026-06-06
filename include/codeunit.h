@@ -18,26 +18,26 @@ typedef struct {
     u64 parameter_count;
     u64 register_count;
     u64 env_length;
-    size_t inttable_offset;
-    size_t strtable_offset;
-    size_t codetable_offset;
+    Offset inttable_offset;
+    Offset strtable_offset;
+    Offset codetable_offset;
     u64 instr_count;
     Instruction instructions[];
 } CodeUnit;
 
-size_t codeunit_new(
+Offset codeunit_new(
     Arena *a,
     u64 parameter_count,
     u64 register_count,
     u64 env_length,
-    size_t inttable_offset,
-    size_t strtable_offset,
-    size_t codetable_offset,
+    Offset inttable_offset,
+    Offset strtable_offset,
+    Offset codetable_offset,
     u64 instr_count,
     Instruction instructions[]
 );
-CodeUnit *codeunit_resolve(Arena *a, size_t offset);
-bool codeunit_validate(Arena *a, size_t offset);
+CodeUnit *codeunit_resolve(Arena *a, Offset offset);
+bool codeunit_validate(Arena *a, Offset offset);
 
 #endif
 
