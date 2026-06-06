@@ -77,7 +77,7 @@ size_t generic_to_str(Arena *a, size_t offset) {
             int n = snprintf(
                 buffer,
                 sizeof(buffer),
-                "%lld",
+                "%" PRId64,
                 (long long)value->payload
             );
             assert(n > 0 && (size_t)n < sizeof(buffer));

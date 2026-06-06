@@ -30,7 +30,8 @@ static i32 mt_failed = 0;
     if (expected_value != actual_value) { \
         fprintf( \
             stderr, \
-            "    ASSERT_EQ failed at %s:%d: expected %lld, got %lld\n", \
+            "    ASSERT_EQ failed at %s:%d: expected %" PRId64 ", got %" \
+                PRId64 "\n", \
             __FILE__, \
             __LINE__, \
             expected_value, \
