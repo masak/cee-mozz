@@ -5,6 +5,7 @@
 #include "../include/codeunit.h"
 #include "../include/environment.h"
 #include "../include/func-value.h"
+#include "../include/seenset.h"
 #include "../include/tags.h"
 
 Offset func_new(Arena *a, Offset env_offset, Offset codeunit_offset) {
@@ -24,7 +25,12 @@ FuncValue *func_resolve(Arena *a, Offset offset) {
     return (FuncValue *)(a->bytes + offset);
 }
 
-bool func_validate(Arena *a, Offset offset) {
+bool func_validate(Arena *a, Offset offset, SeenSet *seenset) {
+    if (seen(seenset, offset)) {
+        return true;
+    }
+    seenset_add(seenset, offset);
+
     assert(offset <= ARENA_SIZE - sizeof(FuncValue));
     FuncValue *func_value = func_resolve(a, offset);
 

@@ -5,6 +5,7 @@
 #include "../include/arena.h"
 #include "../include/ascii-str-value.h"
 #include "../include/i64-value.h"
+#include "../include/seenset.h"
 #include "../include/typedefs.h"
 #include "../include/tags.h"
 #include "../include/value.h"
@@ -27,7 +28,12 @@ AsciiStrValue *ascii_str_resolve(Arena *a, Offset offset) {
     return (AsciiStrValue *)(a->bytes + offset);
 }
 
-bool ascii_str_validate(Arena *a, Offset offset) {
+bool ascii_str_validate(Arena *a, Offset offset, SeenSet *seenset) {
+    if (seen(seenset, offset)) {
+        return true;
+    }
+    seenset_add(seenset, offset);
+
     AsciiStrValue *value = ascii_str_resolve(a, offset);
 
     assert(

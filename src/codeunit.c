@@ -6,6 +6,7 @@
 #include "../include/codeunit.h"
 #include "../include/environment.h"
 #include "../include/func-value.h"
+#include "../include/seenset.h"
 #include "../include/tags.h"
 
 Offset codeunit_new(
@@ -43,7 +44,12 @@ CodeUnit *codeunit_resolve(Arena *a, Offset offset) {
     return (CodeUnit *)(a->bytes + offset);
 }
 
-bool codeunit_validate(Arena *a, Offset offset) {
+bool codeunit_validate(Arena *a, Offset offset, SeenSet *seenset) {
+    if (seen(seenset, offset)) {
+        return true;
+    }
+    seenset_add(seenset, offset);
+
     assert(offset <= ARENA_SIZE - sizeof(CodeUnit));
     CodeUnit *codeunit = codeunit_resolve(a, offset);
 

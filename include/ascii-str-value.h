@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "arena.h"
+#include "seenset.h"
 #include "typedefs.h"
 
 typedef struct {
@@ -14,7 +15,7 @@ typedef struct {
 
 Offset ascii_str_new(Arena *a, s8 *str);
 AsciiStrValue *ascii_str_resolve(Arena *a, Offset offset);
-bool ascii_str_validate(Arena *a, Offset offset);
+bool ascii_str_validate(Arena *a, Offset offset, SeenSet *seenset);
 
 Offset ascii_str_concat(Arena *a, Offset offset1, Offset offset2);
 Offset generic_to_str(Arena *a, Offset offset);

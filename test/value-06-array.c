@@ -3,6 +3,7 @@
 #include "../include/arena.h"
 #include "../include/array-value.h"
 #include "../include/i64-value.h"
+#include "../include/seenset.h"
 #include "../include/test.h"
 #include "../include/tags.h"
 #include "../include/value.h"
@@ -25,18 +26,24 @@ void create_empty_array(void) {
     arena_init(&arena);
     Offset array_offset = array_new(&arena, 0);
     ArrayValue *array_value = array_resolve(&arena, array_offset);
+    SeenSet seenset;
+    seenset_init(&seenset);
+
     ASSERT_EQ(array_value->tag, TAG_ARRAY);
     ASSERT_EQ(array_value->length, 0);
-    ASSERT(array_validate(&arena, array_offset));
+    ASSERT(array_validate(&arena, array_offset, &seenset));
 }
 
 void array_with_capacity(void) {
     arena_init(&arena);
     Offset array_offset = array_new(&arena, 16);
     ArrayValue *array_value = array_resolve(&arena, array_offset);
+    SeenSet seenset;
+    seenset_init(&seenset);
+
     ASSERT_EQ(array_value->tag, TAG_ARRAY);
     ASSERT_EQ(array_value->length, 0);
-    ASSERT(array_validate(&arena, array_offset));
+    ASSERT(array_validate(&arena, array_offset, &seenset));
 }
 
 void push_increases_length(void) {

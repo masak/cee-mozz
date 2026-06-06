@@ -2,6 +2,7 @@
 
 #include "../include/arena.h"
 #include "../include/i64-value.h"
+#include "../include/seenset.h"
 #include "../include/test.h"
 
 #define ASSERT_I64_ADD(xv, yv, zv) do { \
@@ -224,8 +225,10 @@ void minimum_mod_negative_one() {
 #define ASSERT_I64_VALIDATE(xv) do { \
     Arena arena; \
     arena_init(&arena); \
+    SeenSet seenset; \
+    seenset_init(&seenset); \
     Offset x = i64_new(&arena, xv); \
-    bool actual = i64_validate(&arena, x); \
+    bool actual = i64_validate(&arena, x, &seenset); \
     ASSERT(actual); \
 } while (0)
 

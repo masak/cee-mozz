@@ -5,6 +5,7 @@
 #include "../include/array-value.h"
 #include "../include/arena.h"
 #include "../include/i64-value.h"
+#include "../include/seenset.h"
 #include "../include/tags.h"
 
 Offset array_new(Arena *a, u64 capacity) {
@@ -26,7 +27,12 @@ ArrayValue *array_resolve(Arena *a, Offset offset) {
     return (ArrayValue *)(a->bytes + offset);
 }
 
-bool array_validate(Arena *a, Offset offset) {
+bool array_validate(Arena *a, Offset offset, SeenSet *seenset) {
+    if (seen(seenset, offset)) {
+        return true;
+    }
+    seenset_add(seenset, offset);
+
     assert(offset <= ARENA_SIZE - sizeof(ArrayValue));
     ArrayValue *array_value = array_resolve(a, offset);
 

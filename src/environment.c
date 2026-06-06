@@ -4,6 +4,7 @@
 
 #include "../include/arena.h"
 #include "../include/environment.h"
+#include "../include/seenset.h"
 #include "../include/typedefs.h"
 #include "../include/tags.h"
 
@@ -32,7 +33,12 @@ Environment *environment_resolve(Arena *a, Offset offset) {
     return (Environment *)(a->bytes + offset);
 }
 
-bool environment_validate(Arena *a, Offset offset) {
+bool environment_validate(Arena *a, Offset offset, SeenSet *seenset) {
+    if (seen(seenset, offset)) {
+        return true;
+    }
+    seenset_add(seenset, offset);
+
     Environment *environment = environment_resolve(a, offset);
     (void) environment;     /* remove this line once we start doing the below
                                things; just hiding the warning for now */

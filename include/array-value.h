@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include "arena.h"
+#include "seenset.h"
 #include "typedefs.h"
 #include "value.h"
 
@@ -22,7 +23,7 @@ typedef struct {
 
 Offset array_new(Arena *a, u64 capacity);
 ArrayValue *array_resolve(Arena *a, Offset offset);
-bool array_validate(Arena *a, Offset offset);
+bool array_validate(Arena *a, Offset offset, SeenSet *seenset);
 
 void array_push(Arena *a, Offset array_offset, Offset value_offset);
 Offset array_get(Arena *a, Offset array_offset, Offset index_offset);
