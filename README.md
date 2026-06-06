@@ -16,10 +16,10 @@ defining the various types of the runtime:
 | `UninitializedValue` | | | |
 | `ArrayValue` | ✅ | ✅ | ✅ `push get set length concat` |
 | `ArrayElements` | ✅ | ✅ | ✅ |
-| `FuncValue` | | | |
+| `FuncValue` | ✅ | (✅) | ✅ |
 | `MacroValue` | | | |
-| `Environment` | | | |
-| `CodeUnit` | | | |
+| `Environment` | ✅ | (✅) | ✅ |
+| `CodeUnit` | ✅ | (✅) | ✅ |
 | `SyntaxNodeValue` | | | |
 | `IntValue` | | | `add sub mul floordiv mod` |
 | `StrValue` | | | `concat` |
