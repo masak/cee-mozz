@@ -60,6 +60,7 @@ bool codeunit_validate(Arena *a, size_t offset) {
 
     /* for each instruction:
            check each register is within range
+           check that each register that is read from was initialized
            check that int, str, code indixes are within range
            check that jump targets are within range */
 
