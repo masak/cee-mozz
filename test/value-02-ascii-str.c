@@ -5,7 +5,7 @@
 #include "../include/i64-value.h"
 #include "../include/test.h"
 #include "../include/typedefs.h"
-#include "../include/types.h"
+#include "../include/tags.h"
 
 /* Compare an AsciiStrValue's payload against an expected C string */
 #define ASSERT_ASCII_STR_EQ(val, expected) do { \

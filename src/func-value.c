@@ -5,7 +5,7 @@
 #include "../include/codeunit.h"
 #include "../include/environment.h"
 #include "../include/func-value.h"
-#include "../include/types.h"
+#include "../include/tags.h"
 
 size_t func_new(Arena *a, size_t env_offset, size_t codeunit_offset) {
     FuncValue *func_value = arena_alloc(

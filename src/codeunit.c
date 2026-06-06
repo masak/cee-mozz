@@ -6,7 +6,7 @@
 #include "../include/codeunit.h"
 #include "../include/environment.h"
 #include "../include/func-value.h"
-#include "../include/types.h"
+#include "../include/tags.h"
 
 size_t codeunit_new(
     Arena *a,

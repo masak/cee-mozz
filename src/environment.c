@@ -5,7 +5,7 @@
 #include "../include/arena.h"
 #include "../include/environment.h"
 #include "../include/typedefs.h"
-#include "../include/types.h"
+#include "../include/tags.h"
 
 size_t environment_new(
     Arena *a,

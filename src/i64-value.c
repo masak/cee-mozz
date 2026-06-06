@@ -3,7 +3,7 @@
 
 #include "../include/arena.h"
 #include "../include/i64-value.h"
-#include "../include/types.h"
+#include "../include/tags.h"
 
 size_t i64_new(Arena *a, i64 payload) {
     I64Value *i64_value = arena_alloc(a, sizeof(I64Value), alignof(I64Value));

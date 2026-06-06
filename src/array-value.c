@@ -5,7 +5,7 @@
 #include "../include/array-value.h"
 #include "../include/arena.h"
 #include "../include/i64-value.h"
-#include "../include/types.h"
+#include "../include/tags.h"
 
 // typedef struct {
 //     u64 tag;

@@ -3,7 +3,7 @@
 #include "../include/array-value.h"
 #include "../include/i64-value.h"
 #include "../include/test.h"
-#include "../include/types.h"
+#include "../include/tags.h"
 #include "../include/value.h"
 
 #define ASSERT_ARRAY_LENGTH(arr, expected) do { \

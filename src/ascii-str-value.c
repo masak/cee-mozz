@@ -6,7 +6,7 @@
 #include "../include/ascii-str-value.h"
 #include "../include/i64-value.h"
 #include "../include/typedefs.h"
-#include "../include/types.h"
+#include "../include/tags.h"
 #include "../include/value.h"
 
 size_t ascii_str_new(Arena *a, s8 *str) {
