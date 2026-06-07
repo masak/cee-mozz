@@ -48,13 +48,13 @@ bool array_validate(Arena *a, Offset offset, SeenSet *seenset) {
     }
 
     for (u64 i = 0; i < array_value->length; i++) {
-        Offset element_offset = array_elements->elements[i];
+        MaybeOffset element_offset = array_elements->elements[i];
         if (element_offset == UNSET) {
             return false;
         }
     }
     for (u64 i = array_value->length; i < array_elements->capacity; i++) {
-        Offset element_offset = array_elements->elements[i];
+        MaybeOffset element_offset = array_elements->elements[i];
         if (element_offset != UNSET) {
             return false;
         }
@@ -192,7 +192,7 @@ bool array_elements_validate(Arena *a, Offset offset, SeenSet *seenset) {
     }
 
     for (u64 i = 0; i < array_elements->capacity; i++) {
-        Offset element_offset = array_elements->elements[i];
+        MaybeOffset element_offset = array_elements->elements[i];
         if (element_offset == UNSET) {
             continue;
         }

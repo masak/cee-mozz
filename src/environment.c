@@ -11,7 +11,7 @@
 
 Offset environment_new(
     Arena *a,
-    Offset outer_env_offset,
+    MaybeOffset outer_env_offset,
     u64 entry_count,
     EnvEntry entries[]
 ) {
@@ -42,17 +42,18 @@ bool environment_validate(Arena *a, Offset offset, SeenSet *seenset) {
 
     Environment *environment = environment_resolve(a, offset);
 
-    if (environment->outer_env_offset != UNSET) {
-        if (value_tag(a, offset) != TAG_ENVIRONMENT) {
+    MaybeOffset outer_env_offset = environment->outer_env_offset;
+    if (outer_env_offset != UNSET) {
+        if (value_tag(a, outer_env_offset) != TAG_ENVIRONMENT) {
             return false;
         }
-        if (!environment_validate(a, environment->outer_env_offset, seenset)) {
+        if (!environment_validate(a, outer_env_offset, seenset)) {
             return false;
         }
     }
 
     for (u64 i = 0; i < environment->entry_count; i++) {
-        Offset cell = environment->entries[i].cell;
+        MaybeOffset cell = environment->entries[i].cell;
         if (cell == UNSET) {
             continue;
         }

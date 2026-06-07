@@ -18,7 +18,7 @@ typedef struct {
 typedef struct {
     u64 tag;
     u64 capacity;
-    Offset elements[];
+    MaybeOffset elements[];
 } ArrayElements;
 
 Offset array_new(Arena *a, u64 capacity);

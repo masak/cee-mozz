@@ -9,19 +9,19 @@
 
 typedef struct {
     u64 writable;
-    Offset cell;
+    MaybeOffset cell;
 } EnvEntry;
 
 typedef struct {
     u64 tag;
-    Offset outer_env_offset;
+    MaybeOffset outer_env_offset;
     u64 entry_count;
     EnvEntry entries[];
 } Environment;
 
 Offset environment_new(
     Arena *a,
-    Offset outer_env_offset,
+    MaybeOffset outer_env_offset,
     u64 entry_count,
     EnvEntry entries[]
 );

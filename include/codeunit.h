@@ -19,9 +19,9 @@ typedef struct {
     u64 parameter_count;
     u64 register_count;
     u64 env_length;
-    Offset inttable_offset;
-    Offset strtable_offset;
-    Offset codetable_offset;
+    MaybeOffset inttable_offset;
+    MaybeOffset strtable_offset;
+    MaybeOffset codetable_offset;
     u64 instr_count;
     Instruction instructions[];
 } CodeUnit;
@@ -31,9 +31,9 @@ Offset codeunit_new(
     u64 parameter_count,
     u64 register_count,
     u64 env_length,
-    Offset inttable_offset,
-    Offset strtable_offset,
-    Offset codetable_offset,
+    MaybeOffset inttable_offset,
+    MaybeOffset strtable_offset,
+    MaybeOffset codetable_offset,
     u64 instr_count,
     Instruction instructions[]
 );
