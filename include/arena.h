@@ -9,7 +9,7 @@
 
 enum { ARENA_SIZE = 16 * 1024 };
 
-#define UNSET 0xA3A3A3A3A3A3A3A3ull
+#define UNSET 0xA3A3A3A3ul
 
 typedef struct {
     _Alignas(max_align_t) unsigned char bytes[ARENA_SIZE];
@@ -18,8 +18,8 @@ typedef struct {
 
 typedef u32     Tag;
 
-typedef size_t  Offset;
-typedef size_t  MaybeOffset;
+typedef u32     Offset;
+typedef u32     MaybeOffset;
 
 void arena_init(Arena *a);
 void *arena_alloc(Arena *a, size_t size, size_t align);
