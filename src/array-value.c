@@ -9,7 +9,7 @@
 #include "../include/tags.h"
 #include "../include/value.h"
 
-Offset array_new(Arena *a, u64 capacity) {
+Offset array_new(Arena *a, u32 capacity) {
     Offset elements_offset = array_elements_new(a, capacity);
     ArrayValue *array_value = arena_alloc(
         a,
@@ -47,13 +47,13 @@ bool array_validate(Arena *a, Offset offset, SeenSet *seenset) {
         return false;
     }
 
-    for (u64 i = 0; i < array_value->length; i++) {
+    for (u32 i = 0; i < array_value->length; i++) {
         MaybeOffset element_offset = array_elements->elements[i];
         if (element_offset == UNSET) {
             return false;
         }
     }
-    for (u64 i = array_value->length; i < array_elements->capacity; i++) {
+    for (u32 i = array_value->length; i < array_elements->capacity; i++) {
         MaybeOffset element_offset = array_elements->elements[i];
         if (element_offset != UNSET) {
             return false;
@@ -69,7 +69,7 @@ void array_push(Arena *a, Offset array_offset, Offset value_offset) {
         = array_elements_resolve(a, array_value->elements_offset);
 
     if (array_value->length >= elems->capacity) {
-        u64 new_capacity = (elems->capacity == 0) ? 8 : elems->capacity * 2;
+        u32 new_capacity = (elems->capacity == 0) ? 8 : elems->capacity * 2;
 
         size_t new_elems_size
             = sizeof(ArrayElements) + new_capacity * sizeof(Offset);
@@ -99,7 +99,7 @@ Offset array_get(Arena *a, Offset array_offset, Offset index_offset) {
     i64 index = index_value->payload;
 
     assert(index >= 0);
-    assert((u64)index < array_value->length);
+    assert((u32)index < array_value->length);
 
     ArrayElements *elems
         = array_elements_resolve(a, array_value->elements_offset);
@@ -117,7 +117,7 @@ void array_set(
     i64 index = index_value->payload;
 
     assert(index >= 0);
-    assert((u64)index < array_value->length);
+    assert((u32)index < array_value->length);
 
     ArrayElements *elems
         = array_elements_resolve(a, array_value->elements_offset);
@@ -137,7 +137,7 @@ Offset array_concat(Arena *a, Offset array_offset1, Offset array_offset2) {
     ArrayElements *elems2
         = array_elements_resolve(a, array_value2->elements_offset);
 
-    u64 total_length = array_value1->length + array_value2->length;
+    u32 total_length = array_value1->length + array_value2->length;
 
     Offset result = array_new(a, total_length);
     ArrayValue *result_array_value = array_resolve(a, result);
@@ -159,7 +159,7 @@ Offset array_concat(Arena *a, Offset array_offset1, Offset array_offset2) {
     return result;
 }
 
-Offset array_elements_new(Arena *a, u64 capacity) {
+Offset array_elements_new(Arena *a, u32 capacity) {
     size_t elements_size = capacity * sizeof(Offset);
     ArrayElements *elems = arena_alloc(
         a,
@@ -191,7 +191,7 @@ bool array_elements_validate(Arena *a, Offset offset, SeenSet *seenset) {
         return false;
     }
 
-    for (u64 i = 0; i < array_elements->capacity; i++) {
+    for (u32 i = 0; i < array_elements->capacity; i++) {
         MaybeOffset element_offset = array_elements->elements[i];
         if (element_offset == UNSET) {
             continue;

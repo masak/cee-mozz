@@ -11,17 +11,17 @@
 
 typedef struct {
     Tag tag;
-    u64 length;
+    u32 length;
     Offset elements_offset;
 } ArrayValue;
 
 typedef struct {
     Tag tag;
-    u64 capacity;
+    u32 capacity;
     MaybeOffset elements[];
 } ArrayElements;
 
-Offset array_new(Arena *a, u64 capacity);
+Offset array_new(Arena *a, u32 capacity);
 ArrayValue *array_resolve(Arena *a, Offset offset);
 bool array_validate(Arena *a, Offset offset, SeenSet *seenset);
 
@@ -36,7 +36,7 @@ void array_set(
 Offset array_length(Arena *a, Offset array_offset);
 Offset array_concat(Arena *a, Offset array_offset1, Offset array_offset2);
 
-Offset array_elements_new(Arena *a, u64 capacity);
+Offset array_elements_new(Arena *a, u32 capacity);
 ArrayElements *array_elements_resolve(Arena *a, Offset offset);
 bool array_elements_validate(Arena *a, Offset offset, SeenSet *seenset);
 

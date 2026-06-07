@@ -12,7 +12,7 @@
 Offset environment_new(
     Arena *a,
     MaybeOffset outer_env_offset,
-    u64 entry_count,
+    u32 entry_count,
     EnvEntry entries[]
 ) {
     size_t entries_size = entry_count * sizeof(EnvEntry);
@@ -52,7 +52,7 @@ bool environment_validate(Arena *a, Offset offset, SeenSet *seenset) {
         }
     }
 
-    for (u64 i = 0; i < environment->entry_count; i++) {
+    for (u32 i = 0; i < environment->entry_count; i++) {
         MaybeOffset cell = environment->entries[i].cell;
         if (cell == UNSET) {
             continue;

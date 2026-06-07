@@ -16,25 +16,25 @@ typedef struct {
 
 typedef struct {
     Tag tag;
-    u64 parameter_count;
-    u64 register_count;
-    u64 env_length;
+    u32 parameter_count;
+    u32 register_count;
+    u32 env_length;
     MaybeOffset inttable_offset;
     MaybeOffset strtable_offset;
     MaybeOffset codetable_offset;
-    u64 instr_count;
+    u32 instr_count;
     Instruction instructions[];
 } CodeUnit;
 
 Offset codeunit_new(
     Arena *a,
-    u64 parameter_count,
-    u64 register_count,
-    u64 env_length,
+    u32 parameter_count,
+    u32 register_count,
+    u32 env_length,
     MaybeOffset inttable_offset,
     MaybeOffset strtable_offset,
     MaybeOffset codetable_offset,
-    u64 instr_count,
+    u32 instr_count,
     Instruction instructions[]
 );
 CodeUnit *codeunit_resolve(Arena *a, Offset offset);

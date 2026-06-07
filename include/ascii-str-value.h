@@ -9,7 +9,7 @@
 
 typedef struct {
     Tag tag;
-    u64 length_in_bytes;
+    u32 length_in_bytes;
     char payload[];
 } AsciiStrValue;
 

@@ -11,7 +11,7 @@
 #include "../include/value.h"
 
 Offset ascii_str_new(Arena *a, s8 *str) {
-    u64 length_in_bytes = str->length_in_bytes;
+    u32 length_in_bytes = str->length_in_bytes;
     AsciiStrValue *ascii_str_value = arena_alloc(
         a,
         sizeof(AsciiStrValue) + length_in_bytes,
@@ -40,7 +40,7 @@ bool ascii_str_validate(Arena *a, Offset offset, SeenSet *seenset) {
         offset + sizeof(AsciiStrValue) + value->length_in_bytes <= ARENA_SIZE
     );
 
-    for (u64 i = 0; i < value->length_in_bytes; i++) {
+    for (u32 i = 0; i < value->length_in_bytes; i++) {
         unsigned char c = (unsigned char)value->payload[i];
         if (c > 127) {
             return false;
@@ -53,8 +53,8 @@ Offset ascii_str_concat(Arena *a, Offset offset1, Offset offset2) {
     AsciiStrValue *lhs = ascii_str_resolve(a, offset1);
     AsciiStrValue *rhs = ascii_str_resolve(a, offset2);
 
-    u64 length_in_bytes = lhs->length_in_bytes + rhs->length_in_bytes;
-    u64 total_size = sizeof(AsciiStrValue) + length_in_bytes;
+    u32 length_in_bytes = lhs->length_in_bytes + rhs->length_in_bytes;
+    u32 total_size = sizeof(AsciiStrValue) + length_in_bytes;
 
     AsciiStrValue *result = arena_alloc(a, total_size, alignof(AsciiStrValue));
     result->tag = TAG_ASCII_STR;
@@ -94,7 +94,7 @@ Offset generic_to_str(Arena *a, Offset offset) {
                 alignof(AsciiStrValue)
             );
             result->tag = TAG_ASCII_STR;
-            result->length_in_bytes = (u64)length;
+            result->length_in_bytes = (u32)length;
             memcpy(result->payload, buffer, length);
 
             return (Offset)((unsigned char *)result - a->bytes);
