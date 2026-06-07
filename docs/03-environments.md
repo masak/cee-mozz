@@ -46,7 +46,7 @@ print(getX());      # 42
 
 The environment inside the function `f` which contains the `x` binding was
 captured by both `sx`/`setX` and `gx`/`getX`. This is the environment that
-stores the 42 value betweem the penultimate and final line of the code.
+stores the 42 value between the penultimate and final line of the code.
 
 The `setX` and `getX` variables are scoped to the whole program; even though
 the environment in question gets created for execution inside the function `f`,
