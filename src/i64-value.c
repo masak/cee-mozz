@@ -33,19 +33,22 @@ bool i64_validate(Arena *a, Offset offset, SeenSet *seenset) {
 Offset i64_add(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
-    return i64_new(a, lhs->payload + rhs->payload);
+    u64 sum = (u64)lhs->payload + (u64)rhs->payload;
+    return i64_new(a, (u64)sum);
 }
 
 Offset i64_subtract(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
-    return i64_new(a, lhs->payload - rhs->payload);
+    u64 difference = (u64)lhs->payload - (u64)rhs->payload;
+    return i64_new(a, (i64)difference);
 }
 
 Offset i64_multiply(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
-    return i64_new(a, lhs->payload * rhs->payload);
+    u64 product = (u64)lhs->payload * (u64)rhs->payload;
+    return i64_new(a, (i64)product);
 }
 
 Offset i64_divide(Arena *a, Offset m, Offset n, Offset fallback) {

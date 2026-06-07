@@ -1,7 +1,7 @@
 .POSIX:
 
 CC		= clang
-CFLAGS  = -std=c11 -Wall -Wextra -pedantic -g -O0
+CFLAGS  = -std=c11 -Wall -Wextra -pedantic -g -O0 -fsanitize=address,undefined
 LDFLAGS =
 
 SRC_OBJS = \
