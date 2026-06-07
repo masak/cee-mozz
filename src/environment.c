@@ -7,6 +7,7 @@
 #include "../include/seenset.h"
 #include "../include/typedefs.h"
 #include "../include/tags.h"
+#include "../include/value.h"
 
 Offset environment_new(
     Arena *a,
@@ -40,17 +41,25 @@ bool environment_validate(Arena *a, Offset offset, SeenSet *seenset) {
     seenset_add(seenset, offset);
 
     Environment *environment = environment_resolve(a, offset);
-    (void) environment;     /* remove this line once we start doing the below
-                               things; just hiding the warning for now */
 
-    /* check that outer_env_offset points either to a valid environment,
-       or is unset */
+    if (environment->outer_env_offset != UNSET) {
+        if (value_tag(a, offset) != TAG_ENVIRONMENT) {
+            return false;
+        }
+        if (!environment_validate(a, environment->outer_env_offset, seenset)) {
+            return false;
+        }
+    }
 
-    /* for each entry_count:
-           check that its cell points to a valid value tag and that its
-           resolved value validates, or is unset */
-
-    /* both of the above checks have to wait for the SeenSet mechanism */
+    for (u64 i = 0; i < environment->entry_count; i++) {
+        Offset cell = environment->entries[i].cell;
+        if (cell == UNSET) {
+            continue;
+        }
+        if (!generic_validate(a, cell, seenset)) {
+            return false;
+        }
+    }
 
     return true;
 }

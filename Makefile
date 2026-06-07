@@ -66,7 +66,7 @@ build/func-value.o: src/func-value.c include/arena.h include/codeunit.h include/
 build/macro-value.o: src/macro-value.c include/arena.h include/codeunit.h include/environment.h include/macro-value.h include/seenset.h include/tags.h
 	$(CC) $(CFLAGS) -c -o $@ src/macro-value.c
 
-build/environment.o: src/environment.c include/arena.h include/environment.h include/seenset.h include/typedefs.h include/tags.h
+build/environment.o: src/environment.c include/arena.h include/environment.h include/seenset.h include/typedefs.h include/tags.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ src/environment.c
 
 build/codeunit.o: src/codeunit.c include/arena.h include/codeunit.h include/environment.h include/seenset.h include/tags.h
