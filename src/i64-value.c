@@ -34,7 +34,7 @@ Offset i64_add(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
     u64 sum = (u64)lhs->payload + (u64)rhs->payload;
-    return i64_new(a, (u64)sum);
+    return i64_new(a, (i64)sum);
 }
 
 Offset i64_subtract(Arena *a, Offset m, Offset n) {
