@@ -71,7 +71,7 @@ bool codeunit_validate(Arena *a, Offset offset, SeenSet *seenset) {
            check that jump targets are within range */
 
     /* later we want to recursively validate the IntTable, StrTable, and
-       CodeTable, but it has to wait for the SeenSet mechanism */
+       CodeTable, but we have to implement those types first */
 
     return true;
 }

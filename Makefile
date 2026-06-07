@@ -48,7 +48,7 @@ build/value-06-array: build/value-06-array.o $(SRC_OBJS)
 build/arena.o: src/arena.c include/arena.h
 	$(CC) $(CFLAGS) -c -o $@ src/arena.c
 
-build/value.o: src/value.c include/arena.h include/value.h include/typedefs.h
+build/value.o: src/value.c include/arena.h include/array-value.h include/ascii-str-value.h include/codeunit.h include/environment.h include/func-value.h include/i64-value.h include/macro-value.h include/value.h include/tags.h include/typedefs.h
 	$(CC) $(CFLAGS) -c -o $@ src/value.c
 
 build/i64-value.o: src/i64-value.c include/arena.h include/i64-value.h include/seenset.h include/tags.h
@@ -57,7 +57,7 @@ build/i64-value.o: src/i64-value.c include/arena.h include/i64-value.h include/s
 build/ascii-str-value.o: src/ascii-str-value.c include/arena.h include/ascii-str-value.h include/i64-value.h include/seenset.h include/typedefs.h include/tags.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ src/ascii-str-value.c
 
-build/array-value.o: src/array-value.c include/array-value.h include/arena.h include/i64-value.h include/seenset.h include/tags.h
+build/array-value.o: src/array-value.c include/array-value.h include/arena.h include/i64-value.h include/seenset.h include/tags.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ src/array-value.c
 
 build/func-value.o: src/func-value.c include/arena.h include/codeunit.h include/environment.h include/func-value.h include/seenset.h include/tags.h

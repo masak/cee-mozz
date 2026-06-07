@@ -7,6 +7,7 @@
 #include "../include/i64-value.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
+#include "../include/value.h"
 
 Offset array_new(Arena *a, u64 capacity) {
     Offset elements_offset = array_elements_new(a, capacity);
@@ -33,32 +34,30 @@ bool array_validate(Arena *a, Offset offset, SeenSet *seenset) {
     }
     seenset_add(seenset, offset);
 
-    assert(offset <= ARENA_SIZE - sizeof(ArrayValue));
     ArrayValue *array_value = array_resolve(a, offset);
 
     Offset elems_offset = array_value->elements_offset;
-    if (elems_offset > ARENA_SIZE - sizeof(ArrayElements)) {
+    if (value_tag(a, elems_offset) != TAG_ARRAY_ELEMENTS) {
         return false;
     }
+    array_elements_validate(a, elems_offset, seenset);
 
-    ArrayElements *elems = (ArrayElements *)(a->bytes + elems_offset);
-    if (elems->tag != TAG_ARRAY_ELEMENTS) {
-        return false;
-    }
-
-    if (array_value->length > elems->capacity) {
-        return false;
-    }
-
-    Offset elems_total_size
-        = sizeof(ArrayElements) + elems->capacity * sizeof(Offset);
-    if (elems_offset + elems_total_size > ARENA_SIZE) {
+    ArrayElements *array_elements = (ArrayElements *)(a->bytes + elems_offset);
+    if (array_value->length > array_elements->capacity) {
         return false;
     }
 
     for (u64 i = 0; i < array_value->length; i++) {
-        /* later we want to recursively validate elements, but it has to wait
-           for the SeenSet mechanism */
+        Offset element_offset = array_elements->elements[i];
+        if (element_offset == UNSET) {
+            return false;
+        }
+    }
+    for (u64 i = array_value->length; i < array_elements->capacity; i++) {
+        Offset element_offset = array_elements->elements[i];
+        if (element_offset != UNSET) {
+            return false;
+        }
     }
 
     return true;
@@ -176,5 +175,32 @@ Offset array_elements_new(Arena *a, u64 capacity) {
 ArrayElements *array_elements_resolve(Arena *a, Offset offset) {
     assert(offset <= ARENA_SIZE - sizeof(ArrayElements));
     return (ArrayElements *)(a->bytes + offset);
+}
+
+bool array_elements_validate(Arena *a, Offset offset, SeenSet *seenset) {
+    if (seen(seenset, offset)) {
+        return true;
+    }
+    seenset_add(seenset, offset);
+
+    ArrayElements *array_elements = array_elements_resolve(a, offset);
+
+    Offset elems_total_size
+        = sizeof(ArrayElements) + array_elements->capacity * sizeof(Offset);
+    if (offset + elems_total_size > ARENA_SIZE) {
+        return false;
+    }
+
+    for (u64 i = 0; i < array_elements->capacity; i++) {
+        Offset element_offset = array_elements->elements[i];
+        if (element_offset == UNSET) {
+            continue;
+        }
+        if (!generic_validate(a, element_offset, seenset)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 

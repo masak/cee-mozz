@@ -1,11 +1,13 @@
 #include <assert.h>
 #include <stdalign.h>
 #include <stddef.h>
+#include <string.h>
 
 #include "../include/arena.h"
 
 void arena_init(Arena *a) {
     a->used = 0;
+    memset(a->bytes, (unsigned char)0xA3, ARENA_SIZE);
 }
 
 /* Bump-allocate `size` bytes with a given power-of-two alignment. */

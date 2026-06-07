@@ -38,6 +38,7 @@ Offset array_concat(Arena *a, Offset array_offset1, Offset array_offset2);
 
 Offset array_elements_new(Arena *a, u64 capacity);
 ArrayElements *array_elements_resolve(Arena *a, Offset offset);
+bool array_elements_validate(Arena *a, Offset offset, SeenSet *seenset);
 
 #endif
 

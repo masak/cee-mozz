@@ -7,6 +7,8 @@
 
 enum { ARENA_SIZE = 16 * 1024 };
 
+#define UNSET 0xA3A3A3A3A3A3A3A3ull
+
 typedef struct {
     _Alignas(max_align_t) unsigned char bytes[ARENA_SIZE];
     size_t used;
