@@ -11,13 +11,13 @@
 #define ASSERT_ARRAY_LENGTH(arr, expected) do { \
     Offset len_offset = array_length(&arena, arr); \
     i64 actual = i64_resolve(&arena, len_offset)->payload; \
-    ASSERT_EQ(actual, expected); \
+    ASSERT_I64_EQ(actual, expected); \
 } while (0)
 
 #define ASSERT_ARRAY_GET(arr, idx, expected_offset) do { \
     Offset idx_offset = i64_new(&arena, idx); \
     Offset actual_offset = array_get(&arena, arr, idx_offset); \
-    ASSERT_EQ(actual_offset, expected_offset); \
+    ASSERT_OFFSET_EQ(actual_offset, expected_offset); \
 } while (0)
 
 static Arena arena;
@@ -29,8 +29,8 @@ void create_empty_array(void) {
     SeenSet seenset;
     seenset_init(&seenset);
 
-    ASSERT_EQ(array_value->tag, TAG_ARRAY);
-    ASSERT_EQ(array_value->length, 0);
+    ASSERT_TAG_EQ(array_value->tag, TAG_ARRAY);
+    ASSERT_I64_EQ(array_value->length, 0);
     ASSERT(array_validate(&arena, array_offset, &seenset));
 }
 
@@ -41,8 +41,8 @@ void array_with_capacity(void) {
     SeenSet seenset;
     seenset_init(&seenset);
 
-    ASSERT_EQ(array_value->tag, TAG_ARRAY);
-    ASSERT_EQ(array_value->length, 0);
+    ASSERT_TAG_EQ(array_value->tag, TAG_ARRAY);
+    ASSERT_I64_EQ(array_value->length, 0);
     ASSERT(array_validate(&arena, array_offset, &seenset));
 }
 

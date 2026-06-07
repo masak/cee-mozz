@@ -17,7 +17,7 @@
     memcpy(_buf, (val)->payload, _len); \
     _buf[_len] = '\0'; \
     ASSERT_STR_EQ(_buf, expected); \
-    ASSERT_EQ(_len, strlen(expected)); \
+    ASSERT_I64_EQ(_len, strlen(expected)); \
 } while (0)
 
 /* Create an AsciiStrValue from a string literal and assert its contents */
@@ -27,7 +27,7 @@
     s8 str = s8(s); \
     Offset offset = ascii_str_new(&arena, &str); \
     AsciiStrValue *val = ascii_str_resolve(&arena, offset); \
-    ASSERT_EQ(val->tag, TAG_ASCII_STR); \
+    ASSERT_TAG_EQ(val->tag, TAG_ASCII_STR); \
     ASSERT_ASCII_STR_EQ(val, expected); \
 } while (0)
 
@@ -38,7 +38,7 @@
     Offset i64_offset = i64_new(&arena, xv); \
     Offset str_offset = generic_to_str(&arena, i64_offset); \
     AsciiStrValue *val = ascii_str_resolve(&arena, str_offset); \
-    ASSERT_EQ(val->tag, TAG_ASCII_STR); \
+    ASSERT_TAG_EQ(val->tag, TAG_ASCII_STR); \
     ASSERT_ASCII_STR_EQ(val, expected); \
 } while (0)
 
@@ -49,7 +49,7 @@
     s8 str = s8(s); \
     Offset str_offset = ascii_str_new(&arena, &str); \
     Offset result_offset = generic_to_str(&arena, str_offset); \
-    ASSERT_EQ(result_offset, str_offset); \
+    ASSERT_OFFSET_EQ(result_offset, str_offset); \
 } while (0)
 
 void create_empty_string(void) {
@@ -79,7 +79,7 @@ void concat_two_strings(void) {
     Offset n = ascii_str_new(&arena, &s8("world"));
     Offset result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
-    ASSERT_EQ(val->tag, TAG_ASCII_STR);
+    ASSERT_TAG_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "helloworld");
 }
 
@@ -90,7 +90,7 @@ void concat_with_empty_left(void) {
     Offset n = ascii_str_new(&arena, &s8("world"));
     Offset result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
-    ASSERT_EQ(val->tag, TAG_ASCII_STR);
+    ASSERT_TAG_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "world");
 }
 
@@ -101,7 +101,7 @@ void concat_with_empty_right(void) {
     Offset n = ascii_str_new(&arena, &s8(""));
     Offset result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
-    ASSERT_EQ(val->tag, TAG_ASCII_STR);
+    ASSERT_TAG_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "hello");
 }
 
@@ -112,7 +112,7 @@ void concat_both_empty(void) {
     Offset n = ascii_str_new(&arena, &s8(""));
     Offset result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
-    ASSERT_EQ(val->tag, TAG_ASCII_STR);
+    ASSERT_TAG_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "");
 }
 
@@ -137,7 +137,7 @@ void concat_preserves_lengths(void) {
     AsciiStrValue *rhs = ascii_str_resolve(&arena, n);
     Offset result = ascii_str_concat(&arena, m, n);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
-    ASSERT_EQ(
+    ASSERT_I64_EQ(
         val->length_in_bytes,
         lhs->length_in_bytes + rhs->length_in_bytes
     );
@@ -191,7 +191,7 @@ void to_str_from_i64_creates_new_value(void) {
     Offset i64_offset = i64_new(&arena, 42);
     Offset str_offset = generic_to_str(&arena, i64_offset);
     ASSERT(str_offset != i64_offset);
-    ASSERT_EQ(ascii_str_resolve(&arena, str_offset)->tag, TAG_ASCII_STR);
+    ASSERT_TAG_EQ(ascii_str_resolve(&arena, str_offset)->tag, TAG_ASCII_STR);
 }
 
 void to_str_identity_for_ascii_str(void) {
@@ -207,7 +207,7 @@ void to_str_identity_returns_same_offset(void) {
     arena_init(&arena);
     Offset offset = ascii_str_new(&arena, &s8("unchanged"));
     Offset result = generic_to_str(&arena, offset);
-    ASSERT_EQ(result, offset);
+    ASSERT_OFFSET_EQ(result, offset);
 }
 
 int main(void) {

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "arena.h"
 #include "typedefs.h"
 
 static i32 mt_run = 0;
@@ -24,7 +25,7 @@ static i32 mt_failed = 0;
     } \
 } while (0)
 
-#define ASSERT_EQ(actual, expected) do { \
+#define ASSERT_I64_EQ(actual, expected) do { \
     i64 expected_value = (expected); \
     i64 actual_value = (actual); \
     if (expected_value != actual_value) { \
@@ -32,6 +33,42 @@ static i32 mt_failed = 0;
             stderr, \
             "    ASSERT_EQ failed at %s:%d: expected %" PRId64 ", got %" \
                 PRId64 "\n", \
+            __FILE__, \
+            __LINE__, \
+            expected_value, \
+            actual_value \
+        ); \
+        mt_failed++; \
+        return; \
+    } \
+} while (0)
+
+#define ASSERT_OFFSET_EQ(actual, expected) do { \
+    Offset expected_value = (expected); \
+    Offset actual_value = (actual); \
+    if (expected_value != actual_value) { \
+        fprintf( \
+            stderr, \
+            "    ASSERT_EQ failed at %s:%d: expected %" PRId32 ", got %" \
+                PRId32 "\n", \
+            __FILE__, \
+            __LINE__, \
+            expected_value, \
+            actual_value \
+        ); \
+        mt_failed++; \
+        return; \
+    } \
+} while (0)
+
+#define ASSERT_TAG_EQ(actual, expected) do { \
+    Tag expected_value = (expected); \
+    Tag actual_value = (actual); \
+    if (expected_value != actual_value) { \
+        fprintf( \
+            stderr, \
+            "    ASSERT_EQ failed at %s:%d: expected %" PRId32 ", got %" \
+                PRId32 "\n", \
             __FILE__, \
             __LINE__, \
             expected_value, \

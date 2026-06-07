@@ -13,7 +13,7 @@
     Offset z = i64_add(&arena, x, y); \
     i64 actual = i64_resolve(&arena, z)->payload; \
     i64 expected = zv; \
-    ASSERT_EQ(actual, expected); \
+    ASSERT_I64_EQ(actual, expected); \
 } while (0)
 
 void positive_addition(void) {
@@ -56,7 +56,7 @@ void large_opposite_values(void) {
     Offset z = i64_subtract(&arena, x, y); \
     i64 actual = i64_resolve(&arena, z)->payload; \
     i64 expected = zv; \
-    ASSERT_EQ(actual, expected); \
+    ASSERT_I64_EQ(actual, expected); \
 } while (0)
 
 void positive_subtraction(void) {
@@ -99,7 +99,7 @@ void big_self_subtraction(void) {
     Offset z = i64_multiply(&arena, x, y); \
     i64 actual = i64_resolve(&arena, z)->payload; \
     i64 expected = zv; \
-    ASSERT_EQ(actual, expected); \
+    ASSERT_I64_EQ(actual, expected); \
 } while (0)
 
 void positive_multiplication(void) {
@@ -143,7 +143,7 @@ void extreme_values_that_just_overflow(void) {
     Offset w = i64_divide(&arena, x, y, z); \
     i64 actual = i64_resolve(&arena, w)->payload; \
     i64 expected = wv; \
-    ASSERT_EQ(actual, expected); \
+    ASSERT_I64_EQ(actual, expected); \
 } while (0)
 
 void positive_exact_division() {
@@ -187,7 +187,7 @@ void min_divide_overflow_trap() {
     Offset w = i64_modulo(&arena, x, y, z); \
     i64 actual = i64_resolve(&arena, w)->payload; \
     i64 expected = wv; \
-    ASSERT_EQ(actual, expected); \
+    ASSERT_I64_EQ(actual, expected); \
 } while (0)
 
 void positive_modulo_exact() {
