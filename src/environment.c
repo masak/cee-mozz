@@ -99,9 +99,9 @@ Offset environment_load(
 void environment_store(
     Arena *a,
     Offset env_offset,
-    Offset value_offset,
     u32 outer_steps,
-    u32 entry_index
+    u32 entry_index,
+    Offset value_offset
 ) {
     if (value_offset == UNSET) {
         assert(0 && "Trying to store UNSET in environment_store");
