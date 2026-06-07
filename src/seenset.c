@@ -9,7 +9,7 @@ void seenset_init(SeenSet *seenset) {
 
 bool seen(SeenSet *seenset, Offset offset) {
     assert(offset < ARENA_SIZE);
-    return (seenset->bits[offset / 8] >> (offset & 8)) & 1;
+    return (seenset->bits[offset / 8] >> (offset % 8)) & 1;
 }
 
 void seenset_add(SeenSet *seenset, Offset offset) {
