@@ -40,7 +40,9 @@ bool array_validate(Arena *a, Offset offset, SeenSet *seenset) {
     if (value_tag(a, elems_offset) != TAG_ARRAY_ELEMENTS) {
         return false;
     }
-    array_elements_validate(a, elems_offset, seenset);
+    if (!array_elements_validate(a, elems_offset, seenset)) {
+        return false;
+    }
 
     ArrayElements *array_elements = (ArrayElements *)(a->bytes + elems_offset);
     if (array_value->length > array_elements->capacity) {
