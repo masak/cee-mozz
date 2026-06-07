@@ -24,9 +24,9 @@ defining the various types of the runtime:
 | `IntValue` | | | `add sub mul floordiv mod` |
 | `StrValue` | | | `concat` |
 | `SmallStrValue` | | | `concat` |
-| `IntTable` | | | |
-| `StrTable` | | | |
-| `CodeTable` | | | |
+| `IntTable` | ✅ | ✅ | ✅ |
+| `StrTable` | ✅ | ✅ | ✅ |
+| `CodeTable` | ✅ | ✅ | ✅ |
 
 ## Design documents
 

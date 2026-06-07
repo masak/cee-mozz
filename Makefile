@@ -14,7 +14,10 @@ SRC_OBJS = \
  build/macro-value.o \
  build/environment.o \
  build/codeunit.o \
- build/seenset.o
+ build/seenset.o \
+ build/int-table.o \
+ build/str-table.o \
+ build/code-table.o
 
 TEST_EXECUTABLES = \
  build/value-01-i64 \
@@ -69,11 +72,20 @@ build/macro-value.o: src/macro-value.c include/arena.h include/codeunit.h includ
 build/environment.o: src/environment.c include/arena.h include/environment.h include/seenset.h include/typedefs.h include/tags.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ src/environment.c
 
-build/codeunit.o: src/codeunit.c include/arena.h include/codeunit.h include/environment.h include/seenset.h include/tags.h
+build/codeunit.o: src/codeunit.c include/arena.h include/codeunit.h include/environment.h include/seenset.h include/tags.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ src/codeunit.c
 
 build/seenset.o: src/seenset.c include/arena.h include/seenset.h include/typedefs.h
 	$(CC) $(CFLAGS) -c -o $@ src/seenset.c
+
+build/int-table.o: src/int-table.c include/arena.h include/int-table.h include/seenset.h include/tags.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ src/int-table.c
+
+build/str-table.o: src/str-table.c include/arena.h include/seenset.h include/str-table.h include/tags.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ src/str-table.c
+
+build/code-table.o: src/code-table.c include/arena.h include/code-table.h include/seenset.h include/tags.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ src/code-table.c
 
 # -----------------------------------------------------------------------------
 # Test objects

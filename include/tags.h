@@ -10,6 +10,10 @@
 #define TAG_MACRO           0x09
 #define TAG_ENVIRONMENT     0x0a
 #define TAG_CODE_UNIT       0x0b
+/* skipping syntaxnode 0x0c, int 0x0d, str 0x0e, smallstr 0x0f */
+#define TAG_INT_TABLE       0x10
+#define TAG_STR_TABLE       0x11
+#define TAG_CODE_TABLE      0x12
 
 #endif
 

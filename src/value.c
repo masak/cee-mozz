@@ -4,11 +4,14 @@
 #include "../include/arena.h"
 #include "../include/array-value.h"
 #include "../include/ascii-str-value.h"
+#include "../include/code-table.h"
 #include "../include/codeunit.h"
 #include "../include/environment.h"
 #include "../include/func-value.h"
 #include "../include/i64-value.h"
+#include "../include/int-table.h"
 #include "../include/macro-value.h"
+#include "../include/str-table.h"
 #include "../include/value.h"
 #include "../include/tags.h"
 
@@ -36,6 +39,12 @@ bool generic_validate(Arena *a, Offset offset, SeenSet *seenset) {
             return environment_validate(a, offset, seenset);
         case TAG_CODE_UNIT:
             return codeunit_validate(a, offset, seenset);
+        case TAG_INT_TABLE:
+            return inttable_validate(a, offset, seenset);
+        case TAG_STR_TABLE:
+            return strtable_validate(a, offset, seenset);
+        case TAG_CODE_TABLE:
+            return codetable_validate(a, offset, seenset);
         default:
             assert(0 && "unsupported type tag in generic_validate");
             return 0; /* unreachable */

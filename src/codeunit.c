@@ -3,10 +3,14 @@
 #include <string.h>
 
 #include "../include/arena.h"
+#include "../include/code-table.h"
 #include "../include/codeunit.h"
 #include "../include/environment.h"
+#include "../include/int-table.h"
 #include "../include/seenset.h"
+#include "../include/str-table.h"
 #include "../include/tags.h"
+#include "../include/value.h"
 
 Offset codeunit_new(
     Arena *a,
@@ -60,9 +64,32 @@ bool codeunit_validate(Arena *a, Offset offset, SeenSet *seenset) {
         return false;
     }
 
-    /* check inttable_offset (IntTable tag or unset) */
-    /* check strtable_offset (StrTable tag or unset) */
-    /* check codetable_offset (CodeTable tag or unset) */
+    if (codeunit->inttable_offset != UNSET) {
+        if (value_tag(a, codeunit->inttable_offset) != TAG_INT_TABLE) {
+            return false;
+        }
+        if (!inttable_validate(a, codeunit->inttable_offset, seenset)) {
+            return false;
+        }
+    }
+
+    if (codeunit->strtable_offset != UNSET) {
+        if (value_tag(a, codeunit->strtable_offset) != TAG_STR_TABLE) {
+            return false;
+        }
+        if (!strtable_validate(a, codeunit->strtable_offset, seenset)) {
+            return false;
+        }
+    }
+
+    if (codeunit->codetable_offset != UNSET) {
+        if (value_tag(a, codeunit->codetable_offset) != TAG_CODE_TABLE) {
+            return false;
+        }
+        if (!codetable_validate(a, codeunit->codetable_offset, seenset)) {
+            return false;
+        }
+    }
 
     /* for each instruction:
            check each register is within range
