@@ -5,6 +5,8 @@
 #include <stdalign.h>
 #include <stddef.h>
 
+#include "typedefs.h"
+
 enum { ARENA_SIZE = 16 * 1024 };
 
 #define UNSET 0xA3A3A3A3A3A3A3A3ull
@@ -14,8 +16,10 @@ typedef struct {
     size_t used;
 } Arena;
 
-typedef size_t Offset;
-typedef size_t MaybeOffset;
+typedef u32     Tag;
+
+typedef size_t  Offset;
+typedef size_t  MaybeOffset;
 
 void arena_init(Arena *a);
 void *arena_alloc(Arena *a, size_t size, size_t align);

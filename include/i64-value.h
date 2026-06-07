@@ -8,7 +8,7 @@
 #include "typedefs.h"
 
 typedef struct {
-    u64 tag;
+    Tag tag;
     i64 payload;
 } I64Value;
 

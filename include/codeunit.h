@@ -15,7 +15,7 @@ typedef struct {
 } Instruction;
 
 typedef struct {
-    u64 tag;
+    Tag tag;
     u64 parameter_count;
     u64 register_count;
     u64 env_length;

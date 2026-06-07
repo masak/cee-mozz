@@ -8,7 +8,7 @@
 #include "typedefs.h"
 
 typedef struct {
-    u64 tag;
+    Tag tag;
     Offset env_offset;
     Offset codeunit_offset;
 } MacroValue;

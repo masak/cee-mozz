@@ -13,7 +13,7 @@ typedef struct {
 } EnvEntry;
 
 typedef struct {
-    u64 tag;
+    Tag tag;
     MaybeOffset outer_env_offset;
     u64 entry_count;
     EnvEntry entries[];

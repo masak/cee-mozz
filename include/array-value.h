@@ -10,13 +10,13 @@
 #include "value.h"
 
 typedef struct {
-    u64 tag;
+    Tag tag;
     u64 length;
     Offset elements_offset;
 } ArrayValue;
 
 typedef struct {
-    u64 tag;
+    Tag tag;
     u64 capacity;
     MaybeOffset elements[];
 } ArrayElements;
