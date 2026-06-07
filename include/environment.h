@@ -28,14 +28,19 @@ Offset environment_new(
 Environment *environment_resolve(Arena *a, Offset offset);
 bool environment_validate(Arena *a, Offset offset, SeenSet *seenset);
 
-Offset environment_load(Arena *a, Offset env_offset, u32 entry_index);
-void environment_store(
+Offset environment_load(
     Arena *a,
     Offset env_offset,
-    Offset value_offset,
     u32 outer_steps,
     u32 entry_index,
     Offset fallback_offset
+);
+void environment_store(
+    Arena *a,
+    Offset env_offset,
+    u32 outer_steps,
+    u32 entry_index,
+    Offset value_offset
 );
 
 #endif

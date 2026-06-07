@@ -65,3 +65,67 @@ bool environment_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+Offset environment_load(
+    Arena *a,
+    Offset env_offset,
+    u32 outer_steps,
+    u32 entry_index,
+    Offset fallback_offset
+) {
+    Offset current_env_offset = env_offset;
+
+    for (u32 i = 0; i < outer_steps; i++) {
+        Environment *environment = environment_resolve(a, current_env_offset);
+        MaybeOffset outer_env_offset = environment->outer_env_offset;
+        if (outer_env_offset == UNSET) {
+            return fallback_offset;
+        }
+        current_env_offset = outer_env_offset;
+    }
+
+    Environment *environment = environment_resolve(a, current_env_offset);
+    if (entry_index >= environment->entry_count) {
+        return fallback_offset;
+    }
+
+    MaybeOffset cell = environment->entries[entry_index].cell;
+    if (cell == UNSET) {
+        return fallback_offset;
+    }
+
+    return cell;
+}
+
+void environment_store(
+    Arena *a,
+    Offset env_offset,
+    Offset value_offset,
+    u32 outer_steps,
+    u32 entry_index
+) {
+    if (value_offset == UNSET) {
+        assert(0 && "Trying to store UNSET in environment_store");
+        return;
+    }
+
+    Offset current_env_offset = env_offset;
+
+    for (u32 i = 0; i < outer_steps; i++) {
+        Environment *environment = environment_resolve(a, current_env_offset);
+        MaybeOffset outer_env_offset = environment->outer_env_offset;
+        if (outer_env_offset == UNSET) {
+            assert(0 && "Too many outer_steps in environment_store");
+            return;
+        }
+        current_env_offset = outer_env_offset;
+    }
+
+    Environment *environment = environment_resolve(a, current_env_offset);
+    if (entry_index >= environment->entry_count) {
+        assert(0 && "entry_index exceeds entry_count in environment_store");
+        return;
+    }
+
+    environment->entries[entry_index].cell = value_offset;
+}
+
