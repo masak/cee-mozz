@@ -7,6 +7,7 @@
 #include "../include/test.h"
 #include "../include/typedefs.h"
 #include "../include/tags.h"
+#include "../include/value.h"
 
 /* Compare an AsciiStrValue's payload against an expected C string */
 #define ASSERT_ASCII_STR_EQ(val, expected) do { \

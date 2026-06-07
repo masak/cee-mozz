@@ -82,7 +82,7 @@ build/seenset.o: src/seenset.c include/arena.h include/seenset.h include/typedef
 build/value-01-i64.o: test/value-01-i64.c include/i64-value.h include/seenset.h include/test.h
 	$(CC) $(CFLAGS) -c -o $@ test/value-01-i64.c
 
-build/value-02-ascii-str.o: test/value-02-ascii-str.c include/arena.h include/ascii-str-value.h include/i64-value.h include/test.h include/typedefs.h include/tags.h
+build/value-02-ascii-str.o: test/value-02-ascii-str.c include/arena.h include/ascii-str-value.h include/i64-value.h include/test.h include/typedefs.h include/tags.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ test/value-02-ascii-str.c
 
 build/value-06-array.o: test/value-06-array.c include/arena.h include/array-value.h include/i64-value.h include/seenset.h include/test.h include/tags.h include/value.h

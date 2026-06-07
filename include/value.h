@@ -12,5 +12,7 @@ typedef struct {
 Tag value_tag(Arena *a, Offset offset);
 bool generic_validate(Arena *a, Offset offset, SeenSet *seenset);
 
+Offset generic_to_str(Arena *a, Offset offset);
+
 #endif
 

@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <string.h>
+
 #include "../include/arena.h"
 #include "../include/array-value.h"
 #include "../include/ascii-str-value.h"
@@ -35,6 +38,43 @@ bool generic_validate(Arena *a, Offset offset, SeenSet *seenset) {
             return codeunit_validate(a, offset, seenset);
         default:
             assert(0 && "unsupported type tag in generic_validate");
+            return 0; /* unreachable */
+    }
+}
+
+/* Convert any Value to its AsciiStrValue representation */
+Offset generic_to_str(Arena *a, Offset offset) {
+    switch (value_tag(a, offset)) {
+        case TAG_I64: {
+            I64Value *value = i64_resolve(a, offset);
+
+            /* i64 range: -9223372036854775808 .. 9223372036854775807
+             * maximum string length is 20 characters (19 digits + sign). */
+            char buffer[32];
+            int n = snprintf(
+                buffer,
+                sizeof(buffer),
+                "%" PRId64,
+                (long long)value->payload
+            );
+            assert(n > 0 && (size_t)n < sizeof(buffer));
+
+            size_t length = (size_t)n;
+            AsciiStrValue *result = arena_alloc(
+                a,
+                sizeof(AsciiStrValue) + length,
+                alignof(AsciiStrValue)
+            );
+            result->tag = TAG_ASCII_STR;
+            result->length_in_bytes = (u32)length;
+            memcpy(result->payload, buffer, length);
+
+            return (Offset)((unsigned char *)result - a->bytes);
+        }
+        case TAG_ASCII_STR:
+            return offset;
+        default:
+            assert(0 && "unsupported type tag in generic_to_str");
             return 0; /* unreachable */
     }
 }
