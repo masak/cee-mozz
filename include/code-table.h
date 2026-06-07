@@ -17,5 +17,7 @@ Offset codetable_new(Arena *a, u32 length, Offset elements[]);
 CodeTable *codetable_resolve(Arena *a, Offset offset);
 bool codetable_validate(Arena *a, Offset offset, SeenSet *seenset);
 
+Offset codetable_get(Arena *a, Offset offset, u32 index);
+
 #endif
 

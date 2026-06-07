@@ -56,3 +56,9 @@ bool codetable_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+Offset codetable_get(Arena *a, Offset offset, u32 index) {
+    CodeTable *codetable = codetable_resolve(a, offset);
+    assert(index < codetable->length);
+    return codetable->elements[index];
+}
+

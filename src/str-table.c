@@ -56,3 +56,9 @@ bool strtable_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+Offset strtable_get(Arena *a, Offset offset, u32 index) {
+    StrTable *strtable = strtable_resolve(a, offset);
+    assert(index < strtable->length);
+    return strtable->elements[index];
+}
+

@@ -56,3 +56,9 @@ bool inttable_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+Offset inttable_get(Arena *a, Offset offset, u32 index) {
+    IntTable *inttable = inttable_resolve(a, offset);
+    assert(index < inttable->length);
+    return inttable->elements[index];
+}
+

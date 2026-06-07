@@ -17,5 +17,7 @@ Offset strtable_new(Arena *a, u32 length, Offset elements[]);
 StrTable *strtable_resolve(Arena *a, Offset offset);
 bool strtable_validate(Arena *a, Offset offset, SeenSet *seenset);
 
+Offset strtable_get(Arena *a, Offset offset, u32 index);
+
 #endif
 
