@@ -98,10 +98,10 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 
 ## Environment
 
-| bytes         | instruction               | description            |
-|---------------|---------------------------|------------------------|
-| `25 tr ee oo` | `<tr> = load(<ee>, <oo>)` | load from environment  |
-| `26 r1 ee oo` | `store(<r1>, <ee>, <oo>)` | store into environment |
+| bytes         | instruction               | description                    |
+|---------------|---------------------------|--------------------------------|
+| `25 tr ee oo` | `<tr> = load(<ee>, <oo>)` | load from environment [error]  |
+| `26 r1 ee oo` | `store(<r1>, <ee>, <oo>)` | store into environment [error] |
 
 ## SyntaxNode
 
