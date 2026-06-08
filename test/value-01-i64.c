@@ -219,7 +219,7 @@ void zero_mod_positive() {
 }
 
 void minimum_mod_negative_one() {
-    ASSERT_I64_MODULO(INT64_MIN, -1, 999, 0);
+    ASSERT_I64_MODULO(INT64_MIN, -1, 999, 999);
 }
 
 #define ASSERT_I64_VALIDATE(xv) do { \

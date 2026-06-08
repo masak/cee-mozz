@@ -93,7 +93,7 @@ Offset i64_modulo(Arena *a, Offset m, Offset n, Offset fallback) {
     }
 
     if (num == INT64_MIN && den == -1) {
-        return i64_new(a, 0);
+        return fallback;
     }
 
     // num == (num // den) * den + (num % den)
