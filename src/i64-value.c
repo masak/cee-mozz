@@ -30,6 +30,7 @@ bool i64_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+/* Addition overflow is silent and wraps */
 Offset i64_add(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
@@ -37,6 +38,7 @@ Offset i64_add(Arena *a, Offset m, Offset n) {
     return i64_new(a, (i64)sum);
 }
 
+/* Subtraction overflow is silent and wraps */
 Offset i64_subtract(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
@@ -44,6 +46,7 @@ Offset i64_subtract(Arena *a, Offset m, Offset n) {
     return i64_new(a, (i64)difference);
 }
 
+/* Multiplication overflow is silent and wraps */
 Offset i64_multiply(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
