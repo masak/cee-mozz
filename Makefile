@@ -22,7 +22,8 @@ SRC_OBJS = \
 TEST_EXECUTABLES = \
  build/value-01-i64 \
  build/value-02-ascii-str \
- build/value-06-array
+ build/value-06-array \
+ build/value-07-func
 
 all: $(TEST_EXECUTABLES)
 
@@ -30,6 +31,7 @@ test: all
 	./build/value-01-i64
 	./build/value-02-ascii-str
 	./build/value-06-array
+	./build/value-07-func
 
 # -----------------------------------------------------------------------------
 # Test executables
@@ -43,6 +45,9 @@ build/value-02-ascii-str: build/value-02-ascii-str.o $(SRC_OBJS)
 
 build/value-06-array: build/value-06-array.o $(SRC_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ build/value-06-array.o $(SRC_OBJS)
+
+build/value-07-func: build/value-07-func.o $(SRC_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ build/value-07-func.o $(SRC_OBJS)
 
 # -----------------------------------------------------------------------------
 # Source objects
@@ -99,6 +104,9 @@ build/value-02-ascii-str.o: test/value-02-ascii-str.c include/arena.h include/as
 
 build/value-06-array.o: test/value-06-array.c include/arena.h include/array-value.h include/i64-value.h include/seenset.h include/test.h include/tags.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ test/value-06-array.c
+
+build/value-07-func.o: test/value-07-func.c include/arena.h include/array-value.h include/ascii-str-value.h include/codeunit.h include/environment.h include/func-value.h include/i64-value.h include/int-table.h include/macro-value.h include/seenset.h include/str-table.h include/tags.h include/test.h include/typedefs.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ test/value-07-func.c
 
 # -----------------------------------------------------------------------------
 # Cleanup

@@ -36,6 +36,9 @@ bool func_validate(Arena *a, Offset offset, SeenSet *seenset) {
     FuncValue *func_value = func_resolve(a, offset);
 
     Offset env_offset = func_value->env_offset;
+    if (env_offset == UNSET) {
+        return false;
+    }
     if (value_tag(a, env_offset) != TAG_ENVIRONMENT) {
         return false;
     }
@@ -44,6 +47,9 @@ bool func_validate(Arena *a, Offset offset, SeenSet *seenset) {
     }
 
     Offset codeunit_offset = func_value->codeunit_offset;
+    if (codeunit_offset == UNSET) {
+        return false;
+    }
     if (value_tag(a, codeunit_offset) != TAG_CODE_UNIT) {
         return false;
     }
