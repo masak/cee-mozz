@@ -34,6 +34,10 @@ bool strtable_validate(Arena *a, Offset offset, SeenSet *seenset) {
 
     StrTable *strtable = strtable_resolve(a, offset);
 
+    if (strtable->length > 0xFFFF) {
+        return false;
+    }
+
     Offset total_size = sizeof(StrTable) + strtable->length * sizeof(Offset);
     if (offset + total_size > ARENA_SIZE) {
         return false;

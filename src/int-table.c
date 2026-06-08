@@ -34,6 +34,10 @@ bool inttable_validate(Arena *a, Offset offset, SeenSet *seenset) {
 
     IntTable *inttable = inttable_resolve(a, offset);
 
+    if (inttable->length > 0xFFFF) {
+        return false;
+    }
+
     Offset total_size = sizeof(IntTable) + inttable->length * sizeof(Offset);
     if (offset + total_size > ARENA_SIZE) {
         return false;

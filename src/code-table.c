@@ -34,6 +34,10 @@ bool codetable_validate(Arena *a, Offset offset, SeenSet *seenset) {
 
     CodeTable *codetable = codetable_resolve(a, offset);
 
+    if (codetable->length > 0xFFFF) {
+        return false;
+    }
+
     Offset total_size
         = sizeof(CodeTable) + codetable->length * sizeof(Offset);
     if (offset + total_size > ARENA_SIZE) {
