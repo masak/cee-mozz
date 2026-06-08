@@ -49,14 +49,15 @@ A unique singleton value, `none`.
 
 # UninitializedValue
 
-A non-value indicating something (a variable, an array element, or an object
-slot) is not yet initialized.
+Mozzarella, the TypeScript implementation, has an `UninitializedValue` type,
+which qualifies as a `Value` everywhere, but which generates a runtime error
+whenever it is read; this is to simulate using a variable which has not yet
+been initialized.
 
-```
-.------.
-| 0x05 |
-'------'
-```
+In `cee-mozz`, we can avoid this value type; instead whenever we would have
+pointed an offset (in the arena, or in a register) to an `UninitializedValue`,
+we instead let that offset have the special value `0xA3A3A3A3`, which
+designates the state of being unset or uninitialized.
 
 # ArrayValue
 

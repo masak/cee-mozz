@@ -20,7 +20,6 @@ defining the various types of the runtime:
 | `AsciiStrValue` | ✅ | ✅ | ✅ `concat to_string` |
 | `BoolValue` | | | `to_bool` |
 | `NoneValue` | | | |
-| `UninitializedValue` | | | |
 | `ArrayValue` | ✅ | ✅ | ✅ `push get set length concat` |
 | `ArrayElements` | ✅ | ✅ | ✅ |
 | `FuncValue` | ✅ | (✅) | ✅ |
