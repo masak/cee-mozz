@@ -72,15 +72,15 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 
 ## Array
 
-| bytes         | instruction                 | description                  |
-|---------------|-----------------------------|------------------------------|
-| `1a r1 -- --` | `Array.assert(<r1>)`        | assert type Array            |
-| `1b tr pp pp` | `<tr> = Array.init(pppp)`   | initialize array, u16 cap    |
-| `1c tr r1 --` | `<tr>.push(<r1>)`           | add element to end of array  |
-| `1d tr r1 r2` | `<tr> = <r1>[<r2>]`         | index (Array, Int)           |
-| `1e tr r1 r2` | `<tr>[<r1>] = <r2>`         | assign index (Array, Int)    |
-| `1f tr r1 --` | `<tr> = Array.length(<r1>)` | get number of elements       |
-| `20 tr r1 r2` | `<tr> = Array.concat(<r1>, <r2>)` | concatenate (Array, Array) |
+| bytes         | instruction                 | description                 |
+|---------------|-----------------------------|-----------------------------|
+| `1a r1 -- --` | `Array.assert(<r1>)`        | assert type Array           |
+| `1b tr pp pp` | `<tr> = Array.init(pppp)`   | initialize array, u16 cap   |
+| `1c tr r1 --` | `<tr>.push(<r1>)`           | add element to end of array |
+| `1d tr r1 r2` | `<tr> = <r1>[<r2>]`         | get element [error]         |
+| `1e tr r1 r2` | `<tr>[<r1>] = <r2>`         | set element [error]         |
+| `1f tr r1 --` | `<tr> = Array.length(<r1>)` | get number of elements      |
+| `20 tr r1 r2` | `<tr> = Array.concat(<r1>, <r2>)` | concatenate arrays    |
 
 ## Func
 
