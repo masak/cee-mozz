@@ -80,5 +80,7 @@ Applied to the example above, we have:
 Each function still has plenty of registers, and we would find all of the above
 variables stored in registers, even if they are not in an environment. In this
 sense, environments become specifically storage for variables whose reach
-exceeds a single procedure.
+exceeds a single procedure. In other words, they include only those variables
+which a procedure nested deeper inside the current procedure reads from or
+writes to.
 
