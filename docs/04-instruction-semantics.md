@@ -6,7 +6,7 @@ from this array, but ideally this should never give an error, assuming code
 from validated `CodeUnit`s. We also check that a register is not unset before
 reading from it, but this should also have been ruled out by validation.
 
-We also assume there's an `int_table`, a `str_table`, and a `code_table`, all
+We also assume there's an `inttable`, a `strtable`, and a `codetable`, all
 associated with the currently executing routine. We perform overly-cautious
 checking of the tags of the data we read from these tables; again, this should
 never give an error, assuming these tables have been validated.
@@ -53,7 +53,7 @@ assert_value_tag_is_one_of(INT_TAGS, reg[t1]);
 Instruction: `<tr> = Int.const(iiii)`
 
 ```c
-reg[tr] = int_table_lookup(int_table, iiii);
+reg[tr] = inttable_get(inttable, iiii);
 ```
 
 ## Add (Int, Int)
