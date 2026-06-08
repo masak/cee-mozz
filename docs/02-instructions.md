@@ -5,6 +5,7 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 | abbr | meaning             |
 |------|---------------------|
 | `tr` | target register     |
+| `rN` | source register `N` |
 | `ii` | index in Int table  |
 | `ss` | index in Str table  |
 | `cc` | index in Code table |
