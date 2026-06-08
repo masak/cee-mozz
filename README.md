@@ -2,6 +2,13 @@
 
 A C implementation of a runtime for Mozzarella.
 
+## Building
+
+```bash
+$ make
+$ make test
+```
+
 ## Plan
 
 See further planning among the documents below. Here is the current progress
