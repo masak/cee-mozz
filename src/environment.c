@@ -126,6 +126,11 @@ void environment_store(
         return;
     }
 
+    if (!environment->entries[entry_index].writable) {
+        assert(0 && "entry is readonly in environment_store");
+        return;
+    }
+
     environment->entries[entry_index].cell = value_offset;
 }
 
