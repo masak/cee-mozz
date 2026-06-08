@@ -31,7 +31,7 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 | `05 tr r1 r2` | `<tr> = Int.sub(<r1>, <r2>)`  | subtract (Int, Int)       |
 | `06 tr r1 r2` | `<tr> = Int.mul(<r1>, <r2>)`  | multiply (Int, Int)       |
 | `07 tr r1 r2` | `<tr> = Int.idiv(<r1>, <r2>)` | divide (Int, Int) [error] |
-| `08 tr r2 r2` | `<tr> = Int.mod(<r1>, <r2>)`  | modulo (Int, Int) [error] |
+| `08 tr r1 r2` | `<tr> = Int.mod(<r1>, <r2>)`  | modulo (Int, Int) [error] |
 
 ## Str
 
