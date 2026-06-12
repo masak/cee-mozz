@@ -64,7 +64,7 @@ Offset generic_to_str(Arena *a, Offset offset) {
                 buffer,
                 sizeof(buffer),
                 "%" PRId64,
-                (long long)value->payload
+                value->payload
             );
             assert(n > 0 && (size_t)n < sizeof(buffer));
 
