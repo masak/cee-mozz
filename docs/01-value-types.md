@@ -33,7 +33,7 @@ A single boolean value, `true` or `false`.
 
 ```
 .------.-------------.
-| 0x03 | i64 payload |
+| 0x03 | i32 payload |
 '------'-------------'
 ```
 
