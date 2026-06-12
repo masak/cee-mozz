@@ -24,7 +24,9 @@ Offset environment_new(
     environment->tag = TAG_ENVIRONMENT;
     environment->outer_env_offset = outer_env_offset;
     environment->entry_count = entry_count;
-    memcpy(environment->entries, entries, entries_size);
+    if (entries != NULL) {
+        memcpy(environment->entries, entries, entries_size);
+    }
 
     return (Offset)((unsigned char *)environment - a->bytes);
 }
