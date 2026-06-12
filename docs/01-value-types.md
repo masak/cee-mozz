@@ -115,7 +115,7 @@ A callable macro.
 '------'-----------'-------------'---------'
 ```
 
-Each entry is worth two u64s:
+Each entry is worth two u32s:
 
 ```
 .-----------------.------------.
