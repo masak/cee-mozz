@@ -146,35 +146,35 @@ void extreme_values_that_just_overflow(void) {
     ASSERT_I64_EQ(actual, expected); \
 } while (0)
 
-void positive_exact_division() {
+void positive_exact_division(void) {
     ASSERT_I64_DIVIDE(42, 6, 999, 7);
 }
 
-void positive_floored_division() {
+void positive_floored_division(void) {
     ASSERT_I64_DIVIDE(17, 5, 999, 3);
 }
 
-void negative_floored_division() {
+void negative_floored_division(void) {
     ASSERT_I64_DIVIDE(-17, 5, 999, -4);
 }
 
-void positive_numerator_negative_denominator_floored() {
+void positive_numerator_negative_denominator_floored(void) {
     ASSERT_I64_DIVIDE(17, -5, 999, -4);
 }
 
-void negative_div_negative_is_positive_floored() {
+void negative_div_negative_is_positive_floored(void) {
     ASSERT_I64_DIVIDE(-17, -5, 999, 3);
 }
 
-void denominator_is_zero_fallback() {
+void denominator_is_zero_fallback(void) {
     ASSERT_I64_DIVIDE(42, 0, -1, -1);
 }
 
-void zero_numerator() {
+void zero_numerator(void) {
     ASSERT_I64_DIVIDE(0, 5, 999, 0);
 }
 
-void min_divide_overflow_trap() {
+void min_divide_overflow_trap(void) {
     ASSERT_I64_DIVIDE(INT64_MIN, -1, 999, 999);
 }
 
@@ -190,35 +190,35 @@ void min_divide_overflow_trap() {
     ASSERT_I64_EQ(actual, expected); \
 } while (0)
 
-void positive_modulo_exact() {
+void positive_modulo_exact(void) {
     ASSERT_I64_MODULO(42, 6, 999, 0);
 }
 
-void positive_modulo_with_remainder() {
+void positive_modulo_with_remainder(void) {
     ASSERT_I64_MODULO(17, 5, 999, 2);
 }
 
-void negative_mod_positive() {
+void negative_mod_positive(void) {
     ASSERT_I64_MODULO(-17, 5, 999, 3);
 }
 
-void positive_mod_negative() {
+void positive_mod_negative(void) {
     ASSERT_I64_MODULO(17, -5, 999, -3);
 }
 
-void negative_mod_negative() {
+void negative_mod_negative(void) {
     ASSERT_I64_MODULO(-17, -5, 999, -2);
 }
 
-void mod_denominator_zero_fallback() {
+void mod_denominator_zero_fallback(void) {
     ASSERT_I64_MODULO(42, 0, -1, -1);
 }
 
-void zero_mod_positive() {
+void zero_mod_positive(void) {
     ASSERT_I64_MODULO(0, 5, 999, 0);
 }
 
-void minimum_mod_negative_one() {
+void minimum_mod_negative_one(void) {
     ASSERT_I64_MODULO(INT64_MIN, -1, 999, 999);
 }
 
@@ -232,7 +232,7 @@ void minimum_mod_negative_one() {
     ASSERT(actual); \
 } while (0)
 
-void validate_some_i64s() {
+void validate_some_i64s(void) {
     ASSERT_I64_VALIDATE(0);
     ASSERT_I64_VALIDATE(5);
     ASSERT_I64_VALIDATE(-17);
