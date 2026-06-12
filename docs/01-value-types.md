@@ -126,13 +126,29 @@ Each entry is worth two u32s:
 # CodeUnit
 
 ```
-.------.-----------------.----------------.------------.
-| 0x0b | parameter count | register count | env length |
-'------+--------------+--+-----------+----+----------+-'
+.------.----------------.----------------.------------.
+| 0x0b | parameters ptr | register count | env length |
+'------+--------------+-+------------+---+-----------+'
        | inttable ptr | strtable ptr | codetable ptr |
        +-------------++-------------++---------------'
        | instr count | instructions |
        '-------------'--------------'
+```
+
+# Parameters
+
+```
+.------.-------------.---------.
+| 0x13 | param count | entries |
+'------'-------------'---------'
+```
+
+Each entry is worth one u32:
+
+```
+.---------.
+| str ptr |
+'---------'
 ```
 
 # SyntaxNodeValue
