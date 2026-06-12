@@ -241,15 +241,15 @@ Instruction: `store(<r1>, <ee>, <oo>)`
 
 Instruction: `<tr> = SyntaxNode.init(...<r1>)`
 
-## ...IntNode (Int)
+## Assign IntNode (Int)
 
 Instruction: `<tr> = SyntaxNode.IntNode(...<r1>)`
 
-## ...StrNode (Str)
+## Assign StrNode (Str)
 
 Instruction: `<tr> = SyntaxNode.StrNode(...<r1>)`
 
-## ...BoolNode (Bool)
+## Assign BoolNode (Bool)
 
 Instruction: `<tr> = SyntaxNode.BoolNode(...<r1>)`
 
