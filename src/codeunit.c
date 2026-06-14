@@ -37,7 +37,9 @@ Offset codeunit_new(
     codeunit->strtable_offset = strtable_offset;
     codeunit->codetable_offset = codetable_offset;
     codeunit->instr_count = instr_count;
-    memcpy(codeunit->instructions, instructions, instructions_size);
+    if (instructions != NULL) {
+        memcpy(codeunit->instructions, instructions, instructions_size);
+    }
 
     return (Offset)((unsigned char *)codeunit - a->bytes);
 }
