@@ -31,7 +31,7 @@ void create_empty_array(void) {
 
     ASSERT_TAG_EQ(array_value->tag, TAG_ARRAY);
     ASSERT_I64_EQ(array_value->length, 0);
-    ASSERT(array_validate(&arena, array_offset, &seenset));
+    ASSERT_TRUE(array_validate(&arena, array_offset, &seenset));
 }
 
 void array_with_capacity(void) {
@@ -43,7 +43,7 @@ void array_with_capacity(void) {
 
     ASSERT_TAG_EQ(array_value->tag, TAG_ARRAY);
     ASSERT_I64_EQ(array_value->length, 0);
-    ASSERT(array_validate(&arena, array_offset, &seenset));
+    ASSERT_TRUE(array_validate(&arena, array_offset, &seenset));
 }
 
 void push_increases_length(void) {
@@ -140,11 +140,12 @@ void concatenate_creates_distinct_array(void) {
     array_push(&arena, arr2_offset, a);
 
     Offset result = array_concat(&arena, arr1_offset, arr2_offset);
-    ASSERT(result != arr1_offset);
-    ASSERT(result != arr2_offset);
+    ASSERT_OFFSET_NE(result, arr1_offset);
+    ASSERT_OFFSET_NE(result, arr2_offset);
 }
 
 int main(void) {
+    PLAN(10);
     RUN_TEST(create_empty_array);
     RUN_TEST(array_with_capacity);
     RUN_TEST(push_increases_length);

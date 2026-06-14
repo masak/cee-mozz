@@ -46,7 +46,7 @@ void validate_func(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(func_validate(&arena, func_offset, &seenset));
+    ASSERT_TRUE(func_validate(&arena, func_offset, &seenset));
 }
 
 void func_validate_with_populated_env(void) {
@@ -62,7 +62,7 @@ void func_validate_with_populated_env(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(func_validate(&arena, func_offset, &seenset));
+    ASSERT_TRUE(func_validate(&arena, func_offset, &seenset));
 }
 
 void func_validate_with_nested_env(void) {
@@ -80,7 +80,7 @@ void func_validate_with_nested_env(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(func_validate(&arena, func_offset, &seenset));
+    ASSERT_TRUE(func_validate(&arena, func_offset, &seenset));
 }
 
 void func_validate_invalid_env_tag(void) {
@@ -92,7 +92,7 @@ void func_validate_invalid_env_tag(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(!func_validate(&arena, func_offset, &seenset));
+    ASSERT_TRUE(!func_validate(&arena, func_offset, &seenset));
 }
 
 void func_validate_unset_env(void) {
@@ -103,7 +103,7 @@ void func_validate_unset_env(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(!func_validate(&arena, func_offset, &seenset));
+    ASSERT_TRUE(!func_validate(&arena, func_offset, &seenset));
 }
 
 void func_validate_invalid_codeunit_tag(void) {
@@ -114,7 +114,7 @@ void func_validate_invalid_codeunit_tag(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(!func_validate(&arena, func_offset, &seenset));
+    ASSERT_TRUE(!func_validate(&arena, func_offset, &seenset));
 }
 
 void func_validate_unset_codeunit(void) {
@@ -124,7 +124,7 @@ void func_validate_unset_codeunit(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(!func_validate(&arena, func_offset, &seenset));
+    ASSERT_TRUE(!func_validate(&arena, func_offset, &seenset));
 }
 
 void func_validate_invalid_codeunit_state(void) {
@@ -137,7 +137,7 @@ void func_validate_invalid_codeunit_state(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(!func_validate(&arena, func_offset, &seenset));
+    ASSERT_TRUE(!func_validate(&arena, func_offset, &seenset));
 }
 
 void func_validate_codeunit_too_many_params(void) {
@@ -149,7 +149,7 @@ void func_validate_codeunit_too_many_params(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(!func_validate(&arena, func_offset, &seenset));
+    ASSERT_TRUE(!func_validate(&arena, func_offset, &seenset));
 }
 
 void func_create_distinct_value(void) {
@@ -162,9 +162,9 @@ void func_create_distinct_value(void) {
     Offset cu2 = codeunit_new(&arena, 0, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
     Offset func2 = func_new(&arena, env2, cu2);
 
-    ASSERT(func1 != func2);
-    ASSERT(func1 != env1);
-    ASSERT(func1 != cu1);
+    ASSERT_OFFSET_NE(func1, func2);
+    ASSERT_OFFSET_NE(func1, env1);
+    ASSERT_OFFSET_NE(func1, cu1);
 }
 
 void func_env_contains_another_func(void) {
@@ -184,7 +184,7 @@ void func_env_contains_another_func(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(func_validate(&arena, outer_func, &seenset));
+    ASSERT_TRUE(func_validate(&arena, outer_func, &seenset));
 }
 
 void func_codeunit_with_tables(void) {
@@ -206,10 +206,11 @@ void func_codeunit_with_tables(void) {
 
     SeenSet seenset;
     seenset_init(&seenset);
-    ASSERT(func_validate(&arena, func_offset, &seenset));
+    ASSERT_TRUE(func_validate(&arena, func_offset, &seenset));
 }
 
 int main(void) {
+    PLAN(13);
     RUN_TEST(create_func_with_empty_env_and_codeunit);
     RUN_TEST(validate_func);
     RUN_TEST(func_validate_with_populated_env);

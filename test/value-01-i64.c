@@ -229,7 +229,7 @@ void minimum_mod_negative_one(void) {
     seenset_init(&seenset); \
     Offset x = i64_new(&arena, xv); \
     bool actual = i64_validate(&arena, x, &seenset); \
-    ASSERT(actual); \
+    ASSERT_TRUE(actual); \
 } while (0)
 
 void validate_some_i64s(void) {
@@ -241,6 +241,7 @@ void validate_some_i64s(void) {
 }
 
 int main(void) {
+    PLAN(41);
     RUN_TEST(positive_addition);
     RUN_TEST(negative_addition);
     RUN_TEST(mixed_signs);

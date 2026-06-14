@@ -13,7 +13,7 @@
 #define ASSERT_ASCII_STR_EQ(val, expected) do { \
     char _buf[256]; \
     size_t _len = (val)->length_in_bytes; \
-    ASSERT(_len < sizeof(_buf)); \
+    ASSERT_TRUE(_len < sizeof(_buf)); \
     memcpy(_buf, (val)->payload, _len); \
     _buf[_len] = '\0'; \
     ASSERT_STR_EQ(_buf, expected); \
@@ -149,8 +149,8 @@ void concat_creates_distinct_values(void) {
     Offset m = ascii_str_new(&arena, &s8("x"));
     Offset n = ascii_str_new(&arena, &s8("y"));
     Offset result = ascii_str_concat(&arena, m, n);
-    ASSERT(result != m);
-    ASSERT(result != n);
+    ASSERT_OFFSET_NE(result, m);
+    ASSERT_OFFSET_NE(result, n);
 }
 
 void to_str_from_positive_i64(void) {
@@ -190,7 +190,7 @@ void to_str_from_i64_creates_new_value(void) {
     arena_init(&arena);
     Offset i64_offset = i64_new(&arena, 42);
     Offset str_offset = generic_to_str(&arena, i64_offset);
-    ASSERT(str_offset != i64_offset);
+    ASSERT_OFFSET_NE(str_offset, i64_offset);
     ASSERT_TAG_EQ(ascii_str_resolve(&arena, str_offset)->tag, TAG_ASCII_STR);
 }
 
@@ -211,6 +211,7 @@ void to_str_identity_returns_same_offset(void) {
 }
 
 int main(void) {
+    PLAN(24);
     RUN_TEST(create_empty_string);
     RUN_TEST(create_short_string);
     RUN_TEST(create_single_character);
