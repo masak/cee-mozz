@@ -19,7 +19,7 @@
  *     }
  *
  *     int main(void) {
- *         TEST_PLAN(1);
+ *         PLAN(1);
  *         RUN_TEST(test_something);
  *         TEST_SUMMARY();
  *     }
@@ -166,7 +166,7 @@ static u32 _current_test_failed = 0;
 
 #define TEST_SUMMARY() do { \
     if (!_plan_set) { \
-        fprintf(stderr, "# error: TEST_PLAN was not called\n"); \
+        fprintf(stderr, "# error: PLAN() was not called\n"); \
         return 1; \
     } \
     if (_test_current != _test_total) { \
