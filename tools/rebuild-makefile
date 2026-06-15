@@ -1,0 +1,210 @@
+#! /usr/bin/perl
+use 5.006;
+use strict;
+use warnings;
+
+sub replace_tabs {
+    my ($s) = @_;
+    $s =~ s/<tab>/\t/g;
+    return $s;
+}
+
+open(my $MAKEFILE, ">", "Makefile")
+    or die "Couldn't open Makefile: $!";
+
+my $TAB = "\t";
+my @source_files = glob("src/*c");
+my @test_files = glob("test/*.c");
+my @h_files = glob("include/*.h");
+
+my %h_files_from_h_file;
+for my $h_file (@h_files) {
+    $h_files_from_h_file{$h_file} = {};
+    open(my $H_FILE, "<", $h_file)
+        or die "Couldn't open $h_file: $!";
+    while (my $line = <$H_FILE>) {
+        chomp $line;
+        next unless $line =~ /^#include "([\w-]+\.h)"$/;
+        my $include_file = "include/$1";
+        $h_files_from_h_file{$h_file}->{$include_file}++;
+    }
+    close($H_FILE);
+}
+
+my %h_files_from_c_file;
+for my $c_file (@source_files, @test_files) {
+    $h_files_from_c_file{$c_file} = {};
+    open(my $C_FILE, "<", $c_file)
+        or die "Couldn't open $c_file: $!";
+    while (my $line = <$C_FILE>) {
+        chomp $line;
+        next unless $line =~ /^#include "..\/(include\/[\w-]+\.h)"$/;
+        my $include_file = $1;
+        $h_files_from_c_file{$c_file}->{$include_file}++;
+        for my $hh_file (keys %{$h_files_from_h_file{$include_file}}) {
+            $h_files_from_c_file{$c_file}->{$hh_file}++;
+        }
+    }
+    close($C_FILE);
+}
+
+sub emit_posix_target {
+    print {$MAKEFILE} replace_tabs(<<'EOF');
+.POSIX:
+
+EOF
+}
+
+sub emit_flags {
+    print {$MAKEFILE} replace_tabs(<<'EOF');
+CC      = clang
+CFLAGS  = -std=c11 -Wall -Wextra -pedantic -g -O0 -fsanitize=address,undefined
+LDFLAGS =
+
+EOF
+}
+
+sub emit_source_objs {
+    print {$MAKEFILE} "SRC_OBJS = \\\n";
+    for my $source_file (@source_files) {
+        my $object_file = $source_file;
+        $object_file =~ s[^src/][build/];
+        $object_file =~ s/\.c$/.o/;
+        if ($source_file eq $source_files[-1]) {
+            print {$MAKEFILE} " $object_file\n";
+        }
+        else {
+            print {$MAKEFILE} " $object_file \\\n";
+        }
+    }
+    print {$MAKEFILE} "\n";
+}
+
+sub emit_test_executables {
+    print {$MAKEFILE} "TEST_EXECUTABLES = \\\n";
+    for my $test_file (@test_files) {
+        my $exe_file = $test_file;
+        $exe_file =~ s[^test/][build/];
+        $exe_file =~ s/\.c$//;
+        if ($test_file eq $test_files[-1]) {
+            print {$MAKEFILE} " $exe_file\n";
+        }
+        else {
+            print {$MAKEFILE} " $exe_file \\\n";
+        }
+    }
+    print {$MAKEFILE} "\n";
+}
+
+sub emit_all_target {
+    print {$MAKEFILE} replace_tabs(<<'EOF');
+all: $(TEST_EXECUTABLES)
+
+EOF
+}
+
+sub emit_test_target {
+    print {$MAKEFILE} "test: all\n";
+    for my $test_file (@test_files) {
+        my $exe_file = $test_file;
+        $exe_file =~ s[^test/][build/];
+        $exe_file =~ s/\.c$//;
+        print {$MAKEFILE} "\t./$exe_file\n";
+    }
+    print {$MAKEFILE} "\n";
+}
+
+sub emit_heading {
+    my ($heading) = @_;
+    print {$MAKEFILE} "# ", "-" x 77, "\n";
+    print {$MAKEFILE} "# $heading\n";
+    print {$MAKEFILE} "# ", "-" x 77, "\n";
+    print {$MAKEFILE} "\n";
+}
+
+sub emit_test_executable_target {
+    my ($exe_file, $object_file) = @_;
+    print {$MAKEFILE} "$exe_file: $object_file \$(SRC_OBJS)\n";
+    print {$MAKEFILE} "\t\$(CC) \$(CFLAGS) \$(LDFLAGS) -o \$@ $object_file \$(SRC_OBJS)\n";
+    print {$MAKEFILE} "\n";
+}
+
+sub emit_test_executable_targets {
+    for my $test_file (@test_files) {
+        my $object_file = $test_file;
+        $object_file =~ s[^test/][build/];
+        $object_file =~ s/\.c$/.o/;
+        my $exe_file = $test_file;
+        $exe_file =~ s[^test/][build/];
+        $exe_file =~ s/\.c$//;
+        emit_test_executable_target($exe_file, $object_file);
+    }
+}
+
+sub emit_source_object_target {
+    my ($object_file, $source_file) = @_;
+    print {$MAKEFILE} "$object_file: $source_file";
+    for my $h_file (sort keys %{$h_files_from_c_file{$source_file}}) {
+        print {$MAKEFILE} " $h_file";
+    }
+    print {$MAKEFILE} "\n";
+    print {$MAKEFILE} "\t\$(CC) \$(CFLAGS) -c -o \$@ $source_file\n";
+    print {$MAKEFILE} "\n";
+}
+
+sub emit_test_object_target {
+    my ($object_file, $test_file) = @_;
+    print {$MAKEFILE} "$object_file: $test_file";
+    for my $h_file (sort keys %{$h_files_from_c_file{$test_file}}) {
+        print {$MAKEFILE} " $h_file";
+    }
+    print {$MAKEFILE} "\n";
+    print {$MAKEFILE} "\t\$(CC) \$(CFLAGS) -c -o \$@ $test_file\n";
+    print {$MAKEFILE} "\n";
+}
+
+sub emit_test_object_targets {
+    for my $test_file (@test_files) {
+        my $object_file = $test_file;
+        $object_file =~ s[^test/][build/];
+        $object_file =~ s/\.c$/.o/;
+        emit_test_object_target($object_file, $test_file);
+    }
+}
+
+sub emit_clean_target {
+    print {$MAKEFILE} replace_tabs(<<'EOF');
+clean:
+<tab>rm -f build/*.o $(TEST_EXECUTABLES)
+
+EOF
+}
+
+emit_posix_target();
+emit_flags();
+emit_source_objs();
+emit_test_executables();
+emit_all_target();
+emit_test_target();
+emit_heading("Test executables");
+emit_test_executable_targets();
+emit_heading("Source objects");
+emit_source_object_target("build/arena.o", "src/arena.c");
+emit_source_object_target("build/value.o", "src/value.c");
+emit_source_object_target("build/i64-value.o", "src/i64-value.c");
+emit_source_object_target("build/ascii-str-value.o", "src/ascii-str-value.c");
+emit_source_object_target("build/array-value.o", "src/array-value.c");
+emit_source_object_target("build/func-value.o", "src/func-value.c");
+emit_source_object_target("build/macro-value.o", "src/macro-value.c");
+emit_source_object_target("build/environment.o", "src/environment.c");
+emit_source_object_target("build/codeunit.o", "src/codeunit.c");
+emit_source_object_target("build/seenset.o", "src/seenset.c");
+emit_source_object_target("build/int-table.o", "src/int-table.c");
+emit_source_object_target("build/str-table.o", "src/str-table.c");
+emit_source_object_target("build/code-table.o", "src/code-table.c");
+emit_source_object_target("build/int-value.o", "src/int-value.c");
+emit_heading("Test objects");
+emit_test_object_targets();
+emit_heading("Cleanup");
+emit_clean_target();
+
