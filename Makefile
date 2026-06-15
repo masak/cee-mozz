@@ -62,44 +62,44 @@ build/value-08-int: build/value-08-int.o $(SRC_OBJS)
 build/arena.o: src/arena.c include/arena.h include/typedefs.h
 	$(CC) $(CFLAGS) -c -o $@ src/arena.c
 
-build/value.o: src/value.c include/arena.h include/array-value.h include/ascii-str-value.h include/code-table.h include/codeunit.h include/environment.h include/func-value.h include/i64-value.h include/int-table.h include/macro-value.h include/seenset.h include/str-table.h include/tags.h include/typedefs.h include/value.h
-	$(CC) $(CFLAGS) -c -o $@ src/value.c
-
-build/i64-value.o: src/i64-value.c include/arena.h include/i64-value.h include/seenset.h include/tags.h include/typedefs.h
-	$(CC) $(CFLAGS) -c -o $@ src/i64-value.c
+build/array-value.o: src/array-value.c include/arena.h include/array-value.h include/i64-value.h include/seenset.h include/tags.h include/typedefs.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ src/array-value.c
 
 build/ascii-str-value.o: src/ascii-str-value.c include/arena.h include/ascii-str-value.h include/i64-value.h include/seenset.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ src/ascii-str-value.c
 
-build/array-value.o: src/array-value.c include/arena.h include/array-value.h include/i64-value.h include/seenset.h include/tags.h include/typedefs.h include/value.h
-	$(CC) $(CFLAGS) -c -o $@ src/array-value.c
-
-build/func-value.o: src/func-value.c include/arena.h include/codeunit.h include/environment.h include/func-value.h include/seenset.h include/tags.h include/typedefs.h include/value.h
-	$(CC) $(CFLAGS) -c -o $@ src/func-value.c
-
-build/macro-value.o: src/macro-value.c include/arena.h include/codeunit.h include/environment.h include/macro-value.h include/seenset.h include/tags.h include/typedefs.h include/value.h
-	$(CC) $(CFLAGS) -c -o $@ src/macro-value.c
-
-build/environment.o: src/environment.c include/arena.h include/environment.h include/seenset.h include/tags.h include/typedefs.h include/value.h
-	$(CC) $(CFLAGS) -c -o $@ src/environment.c
+build/code-table.o: src/code-table.c include/arena.h include/code-table.h include/seenset.h include/tags.h include/typedefs.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ src/code-table.c
 
 build/codeunit.o: src/codeunit.c include/arena.h include/code-table.h include/codeunit.h include/environment.h include/int-table.h include/seenset.h include/str-table.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ src/codeunit.c
 
-build/seenset.o: src/seenset.c include/arena.h include/seenset.h include/typedefs.h
-	$(CC) $(CFLAGS) -c -o $@ src/seenset.c
+build/environment.o: src/environment.c include/arena.h include/environment.h include/seenset.h include/tags.h include/typedefs.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ src/environment.c
+
+build/func-value.o: src/func-value.c include/arena.h include/codeunit.h include/environment.h include/func-value.h include/seenset.h include/tags.h include/typedefs.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ src/func-value.c
+
+build/i64-value.o: src/i64-value.c include/arena.h include/i64-value.h include/seenset.h include/tags.h include/typedefs.h
+	$(CC) $(CFLAGS) -c -o $@ src/i64-value.c
 
 build/int-table.o: src/int-table.c include/arena.h include/int-table.h include/seenset.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ src/int-table.c
 
+build/int-value.o: src/int-value.c include/arena.h include/ascii-str-value.h include/int-value.h include/seenset.h include/tags.h include/typedefs.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ src/int-value.c
+
+build/macro-value.o: src/macro-value.c include/arena.h include/codeunit.h include/environment.h include/macro-value.h include/seenset.h include/tags.h include/typedefs.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ src/macro-value.c
+
+build/seenset.o: src/seenset.c include/arena.h include/seenset.h include/typedefs.h
+	$(CC) $(CFLAGS) -c -o $@ src/seenset.c
+
 build/str-table.o: src/str-table.c include/arena.h include/seenset.h include/str-table.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ src/str-table.c
 
-build/code-table.o: src/code-table.c include/arena.h include/code-table.h include/seenset.h include/tags.h include/typedefs.h include/value.h
-	$(CC) $(CFLAGS) -c -o $@ src/code-table.c
-
-build/int-value.o: src/int-value.c include/arena.h include/ascii-str-value.h include/int-value.h include/seenset.h include/tags.h include/typedefs.h include/value.h
-	$(CC) $(CFLAGS) -c -o $@ src/int-value.c
+build/value.o: src/value.c include/arena.h include/array-value.h include/ascii-str-value.h include/code-table.h include/codeunit.h include/environment.h include/func-value.h include/i64-value.h include/int-table.h include/macro-value.h include/seenset.h include/str-table.h include/tags.h include/typedefs.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ src/value.c
 
 # -----------------------------------------------------------------------------
 # Test objects
