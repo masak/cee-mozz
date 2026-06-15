@@ -13,7 +13,7 @@ open(my $MAKEFILE, ">", "Makefile")
     or die "Couldn't open Makefile: $!";
 
 my $TAB = "\t";
-my @source_files = glob("src/*c");
+my @source_files = glob("source/*c");
 my @test_files = glob("test/*.c");
 my @h_files = glob("include/*.h");
 
@@ -68,7 +68,7 @@ sub emit_source_objs {
     print {$MAKEFILE} "SRC_OBJS = \\\n";
     for my $source_file (@source_files) {
         my $object_file = $source_file;
-        $object_file =~ s[^src/][build/];
+        $object_file =~ s[^source/][build/];
         $object_file =~ s/\.c$/.o/;
         if ($source_file eq $source_files[-1]) {
             print {$MAKEFILE} " $object_file\n";
@@ -155,7 +155,7 @@ sub emit_source_object_target {
 sub emit_source_object_targets {
     for my $source_file (@source_files) {
         my $object_file = $source_file;
-        $object_file =~ s[^src/][build/];
+        $object_file =~ s[^source/][build/];
         $object_file =~ s/\.c$/.o/;
         emit_source_object_target($object_file, $source_file);
     }
