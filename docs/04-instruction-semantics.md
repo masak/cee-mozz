@@ -30,250 +30,386 @@ used, since in this branch the denominator is known not to be zero. This
 pattern, tentatively named "cynical error handling", ought to be more widely
 known than it is.
 
+## Do nothing
+
+Instruction: `no_op`
+
+```python
+# do nothing
+```
+
 ## Assign register
 
-Instruction: `<tr> = <r1>`
+Instruction: `mov tr, r1`
 
-```c
-reg[tr] = reg[r1];
+```python
+reg[tr] = reg[r1]
 ```
 
 ## Assert type Int
 
-Instruction: `Int.assert(<r1>)`
+Instruction: `assert_int r1`
 
-```c
-u64 INT_TAGS[] = { TAG_I64, TAG_INT };
-
-assert_value_tag_is_one_of(INT_TAGS, reg[t1]);
+```python
+# int compatible tags: TAG_I64, TAG_INT
+assert_int_compatible(reg[r1])
 ```
 
 ## Assign Int constant
 
-Instruction: `<tr> = Int.const(iiii)`
+Instruction: `load_int tr, ^iiii`
 
-```c
-reg[tr] = inttable_get(inttable, iiii);
+```python
+reg[tr] = inttable[iiii]
 ```
 
 ## Add (Int, Int)
 
-Instruction: `<tr> = Int.add(<r1>, <r2>)`
+Instruction: `int_add tr, r1, r2`
 
-```c
-reg[tr] = int_add(reg[r1], reg[r2]);
+```python
+assert_int_compatible(reg[r1])
+assert_int_compatible(reg[r2])
+reg[tr] = int_add(reg[r1], reg[r2])
 ```
 
 ## Negate (Int)
 
-Instruction: `<tr> = Int.negate(<r1>)`
+Instruction: `int_neg tr, r1`
 
-```c
-Offset zero = /* initialize zero */;
-reg[tr] = int_subtract(zero, reg[r1]);
+```python
+assert_int_compatible(reg[r1])
+reg[tr] = int_negate(zero, reg[r1])
 ```
 
 ## Subtract (Int, Int)
 
-Instruction: `<tr> = Int.sub(<r1>, <r2>)`
+Instruction: `int_sub tr, r1, r2`
 
-```c
-reg[tr] = int_subtract(reg[r1], reg[r2]);
+```python
+assert_int_compatible(reg[r1])
+assert_int_compatible(reg[r2])
+reg[tr] = int_subtract(reg[r1], reg[r2])
 ```
 
 ## Multiply (Int, Int)
 
-Instruction: `<tr> = Int.mul(<r1>, <r2>)`
+Instruction: `int_mul tr, r1, r2`
 
-```c
-reg[tr] = int_multiply(reg[r1], reg[r2]);
+```python
+assert_int_compatible(reg[r1])
+assert_int_compatible(reg[r2])
+reg[tr] = int_multiply(reg[r1], reg[r2])
 ```
 
 ## Divide (Int, Int) [error]
 
-Instruction: `<tr> = Int.idiv(<r1>, <r2>)`
+Instruction: `int_div tr, r1, r2`
 
-```c
-Offset denominator = reg[r2];
-if (int_is_zero(denominator)) {
-    error("Division by zero (//)");
-}
-else {
-    reg[tr] = int_divide(reg[r1], denominator, denominator);
-}
+```python
+assert_int_compatible(reg[r1])
+assert_int_compatible(reg[r2])
+if int_is_zero(reg[r2]):
+    raise "Division by zero (//)"
+else:
+    reg[tr] = int_divide(reg[r1], reg[r2], reg[r2])
 ```
 
 ## Modulo (Int, Int) [error]
 
-Instruction: `<tr> = Int.mod(<r1>, <r2>)`
+Instruction: `int_mod tr, r1, r2`
 
-```c
-Offset denominator = reg[r2];
-if (int_is_zero(denominator)) {
-    error("Division by zero (%)");
-}
-else {
-    reg[tr] = int_modulo(reg[r1], denominator, denominator);
-}
+```python
+assert_int_compatible(reg[r1])
+assert_int_compatible(reg[r2])
+if int_is_zero(reg[r2]):
+    raise "Division by zero (%)"
+else:
+    reg[tr] = int_modulo(reg[r1], reg[r2], reg[r2])
 ```
 
 ## Assert type Str
 
-Instruction: `Str.assert(<r1>)`
+Instruction: `assert_str r1`
+
+```python
+# str compatible tags: TAG_ASCII_STR, TAG_STR, TAG_SMALL_STR
+assert_str_compatible(reg[r1])
+```
 
 ## Assign Str constant
 
-Instruction: `<tr> = Str.const(ssss)`
+Instruction: `load_str tr, ^ssss`
+
+```python
+reg[tr] = strtable[iiii]
+```
 
 ## Stringify (any)
 
-Instruction: `<tr> = stringify(<r1>)`
+Instruction: `stringify tr, r1`
+
+```python
+reg[tr] = generic_to_string(reg[r1])
+```
 
 ## Concatenate (any, any)
 
-Instruction: `<tr> = Str.concat(<r1>, <r2>)`
+Instruction: `str_concat tr, r1, r2`
+
+```python
+reg[tr] = generic_str_concat(reg[r1], reg[r2])
+```
 
 ## Assert type Bool
 
-Instruction: `Bool.assert(<r1>)`
+Instruction: `assert_bool r1`
+
+```python
+assert_bool(reg[r1])
+```
 
 ## Assign true
 
-Instruction: `<tr> = true`
+Instruction: `load_true tr`
+
+```python
+reg[tr] = bool_true()
+```
 
 ## Assign false
 
-Instruction: `<tr> = false`
+Instruction: `load_false tr`
+
+```python
+reg[tr] = bool_false()
+```
 
 ## Boolify (any)
 
-Instruction: `<tr> = boolify(<r1>)`
+Instruction: `boolify tr, r1`
+
+```python
+reg[tr] = generic_to_bool(reg[r1])
+```
 
 ## Boolean negate (any)
 
-Instruction: `<tr> = not(<r1>)`
+Instruction: `bool_neg tr, r1`
+
+```python
+reg[tr] = generic_bool_negate(reg[r1])
+```
 
 ## Assert type None
 
-Instruction: `None.assert(<r1>)`
+Instruction: `assert_none r1`
+
+```python
+assert_none(reg[r1])
+```
 
 ## Assign none
 
-Instruction: `<tr> = none`
+Instruction: `load_none tr`
+
+```python
+reg[tr] = none_none()
+```
 
 ## Compare (<)
 
-Instruction: `<tr> = cmpLt(<r1>, <r2>)`
+Instruction: `cmp_lt tr, r1, r2`
+
+```python
+reg[tr] = generic_compare_lt(reg[r1], reg[r2])
+```
 
 ## Compare (<=)
 
-Instruction: `<tr> = cmpLe(<r1>, <r2>)`
+Instruction: `cmp_le tr, r1, r2`
+
+```python
+reg[tr] = generic_compare_le(reg[r1], reg[r2])
+```
 
 ## Compare (>)
 
-Instruction: `<tr> = cmpGt(<r1>, <r2>)`
+Instruction: `cmp_gt tr, r1, r2`
+
+```python
+reg[tr] = generic_compare_gt(reg[r1], reg[r2])
+```
 
 ## Compare (>=)
 
-Instruction: `<tr> = cmpGe(<r1>, <r2>)`
+Instruction: `cmp_ge tr, r1, r2`
+
+```python
+reg[tr] = generic_compare_ge(reg[r1], reg[r2])
+```
 
 ## Compare (==)
 
-Instruction: `<tr> = cmpEq(<r1>, <r2>)`
+Instruction: `cmp_eq tr, r1, r2`
+
+```python
+reg[tr] = generic_compare_eq(reg[r1], reg[r2])
+```
 
 ## Compare (!=)
 
-Instruction: `<tr> = cmpNe(<r1>, <r2>)`
+Instruction: `cmp_ne tr, r1, r2`
+
+```python
+reg[tr] = generic_compare_ne(reg[r1], reg[r2])
+```
 
 ## Assert type Array
 
-Instruction: `Array.assert(<r1>)`
+Instruction: `assert_array r1`
+
+```python
+assert_array(reg[r1])
+```
 
 ## Initialize array, u16 cap
 
-Instruction: `<tr> = Array.init(pppp)`
+Instruction: `array_init tr, +pppp`
+
+```python
+reg[tr] = array_init(pppp)
+```
 
 ## Add element to end of array
 
-Instruction: `<tr>.push(<r1>)`
+Instruction: `array_push r1, r2`
+
+```python
+assert_array(reg[r1])
+array_push(reg[r1], reg[r2])
+```
 
 ## Index (Array, Int)
 
-Instruction: `<tr> = <r1>[<r2>]`
+Instruction: `array_get tr, r1, r2`
+
+```python
+assert_array(reg[r1])
+assert_int_compatible(reg[r2])
+reg[tr] = array_get_index(reg[r1], reg[r2])
+```
 
 ## Assign index (Array, Int)
 
-Instruction: `<tr>[<r1>] = <r2>`
+Instruction: `array_set r1, r2, r3`
+
+```python
+assert_array(reg[r1])
+assert_int_compatible(reg[r2])
+array_set(reg[r1], reg[r2], reg[r3])
+```
 
 ## Get number of elements
 
-Instruction: `<tr> = Array.length(<r1>)`
+Instruction: `array_len tr, r1`
+
+```python
+assert_array(reg[r1])
+reg[tr] = array_len(reg[r1])
+```
 
 ## Concatenate (Array, Array)
 
-Instruction: `<tr> = Array.concat(<r1>, <r2>)`
+Instruction: `array_concat tr, r1, r2`
+
+```python
+assert_array(reg[r1])
+assert_array(reg[r2])
+reg[tr] = array_concat(reg[r1], reg[r2])
+```
+
+## Assert type Func
+
+Instruction: `assert_func r1`
 
 ## Initialize Func
 
-Instruction: `<tr> = Func.init(cccc)`
+Instruction: `func_init tr, ^cccc`
+
+```python
+reg[tr] = func_new(env, codetable[cccc])
+```
 
 ## Call Func with arguments Array
 
-Instruction: `<tr> = <r1>(...<r2>)`
+Instruction: `func_call tr, r1, r2`
+
+```python
+reg[tr] = func_new(env, codetable[cccc])
+```
 
 ## Tailcall
 
-Instruction: `tailcall <r1>(...<r2>)`
+Instruction: `func_tailcall r1, r2`
+
+## Assert type Macro
+
+Instruction: `assert_macro r1`
 
 ## Initialize Macro
 
-Instruction: `<tr> = Macro.init(cccc)`
+Instruction: `macro_init tr, ^cccc`
+
+```python
+reg[tr] = macro_new(env, codetable[cccc])
+```
 
 ## Load from environment
 
-Instruction: `<tr> = load(<ee>, <oo>)`
+Instruction: `env_load tr, ^ee, ^oo`
 
 ## Store into environment
 
-Instruction: `store(<r1>, <ee>, <oo>)`
+Instruction: `env_store r1, ^ee, ^oo`
 
 ## Assign SyntaxNode
 
-Instruction: `<tr> = SyntaxNode.init(...<r1>)`
+Instruction: `syntax_node_create tr, t1`
 
 ## Assign IntNode (Int)
 
-Instruction: `<tr> = SyntaxNode.IntNode(...<r1>)`
+Instruction: `int_node_create tr, r1`
 
 ## Assign StrNode (Str)
 
-Instruction: `<tr> = SyntaxNode.StrNode(...<r1>)`
+Instruction: `str_node_create tr, r1`
 
 ## Assign BoolNode (Bool)
 
-Instruction: `<tr> = SyntaxNode.BoolNode(...<r1>)`
-
-## Unconditional jump
-
-Instruction: `jmp <aaaa>`
-
-## Conditional jump
-
-Instruction: `jmp <aaaa> if <r1>`
-
-## Return
-
-Instruction: `ret <r1>`
-
-## Exit with status code
-
-Instruction: `Proc.exit(<r1>)`
+Instruction: `bool_node_create tr, r1`
 
 ## Print string + newline
 
-Instruction: `print(<r1>)`
+Instruction: `print r1`
 
 ## Prompt and input
 
-Instruction: `<tr> = prompt(<r1>)`
+Instruction: `input tr, r1`
+
+## Unconditional jump
+
+Instruction: `jump ^aaaa`
+
+## Conditional jump
+
+Instruction: `jump_if_true r1, ^aaaa`
+
+## Return
+
+Instruction: `return r1`
+
+## Exit with status code
+
+Instruction: `proc_exit r1`
 

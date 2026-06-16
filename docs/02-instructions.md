@@ -78,7 +78,7 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 |---------------|---------------------------|-----------------------------|
 | `1b r1 -- --` | `assert_array r1`         | assert type Array           |
 | `1c tr pp pp` | `array_init tr, +pppp`    | initialize array, u16 cap   |
-| `1d tr r1 --` | `array_push tr, r1`       | add element to end of array |
+| `1d r1 r2 --` | `array_push r1, r2`       | add element to end of array |
 | `1e tr r1 r2` | `array_get tr, r1, r2`    | `tr = r1[t2]` [error]       |
 | `1f r1 r2 r3` | `array_set r1, r2, r3`    | `r1[r2] = r3` [error]       |
 | `20 tr r1 --` | `array_len tr, r1`        | get number of elements      |
@@ -88,45 +88,47 @@ Instruction format: `xx yy zz ww`; four bytes (32 bits)
 
 | bytes         | instruction            | description      |
 |---------------|------------------------|------------------|
-| `22 tr cc cc` | `func_init tr, ^cccc`  | initialize Func  |
-| `23 tr r1 r2` | `func_call tr, r1, r2` | `tr = r1(...r2)` |
-| `24 -- r1 r2` | `func_tailcall r1, r2` | tailcall         |
+| `22 r1 -- --` | `assert_func r1`       | assert type Func |
+| `23 tr cc cc` | `func_init tr, ^cccc`  | initialize Func  |
+| `24 tr r1 r2` | `func_call tr, r1, r2` | `tr = r1(...r2)` |
+| `25 -- r1 r2` | `func_tailcall r1, r2` | tailcall         |
 
 ## Macro
 
-| bytes         | instruction            | description      |
-|---------------|------------------------|------------------|
-| `25 tr cc cc` | `macro_init tr, ^cccc` | initialize Macro |
+| bytes         | instruction            | description       |
+|---------------|------------------------|-------------------|
+| `26 r1 -- --` | `assert_macro r1`      | assert type Macro |
+| `27 tr cc cc` | `macro_init tr, ^cccc` | initialize Macro  |
 
 ## Environment
 
 | bytes         | instruction              | description                    |
 |---------------|--------------------------|--------------------------------|
-| `26 tr ee oo` | `env_load tr, ^ee, ^oo`  | load from environment [error]  |
-| `27 r1 ee oo` | `env_store r1, ^ee, ^oo` | store into environment [error] |
+| `28 tr ee oo` | `env_load tr, ^ee, ^oo`  | load from environment [error]  |
+| `29 r1 ee oo` | `env_store r1, ^ee, ^oo` | store into environment [error] |
 
 ## SyntaxNode
 
 | bytes         | instruction                 | description            |
 |---------------|-----------------------------|------------------------|
-| `28 tr r1 --` | `syntax_node_create tr, t1` | assign SyntaxNode      |
-| `29 tr r1 --` | `int_node_create tr, r1`    | assign IntNode (Int)   |
-| `2a tr r1 --` | `str_node_create tr, r1`    | assign StrNode (Str)   |
-| `2b tr r1 --` | `bool_node_create tr, r1`   | assign BoolNode (Bool) |
+| `2a tr r1 --` | `syntax_node_create tr, t1` | assign SyntaxNode      |
+| `2b tr r1 --` | `int_node_create tr, r1`    | assign IntNode (Int)   |
+| `2c tr r1 --` | `str_node_create tr, r1`    | assign StrNode (Str)   |
+| `2d tr r1 --` | `bool_node_create tr, r1`   | assign BoolNode (Bool) |
 
 ## Input/output
 
 | bytes         | instruction    | description            |
 |---------------|----------------|------------------------|
-| `2c r1 -- --` | `print r1`     | print string + newline |
-| `2d tr r1 --` | `input tr, r1` | prompt and input       |
+| `2e r1 -- --` | `print r1`     | print string + newline |
+| `2f tr r1 --` | `input tr, r1` | prompt and input       |
 
 ## Control
 
 | bytes         | instruction              | description           |
 |---------------|--------------------------|-----------------------|
-| `2e -- aa aa` | `jump ^aaaa`             | unconditional jump    |
-| `2f r1 aa aa` | `jump_if_true r1, ^aaaa` | conditional jump      |
-| `30 r1 -- --` | `return r1`              | return                |
-| `31 r1 -- --` | `proc_exit r1`           | exit with status code |
+| `30 -- aa aa` | `jump ^aaaa`             | unconditional jump    |
+| `31 r1 aa aa` | `jump_if_true r1, ^aaaa` | conditional jump      |
+| `32 r1 -- --` | `return r1`              | return                |
+| `33 r1 -- --` | `proc_exit r1`           | exit with status code |
 
