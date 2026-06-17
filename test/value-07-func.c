@@ -287,7 +287,7 @@ void func_validate_codeunit_too_many_params(void) {
 
 void func_create_distinct_value(void) {
     arena_init(&arena);
-    Offset *params_offset = parameters_new(&arena, 0, NULL);
+    Offset params_offset = parameters_new(&arena, 0, NULL);
     Offset cu1 = codeunit_new(
         &arena,
         params_offset,
