@@ -48,8 +48,8 @@ bool inttable_validate(Arena *a, Offset offset, SeenSet *seenset) {
         if (item_offset == UNSET) {
             return false;
         }
-        /* extend this with IntValue later */
-        if (value_tag(a, item_offset) != TAG_I64) {
+        Tag tag = value_tag(a, item_offset);
+        if (tag != TAG_I64 && tag != TAG_INT) {
             return false;
         }
         if (!generic_validate(a, item_offset, seenset)) {
