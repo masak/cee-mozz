@@ -7,6 +7,7 @@
 #include "../include/codeunit.h"
 #include "../include/environment.h"
 #include "../include/int-table.h"
+#include "../include/parameters.h"
 #include "../include/seenset.h"
 #include "../include/str-table.h"
 #include "../include/tags.h"
@@ -14,7 +15,7 @@
 
 Offset codeunit_new(
     Arena *a,
-    u32 parameter_count,
+    Offset parameters,
     u32 register_count,
     u32 env_length,
     MaybeOffset inttable_offset,
@@ -30,7 +31,7 @@ Offset codeunit_new(
         alignof(CodeUnit)
     );
     codeunit->tag = TAG_CODE_UNIT;
-    codeunit->parameter_count = parameter_count;
+    codeunit->parameters = parameters;
     codeunit->register_count = register_count;
     codeunit->env_length = env_length;
     codeunit->inttable_offset = inttable_offset;
@@ -58,11 +59,19 @@ bool codeunit_validate(Arena *a, Offset offset, SeenSet *seenset) {
     assert(offset <= ARENA_SIZE - sizeof(CodeUnit));
     CodeUnit *codeunit = codeunit_resolve(a, offset);
 
-    if (codeunit->parameter_count > 0x100) {
+    Offset params_offset = codeunit->parameters;
+    if (params_offset == UNSET) {
+        return false;
+    }
+    if (value_tag(a, params_offset) != TAG_PARAMETERS) {
+        return false;
+    }
+    if (!parameters_validate(a, params_offset, seenset)) {
         return false;
     }
 
-    if (codeunit->parameter_count > codeunit->register_count) {
+    Parameters *parameters = parameters_resolve(a, params_offset);
+    if (parameters->parameter_count > codeunit->register_count) {
         return false;
     }
 

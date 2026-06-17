@@ -16,6 +16,7 @@
 #define TAG_INT_TABLE       0x10
 #define TAG_STR_TABLE       0x11
 #define TAG_CODE_TABLE      0x12
+#define TAG_PARAMETERS      0x13
 
 #endif
 

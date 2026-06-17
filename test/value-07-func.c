@@ -9,6 +9,7 @@
 #include "../include/i64-value.h"
 #include "../include/int-table.h"
 #include "../include/macro-value.h"
+#include "../include/parameters.h"
 #include "../include/seenset.h"
 #include "../include/str-table.h"
 #include "../include/tags.h"
@@ -26,9 +27,19 @@ static Arena arena;
 
 void create_func_with_empty_env_and_codeunit(void) {
     arena_init(&arena);
+    Offset params_offset = parameters_new(&arena, 0, NULL);
+    Offset codeunit_offset = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset env_offset = environment_new(&arena, UNSET, 0, NULL);
-    Offset codeunit_offset
-        = codeunit_new(&arena, 0, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
     Offset func_offset = func_new(&arena, env_offset, codeunit_offset);
     FuncValue *func = func_resolve(&arena, func_offset);
 
@@ -39,9 +50,19 @@ void create_func_with_empty_env_and_codeunit(void) {
 
 void validate_func(void) {
     arena_init(&arena);
+    Offset params_offset = parameters_new(&arena, 0, NULL);
+    Offset codeunit_offset = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset env_offset = environment_new(&arena, UNSET, 0, NULL);
-    Offset codeunit_offset
-        = codeunit_new(&arena, 0, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
     Offset func_offset = func_new(&arena, env_offset, codeunit_offset);
 
     SeenSet seenset;
@@ -55,9 +76,19 @@ void func_validate_with_populated_env(void) {
     EnvEntry entries[] = {
         { .writable = 1, .cell = i64_offset }
     };
+    Offset params_offset = parameters_new(&arena, 0, NULL);
+    Offset codeunit_offset = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        1,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset env_offset = environment_new(&arena, UNSET, 1, entries);
-    Offset codeunit_offset
-        = codeunit_new(&arena, 0, 2, 1, UNSET, UNSET, UNSET, 0, NULL);
     Offset func_offset = func_new(&arena, env_offset, codeunit_offset);
 
     SeenSet seenset;
@@ -71,11 +102,21 @@ void func_validate_with_nested_env(void) {
     EnvEntry outer_entries[] = {
         { .writable = 1, .cell = i64_offset }
     };
+    Offset params_offset = parameters_new(&arena, 0, NULL);
+    Offset codeunit_offset = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset outer_env_offset = environment_new(&arena, UNSET, 1, outer_entries);
     Offset inner_env_offset
         = environment_new(&arena, outer_env_offset, 0, NULL);
-    Offset codeunit_offset
-        = codeunit_new(&arena, 0, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
     Offset func_offset = func_new(&arena, inner_env_offset, codeunit_offset);
 
     SeenSet seenset;
@@ -85,9 +126,19 @@ void func_validate_with_nested_env(void) {
 
 void func_validate_invalid_env_tag(void) {
     arena_init(&arena);
+    Offset params_offset = parameters_new(&arena, 0, NULL);
+    Offset codeunit_offset = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset bad_env = i64_new(&arena, 42);
-    Offset codeunit_offset
-        = codeunit_new(&arena, 0, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
     Offset func_offset = func_new(&arena, bad_env, codeunit_offset);
 
     SeenSet seenset;
@@ -97,8 +148,18 @@ void func_validate_invalid_env_tag(void) {
 
 void func_validate_unset_env(void) {
     arena_init(&arena);
-    Offset codeunit_offset
-        = codeunit_new(&arena, 0, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
+    Offset params_offset = parameters_new(&arena, 0, NULL);
+    Offset codeunit_offset = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset func_offset = func_new(&arena, UNSET, codeunit_offset);
 
     SeenSet seenset;
@@ -130,9 +191,31 @@ void func_validate_unset_codeunit(void) {
 void func_validate_invalid_codeunit_state(void) {
     arena_init(&arena);
     Offset env_offset = environment_new(&arena, UNSET, 0, NULL);
+    Offset a_offset = ascii_str_new(&arena, &s8("a"));
+    Offset b_offset = ascii_str_new(&arena, &s8("b"));
+    Offset c_offset = ascii_str_new(&arena, &s8("c"));
+    Offset d_offset = ascii_str_new(&arena, &s8("d"));
+    Offset e_offset = ascii_str_new(&arena, &s8("e"));
+    Offset params_offsets[] = {
+        a_offset,
+        b_offset,
+        c_offset,
+        d_offset,
+        e_offset
+    };
+    Offset params_offset = parameters_new(&arena, 5, params_offsets);
     /* parameter_count > register_count is invalid */
-    Offset bad_codeunit
-        = codeunit_new(&arena, 5, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
+    Offset bad_codeunit = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset func_offset = func_new(&arena, env_offset, bad_codeunit);
 
     SeenSet seenset;
@@ -142,9 +225,59 @@ void func_validate_invalid_codeunit_state(void) {
 
 void func_validate_codeunit_too_many_params(void) {
     arena_init(&arena);
+    Offset x_offset = ascii_str_new(&arena, &s8("x"));
+    Offset params_offsets[] = { /* 257 entries */
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset, x_offset, x_offset,
+        x_offset, x_offset, x_offset, x_offset, x_offset
+    };
+    Offset params_offset = parameters_new(&arena, 0x101, params_offsets);
+    Offset bad_codeunit = codeunit_new(
+        &arena,
+        params_offset,
+        0x200,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset env_offset = environment_new(&arena, UNSET, 0, NULL);
-    Offset bad_codeunit
-        = codeunit_new(&arena, 0x101, 0x200, 0, UNSET, UNSET, UNSET, 0, NULL);
     Offset func_offset = func_new(&arena, env_offset, bad_codeunit);
 
     SeenSet seenset;
@@ -154,12 +287,33 @@ void func_validate_codeunit_too_many_params(void) {
 
 void func_create_distinct_value(void) {
     arena_init(&arena);
+    Offset *params_offset = parameters_new(&arena, 0, NULL);
+    Offset cu1 = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset env1 = environment_new(&arena, UNSET, 0, NULL);
-    Offset cu1 = codeunit_new(&arena, 0, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
     Offset func1 = func_new(&arena, env1, cu1);
 
+    Offset cu2 = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset env2 = environment_new(&arena, UNSET, 0, NULL);
-    Offset cu2 = codeunit_new(&arena, 0, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
     Offset func2 = func_new(&arena, env2, cu2);
 
     ASSERT_OFFSET_NE(func1, func2);
@@ -170,16 +324,35 @@ void func_create_distinct_value(void) {
 void func_env_contains_another_func(void) {
     arena_init(&arena);
     Offset inner_env = environment_new(&arena, UNSET, 0, NULL);
-    Offset inner_codeunit
-        = codeunit_new(&arena, 0, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
+    Offset params_offset = parameters_new(&arena, 0, NULL);
+    Offset inner_codeunit = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset inner_func = func_new(&arena, inner_env, inner_codeunit);
 
     EnvEntry entries[] = {
         { .writable = 1, .cell = inner_func }
     };
     Offset outer_env = environment_new(&arena, UNSET, 1, entries);
-    Offset outer_codeunit
-        = codeunit_new(&arena, 0, 2, 0, UNSET, UNSET, UNSET, 0, NULL);
+    Offset outer_codeunit = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        UNSET,
+        UNSET,
+        UNSET,
+        0,
+        NULL
+    );
     Offset outer_func = func_new(&arena, outer_env, outer_codeunit);
 
     SeenSet seenset;
@@ -199,9 +372,19 @@ void func_codeunit_with_tables(void) {
     Offset str_elems[] = { str_offset };
     Offset strtable = strtable_new(&arena, 1,  str_elems);
 
+    Offset params_offset = parameters_new(&arena, 0, NULL);
+    Offset codeunit_offset = codeunit_new(
+        &arena,
+        params_offset,
+        2,
+        0,
+        inttable,
+        strtable,
+        UNSET,
+        0,
+        NULL
+    );
     Offset env_offset = environment_new(&arena, UNSET, 0, NULL);
-    Offset codeunit_offset
-        = codeunit_new(&arena, 0, 2, 0, inttable, strtable, UNSET, 0, NULL);
     Offset func_offset = func_new(&arena, env_offset, codeunit_offset);
 
     SeenSet seenset;

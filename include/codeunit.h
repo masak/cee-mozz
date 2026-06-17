@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "arena.h"
+#include "parameters.h"
 #include "seenset.h"
 #include "typedefs.h"
 
@@ -16,7 +17,7 @@ typedef struct {
 
 typedef struct {
     Tag tag;
-    u32 parameter_count;
+    Offset parameters;
     u32 register_count;
     u32 env_length;
     MaybeOffset inttable_offset;
@@ -28,7 +29,7 @@ typedef struct {
 
 Offset codeunit_new(
     Arena *a,
-    u32 parameter_count,
+    Offset parameters,
     u32 register_count,
     u32 env_length,
     MaybeOffset inttable_offset,
