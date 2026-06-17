@@ -67,6 +67,25 @@ bool environment_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+static Offset environment_direct_load(
+    Arena *a,
+    Offset env_offset,
+    u32 entry_index,
+    Offset fallback_offset
+) {
+    Environment *environment = environment_resolve(a, env_offset);
+    if (entry_index >= environment->entry_count) {
+        return fallback_offset;
+    }
+
+    MaybeOffset cell = environment->entries[entry_index].cell;
+    if (cell == UNSET) {
+        return fallback_offset;
+    }
+
+    return cell;
+}
+
 Offset environment_load(
     Arena *a,
     Offset env_offset,
@@ -85,17 +104,37 @@ Offset environment_load(
         current_env_offset = outer_env_offset;
     }
 
-    Environment *environment = environment_resolve(a, current_env_offset);
+    return environment_direct_load(
+        a,
+        current_env_offset,
+        entry_index,
+        fallback_offset
+    );
+}
+
+static void environment_direct_store(
+    Arena *a,
+    Offset env_offset,
+    u32 entry_index,
+    Offset value_offset
+) {
+    if (value_offset == UNSET) {
+        assert(0 && "Trying to store UNSET in environment_store");
+        return;
+    }
+
+    Environment *environment = environment_resolve(a, env_offset);
     if (entry_index >= environment->entry_count) {
-        return fallback_offset;
+        assert(0 && "entry_index exceeds entry_count in environment_store");
+        return;
     }
 
-    MaybeOffset cell = environment->entries[entry_index].cell;
-    if (cell == UNSET) {
-        return fallback_offset;
+    if (!environment->entries[entry_index].writable) {
+        assert(0 && "entry is readonly in environment_store");
+        return;
     }
 
-    return cell;
+    environment->entries[entry_index].cell = value_offset;
 }
 
 void environment_store(
@@ -105,11 +144,6 @@ void environment_store(
     u32 entry_index,
     Offset value_offset
 ) {
-    if (value_offset == UNSET) {
-        assert(0 && "Trying to store UNSET in environment_store");
-        return;
-    }
-
     Offset current_env_offset = env_offset;
 
     for (u32 i = 0; i < outer_steps; i++) {
@@ -122,17 +156,6 @@ void environment_store(
         current_env_offset = outer_env_offset;
     }
 
-    Environment *environment = environment_resolve(a, current_env_offset);
-    if (entry_index >= environment->entry_count) {
-        assert(0 && "entry_index exceeds entry_count in environment_store");
-        return;
-    }
-
-    if (!environment->entries[entry_index].writable) {
-        assert(0 && "entry is readonly in environment_store");
-        return;
-    }
-
-    environment->entries[entry_index].cell = value_offset;
+    environment_direct_store(a, current_env_offset, entry_index, value_offset);
 }
 
