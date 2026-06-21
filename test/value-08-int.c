@@ -486,8 +486,28 @@ void to_str_negative_multi_limb(void) {
     ASSERT_INT_TO_STR(n, "-4294967296");
 }
 
+void one_hundred_factorial(void) {
+    arena_init(&arena);
+    Offset product_offset = i32_int(1);
+    for (i32 i = 2; i <= 100; i++) {
+        Offset factor_offset = i32_int(i);
+        product_offset = int_multiply(&arena, product_offset, factor_offset);
+    }
+    IntValue *actual = int_resolve(&arena, product_offset);
+    ASSERT_U32_EQ(actual->sign, 0);
+    ASSERT_U32_EQ(actual->length, 17);
+    u32 expected_limbs[] = {
+        0, 0, 0, 657835546, 4002087658, 3015126738, 2485176044, 1163332810,
+        3742382359, 2486841884, 3944854962, 1726978672, 2752321257, 685067197,
+        3693348501, 2521744277, 6960
+    };
+    for (u32 i = 0; i < 17; i++) {
+        ASSERT_U32_EQ(actual->payload[i], expected_limbs[i]);
+    }
+}
+
 int main(void) {
-    PLAN(47);
+    PLAN(48);
 
     RUN_TEST(create_zero);
     RUN_TEST(create_positive_one_limb);
@@ -542,6 +562,8 @@ int main(void) {
     RUN_TEST(to_str_negative);
     RUN_TEST(to_str_large_multi_limb);
     RUN_TEST(to_str_negative_multi_limb);
+
+    RUN_TEST(one_hundred_factorial);
 
     TEST_SUMMARY();
 }
