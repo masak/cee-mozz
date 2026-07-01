@@ -105,8 +105,12 @@ bool codeunit_validate(Arena *a, Offset offset, SeenSet *seenset) {
     /* for each instruction:
            check each register is within range
            check that each register that is read from was initialized
-           check that int, str, code indixes are within range
+           check that int, str, code indices are within range
+           check that env load/store indices are within range
            check that jump targets are within range */
+
+    /* check that the instructions don't fall off the end without a jump
+       or a return */
 
     /* later we want to recursively validate the IntTable, StrTable, and
        CodeTable, but we have to implement those types first */
