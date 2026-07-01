@@ -3,10 +3,10 @@
 
 #include <stdbool.h>
 
-#include "../include/arena.h"
-#include "../include/seenset.h"
-#include "../include/typedefs.h"
-#include "../include/value.h"
+#include "arena.h"
+#include "seenset.h"
+#include "typedefs.h"
+#include "value.h"
 
 typedef struct {
     Tag tag;
