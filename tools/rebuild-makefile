@@ -9,8 +9,10 @@ sub replace_tabs {
     return $s;
 }
 
-open(my $MAKEFILE, ">", "Makefile")
-    or die "Couldn't open Makefile: $!";
+sub contains {
+	my ($array_ref, $element) = @_;
+	return !!grep { $_ eq $element } @{$array_ref};
+}
 
 my $TAB = "\t";
 my @source_files = glob("source/*c");
@@ -47,6 +49,17 @@ for my $c_file (@source_files, @test_files) {
     }
     close($C_FILE);
 }
+
+for my $hash_ref (values(%h_files_from_c_file)) {
+    for my $name (keys(%{$hash_ref})) {
+        if (!contains(\@h_files, $name)) {
+            die "File $name referenced from .c file, does not exist\n";
+        }
+    }
+}
+
+open(my $MAKEFILE, ">", "Makefile")
+    or die "Couldn't open Makefile: $!";
 
 sub emit_posix_target {
     print {$MAKEFILE} replace_tabs(<<'EOF');
