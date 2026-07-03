@@ -44,5 +44,6 @@ defining the various types of the runtime:
 - Execution of a program (tbw)
 - Converting AST to instructions (tbw)
 - Three types of compilation unit (tbw)
-- Mark-and-sweep garbage collection (tbw)
+- [Mark-and-compact garbage collection](https://github.com/masak/cee-mozz/blob/main/docs/09-garbage-collection.md)
+
 
