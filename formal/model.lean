@@ -381,6 +381,7 @@ inductive ValidSyntaxNodePayload (arena : Arena) (h_wf : ArenaWellFormed arena) 
 inductive ValidOptionSyntaxNodePayload (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → Option SyntaxNodePayload → Prop
   | none (seen : List Offset) : ValidOptionSyntaxNodePayload arena h_wf seen none
   | some (seen : List Offset) (p : SyntaxNodePayload) (h : ValidSyntaxNodePayload arena h_wf seen p) : ValidOptionSyntaxNodePayload arena h_wf seen (some p)
+
 inductive ValidIntValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → Offset → Prop
   | i64 (seen : List Offset) (o : Offset) (payload : Int64)
       (h_cell : arena.resolve o = some (Value.I64Value payload))
