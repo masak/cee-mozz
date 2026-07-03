@@ -164,8 +164,10 @@ theorem update_preserves_wellFormed {a : Arena} {o : Offset} {v : Value}
   . simp [h_eq] at h
     exact h_wf o' h
 
-inductive ArrayElemIsSome (elems : List (Option Offset)) : Fin elems.length → Prop
-  | mk (i : Fin elems.length) (o : Offset) (h : List.get elems i = some o) : ArrayElemIsSome elems i
+inductive ArrayElemIsSome (elems : List (Option Offset)) :
+  Fin elems.length → Prop
+  | mk (i : Fin elems.length) (o : Offset)
+    (h : List.get elems i = some o) : ArrayElemIsSome elems i
 
 mutual
 
@@ -181,7 +183,8 @@ An important side invariant (tracked via `h_seen_valid` in every constructor)
 is that every offset recorded in `seen` is actually allocated in the arena.
 This lets us prove that every validated offset is below `next`. -/
 
-inductive ValidValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → Offset → Prop
+inductive ValidValue (arena : Arena) (h_wf : ArenaWellFormed arena) :
+  List Offset → Offset → Prop
   | alreadySeen (seen : List Offset) (offset : Offset)
       (h_mem : offset ∈ seen)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
@@ -192,8 +195,10 @@ inductive ValidValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offse
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | AsciiStrValue (seen : List Offset) (offset : Offset) (length: UInt32) (payload : List UInt8)
-      (h_cell : arena.resolve offset = some (Value.AsciiStrValue length payload))
+  | AsciiStrValue (seen : List Offset) (offset : Offset) (length: UInt32)
+      (payload : List UInt8)
+      (h_cell : arena.resolve offset =
+        some (Value.AsciiStrValue length payload))
       (h_length : length.toNat = payload.length)
       (h_ascii : ∀ b ∈ payload, b < 128)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
@@ -211,160 +216,217 @@ inductive ValidValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offse
 
   | IntValue (seen : List Offset) (offset : Offset) (sign : Bool)
       (nlimbs : UInt32) (limbs : List UInt32)
-      (h_cell : arena.resolve offset = some (Value.IntValue sign nlimbs limbs))
+      (h_cell : arena.resolve offset =
+        some (Value.IntValue sign nlimbs limbs))
       (h_nlimbs : nlimbs.toNat = limbs.length)
       (h_last_limb_nonzero : ∀ n, limbs.getLast? = some n → n ≠ 0)
       (h_zero_sign : limbs = [] → sign = false)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | StrValue (seen : List Offset) (offset : Offset) (length_bytes : UInt32)
-      (length_codepoints : UInt32) (payload : List UInt8)
-      (h_cell : arena.resolve offset = some (Value.StrValue length_bytes length_codepoints payload))
+  | StrValue (seen : List Offset) (offset : Offset)
+      (length_bytes : UInt32) (length_codepoints : UInt32)
+      (payload : List UInt8)
+      (h_cell : arena.resolve offset =
+        some (Value.StrValue length_bytes length_codepoints payload))
       (h_length_bytes : length_bytes.toNat = payload.length)
-      (h_utf8 : ∃ s : String, s.toUTF8.data.toList = payload ∧ s.length = length_codepoints.toNat)
+      (h_utf8 : ∃ s : String, s.toUTF8.data.toList = payload ∧
+        s.length = length_codepoints.toNat)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | SmallStrValue (seen : List Offset) (offset : Offset) (payload : List UInt8)
+  | SmallStrValue (seen : List Offset) (offset : Offset)
+      (payload : List UInt8)
       (h_cell : arena.resolve offset = some (Value.SmallStrValue payload))
       (h_length : payload.length = 8)
       (h_utf8 : String.fromUTF8? ⟨payload.toArray⟩ ≠ none)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | ArrayValue (seen : List Offset) (offset : Offset) (length : UInt32) (elements : Offset)
-      (capacity : UInt32) (elems : List (Option Offset))
+  | ArrayValue (seen : List Offset) (offset : Offset) (length : UInt32)
+      (elements : Offset) (capacity : UInt32) (elems : List (Option Offset))
       (h_cell : arena.resolve offset = some (Value.ArrayValue length elements))
-      (h_elements_cell : arena.resolve elements = some (Value.ArrayElements capacity elems))
+      (h_elements_cell : arena.resolve elements =
+        some (Value.ArrayElements capacity elems))
       (h_length_le_capacity : length.toNat ≤ capacity.toNat)
-      (h_set : ∀ (i : Fin elems.length), i.val < length.toNat → ArrayElemIsSome elems i)
-      (h_unset : ∀ (i : Fin elems.length), length.toNat ≤ i.val → List.get elems i = none)
+      (h_set : ∀ (i : Fin elems.length), i.val < length.toNat →
+        ArrayElemIsSome elems i)
+      (h_unset : ∀ (i : Fin elems.length), length.toNat ≤ i.val →
+        List.get elems i = none)
       (h_elements_valid : ValidValue arena h_wf (offset :: seen) elements)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | ArrayElements (seen : List Offset) (offset : Offset) (capacity : UInt32)
-      (elems : List (Option Offset))
-      (h_cell : arena.resolve offset = some (Value.ArrayElements capacity elems))
+  | ArrayElements (seen : List Offset) (offset : Offset)
+      (capacity : UInt32) (elems : List (Option Offset))
+      (h_cell : arena.resolve offset =
+        some (Value.ArrayElements capacity elems))
       (h_capacity : capacity.toNat = elems.length)
-      (h_elements_valid : ∀ (i : Fin elems.length), ∀ o, List.get elems i = some o → ValidValue arena h_wf (offset :: seen) o)
+      (h_elements_valid : ∀ (i : Fin elems.length), ∀ o,
+        List.get elems i = some o →
+        ValidValue arena h_wf (offset :: seen) o)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | SyntaxNodeValue (seen : List Offset) (offset : Offset) (kind : Offset) (payload : Option SyntaxNodePayload)
-      (child_count : UInt32) (children : List Offset)
-      (h_cell : arena.resolve offset = some (Value.SyntaxNodeValue kind payload child_count children))
+  | SyntaxNodeValue (seen : List Offset) (offset : Offset) (kind : Offset)
+      (payload : Option SyntaxNodePayload) (child_count : UInt32)
+      (children : List Offset)
+      (h_cell : arena.resolve offset =
+        some (Value.SyntaxNodeValue kind payload child_count children))
       (h_kind_valid : ValidValue arena h_wf (offset :: seen) kind)
-      (h_payload_valid : ValidOptionSyntaxNodePayload arena h_wf (offset :: seen) payload)
+      (h_payload_valid : ValidOptionSyntaxNodePayload arena h_wf
+        (offset :: seen) payload)
       (h_child_count : child_count.toNat = children.length)
-      (h_children_valid : ∀ (i : Fin children.length), ValidValue arena h_wf (offset :: seen) (children.get i))
+      (h_children_valid : ∀ (i : Fin children.length), ValidValue arena h_wf
+        (offset :: seen) (children.get i))
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | FuncValue (seen : List Offset) (offset : Offset) (env : Offset) (codeunit : Offset)
+  | FuncValue (seen : List Offset) (offset : Offset) (env : Offset)
+      (codeunit : Offset)
       (h_cell : arena.resolve offset = some (Value.FuncValue env codeunit))
-      (env_outer_env : Option Offset) (entry_count : UInt32) (env_entries : List (Bool × Option Offset))
-      (h_env_cell : arena.resolve env = some (Value.Environment env_outer_env entry_count env_entries))
-      (cu_name : Option Offset) (cu_outer_codeunit : Option Offset) (cu_parameters : Offset)
-      (cu_register_count : UInt32) (env_length : UInt32)
-      (cu_inttable : Option Offset) (cu_strtable : Option Offset) (cu_codetable : Option Offset)
+      (env_outer_env : Option Offset) (entry_count : UInt32)
+      (env_entries : List (Bool × Option Offset))
+      (h_env_cell : arena.resolve env =
+        some (Value.Environment env_outer_env entry_count env_entries))
+      (cu_name : Option Offset) (cu_outer_codeunit : Option Offset)
+      (cu_parameters : Offset) (cu_register_count : UInt32)
+      (env_length : UInt32) (cu_inttable : Option Offset)
+      (cu_strtable : Option Offset) (cu_codetable : Option Offset)
       (cu_instr_count : UInt32) (cu_instructions : List Instruction)
-      (h_codeunit_cell : arena.resolve codeunit = some (Value.CodeUnit cu_name cu_outer_codeunit cu_parameters cu_register_count env_length cu_inttable cu_strtable cu_codetable cu_instr_count cu_instructions))
+      (h_codeunit_cell : arena.resolve codeunit =
+        some (Value.CodeUnit cu_name cu_outer_codeunit cu_parameters
+          cu_register_count env_length cu_inttable cu_strtable cu_codetable
+          cu_instr_count cu_instructions))
       (h_env_length : entry_count = env_length)
       (h_env_valid : ValidValue arena h_wf (offset :: seen) env)
       (h_codeunit_valid : ValidValue arena h_wf (offset :: seen) codeunit)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | MacroValue (seen : List Offset) (offset : Offset) (env : Offset) (codeunit : Offset)
+  | MacroValue (seen : List Offset) (offset : Offset) (env : Offset)
+      (codeunit : Offset)
       (h_cell : arena.resolve offset = some (Value.MacroValue env codeunit))
-      (env_outer_env : Option Offset) (entry_count : UInt32) (env_entries : List (Bool × Option Offset))
-      (h_env_cell : arena.resolve env = some (Value.Environment env_outer_env entry_count env_entries))
-      (cu_name : Option Offset) (cu_outer_codeunit : Option Offset) (cu_parameters : Offset)
-      (cu_register_count : UInt32) (env_length : UInt32)
-      (cu_inttable : Option Offset) (cu_strtable : Option Offset) (cu_codetable : Option Offset)
+      (env_outer_env : Option Offset) (entry_count : UInt32)
+      (env_entries : List (Bool × Option Offset))
+      (h_env_cell : arena.resolve env =
+        some (Value.Environment env_outer_env entry_count env_entries))
+      (cu_name : Option Offset) (cu_outer_codeunit : Option Offset)
+      (cu_parameters : Offset) (cu_register_count : UInt32)
+      (env_length : UInt32) (cu_inttable : Option Offset)
+      (cu_strtable : Option Offset) (cu_codetable : Option Offset)
       (cu_instr_count : UInt32) (cu_instructions : List Instruction)
-      (h_codeunit_cell : arena.resolve codeunit = some (Value.CodeUnit cu_name cu_outer_codeunit cu_parameters cu_register_count env_length cu_inttable cu_strtable cu_codetable cu_instr_count cu_instructions))
+      (h_codeunit_cell : arena.resolve codeunit =
+        some (Value.CodeUnit cu_name cu_outer_codeunit cu_parameters
+          cu_register_count env_length cu_inttable cu_strtable cu_codetable
+          cu_instr_count cu_instructions))
       (h_env_length : entry_count = env_length)
       (h_env_valid : ValidValue arena h_wf (offset :: seen) env)
       (h_codeunit_valid : ValidValue arena h_wf (offset :: seen) codeunit)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | Environment (seen : List Offset) (offset : Offset) (outer_env : Option Offset) (entry_count : UInt32)
+  | Environment (seen : List Offset) (offset : Offset)
+      (outer_env : Option Offset) (entry_count : UInt32)
       (entries : List (Bool × Option Offset))
-      (h_cell : arena.resolve offset = some (Value.Environment outer_env entry_count entries))
+      (h_cell : arena.resolve offset =
+        some (Value.Environment outer_env entry_count entries))
       (h_entry_count : entry_count.toNat = entries.length)
-      (h_outer_env_valid : ValidOptionEnvironmentValue arena h_wf (offset :: seen) outer_env)
-      (h_entries_valid : ∀ (i : Fin entries.length), ValidOptionValue arena h_wf (offset :: seen) (entries.get i).2)
+      (h_outer_env_valid : ValidOptionEnvironmentValue arena h_wf
+        (offset :: seen) outer_env)
+      (h_entries_valid : ∀ (i : Fin entries.length),
+        ValidOptionValue arena h_wf (offset :: seen) (entries.get i).2)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | CodeUnit (seen : List Offset) (offset : Offset) (name : Option Offset) (outer_codeunit : Option Offset)
-      (parameters : Offset) (register_count : UInt32) (env_length : UInt32)
-      (inttable : Option Offset) (strtable : Option Offset) (codetable : Option Offset)
-      (instr_count : UInt32) (instructions : List Instruction)
-      (h_cell : arena.resolve offset = some (Value.CodeUnit name outer_codeunit parameters register_count env_length inttable strtable codetable instr_count instructions))
+  | CodeUnit (seen : List Offset) (offset : Offset) (name : Option Offset)
+      (outer_codeunit : Option Offset) (parameters : Offset)
+      (register_count : UInt32) (env_length : UInt32)
+      (inttable : Option Offset) (strtable : Option Offset)
+      (codetable : Option Offset) (instr_count : UInt32)
+      (instructions : List Instruction)
+      (h_cell : arena.resolve offset =
+        some (Value.CodeUnit name outer_codeunit parameters register_count
+          env_length inttable strtable codetable instr_count instructions))
       (h_name_valid : ValidOptionValue arena h_wf (offset :: seen) name)
-      (h_outer_valid : ValidOptionValue arena h_wf (offset :: seen) outer_codeunit)
+      (h_outer_valid : ValidOptionValue arena h_wf (offset :: seen)
+        outer_codeunit)
       (params_param_count : UInt32) (params_entries : List Offset)
-      (h_params_cell : arena.resolve parameters = some (Value.Parameters params_param_count params_entries))
-      (h_register_count_ge_param_count : register_count.toNat ≥ params_param_count.toNat)
+      (h_params_cell : arena.resolve parameters =
+        some (Value.Parameters params_param_count params_entries))
+      (h_register_count_ge_param_count :
+        register_count.toNat ≥ params_param_count.toNat)
       (h_params_valid : ValidValue arena h_wf (offset :: seen) parameters)
-      (h_inttable_valid : ValidOptionValue arena h_wf (offset :: seen) inttable)
-      (h_strtable_valid : ValidOptionValue arena h_wf (offset :: seen) strtable)
-      (h_codetable_valid : ValidOptionValue arena h_wf (offset :: seen) codetable)
+      (h_inttable_valid : ValidOptionValue arena h_wf (offset :: seen)
+        inttable)
+      (h_strtable_valid : ValidOptionValue arena h_wf (offset :: seen)
+        strtable)
+      (h_codetable_valid : ValidOptionValue arena h_wf (offset :: seen)
+        codetable)
       (h_instr_count : instr_count.toNat = instructions.length)
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | Parameters (seen : List Offset) (offset : Offset) (param_count : UInt32) (entries : List Offset)
-      (h_cell : arena.resolve offset = some (Value.Parameters param_count entries))
+  | Parameters (seen : List Offset) (offset : Offset)
+      (param_count : UInt32) (entries : List Offset)
+      (h_cell : arena.resolve offset =
+        some (Value.Parameters param_count entries))
       (h_param_count : param_count.toNat = entries.length)
-      (h_entries_valid : ∀ (i : Fin entries.length), ValidStringValue arena h_wf (offset :: seen) (entries.get i))
+      (h_entries_valid : ∀ (i : Fin entries.length), ValidStringValue arena
+        h_wf (offset :: seen) (entries.get i))
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | IntTable (seen : List Offset) (offset : Offset) (length : UInt32) (entries : List Offset)
+  | IntTable (seen : List Offset) (offset : Offset) (length : UInt32)
+      (entries : List Offset)
       (h_cell : arena.resolve offset = some (Value.IntTable length entries))
       (h_length : length.toNat = entries.length)
-      (h_entries_valid : ∀ (i : Fin entries.length), ValidIntValue arena h_wf (offset :: seen) (entries.get i))
+      (h_entries_valid : ∀ (i : Fin entries.length), ValidIntValue arena h_wf
+        (offset :: seen) (entries.get i))
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | StrTable (seen : List Offset) (offset : Offset) (length : UInt32) (entries : List Offset)
+  | StrTable (seen : List Offset) (offset : Offset) (length : UInt32)
+      (entries : List Offset)
       (h_cell : arena.resolve offset = some (Value.StrTable length entries))
       (h_length : length.toNat = entries.length)
-      (h_entries_valid : ∀ (i : Fin entries.length), ValidStringValue arena h_wf (offset :: seen) (entries.get i))
+      (h_entries_valid : ∀ (i : Fin entries.length), ValidStringValue arena
+        h_wf (offset :: seen) (entries.get i))
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-  | CodeTable (seen : List Offset) (offset : Offset) (length : UInt32) (entries : List Offset)
+  | CodeTable (seen : List Offset) (offset : Offset) (length : UInt32)
+      (entries : List Offset)
       (h_cell : arena.resolve offset = some (Value.CodeTable length entries))
       (h_length : length.toNat = entries.length)
-      (h_entries_valid : ∀ (i : Fin entries.length), ValidCodeUnitValue arena h_wf (offset :: seen) (entries.get i))
+      (h_entries_valid : ∀ (i : Fin entries.length), ValidCodeUnitValue arena
+        h_wf (offset :: seen) (entries.get i))
       (h_seen_valid : ∀ o ∈ seen, o < arena.next ∧ arena.resolve o ≠ none) :
       ValidValue arena h_wf seen offset
 
-inductive ValidSyntaxNodePayload (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → SyntaxNodePayload → Prop
+inductive ValidSyntaxNodePayload (arena : Arena)
+    (h_wf : ArenaWellFormed arena) : List Offset → SyntaxNodePayload → Prop
   | int_i64 (seen : List Offset) (n : Offset) (payload : Int64)
       (h_cell : arena.resolve n = some (Value.I64Value payload))
       (h_valid : ValidValue arena h_wf seen n) :
       ValidSyntaxNodePayload arena h_wf seen (SyntaxNodePayload.int n)
 
-  | int_big (seen : List Offset) (n : Offset) (sign : Bool) (nlimbs : UInt32) (limbs : List UInt32)
+  | int_big (seen : List Offset) (n : Offset) (sign : Bool)
+      (nlimbs : UInt32) (limbs : List UInt32)
       (h_cell : arena.resolve n = some (Value.IntValue sign nlimbs limbs))
       (h_valid : ValidValue arena h_wf seen n) :
       ValidSyntaxNodePayload arena h_wf seen (SyntaxNodePayload.int n)
 
-  | str_ascii (seen : List Offset) (s : Offset) (l : UInt32) (payload : List UInt8)
+  | str_ascii (seen : List Offset) (s : Offset) (l : UInt32)
+      (payload : List UInt8)
       (h_cell : arena.resolve s = some (Value.AsciiStrValue l payload))
       (h_valid : ValidValue arena h_wf seen s) :
       ValidSyntaxNodePayload arena h_wf seen (SyntaxNodePayload.str s)
 
-  | str_full (seen : List Offset) (s : Offset) (lb : UInt32) (lc : UInt32) (payload : List UInt8)
-      (h_cell : arena.resolve s = some (Value.StrValue lb lc payload))
+  | str_full (seen : List Offset) (s : Offset) (lb : UInt32) (lc : UInt32)
+      (payload : List UInt8)
+      (h_cell : arena.resolve s =
+        some (Value.StrValue lb lc payload))
       (h_valid : ValidValue arena h_wf seen s) :
       ValidSyntaxNodePayload arena h_wf seen (SyntaxNodePayload.str s)
 
@@ -378,26 +440,36 @@ inductive ValidSyntaxNodePayload (arena : Arena) (h_wf : ArenaWellFormed arena) 
       (h_valid : ValidValue arena h_wf seen b) :
       ValidSyntaxNodePayload arena h_wf seen (SyntaxNodePayload.bool b)
 
-inductive ValidOptionSyntaxNodePayload (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → Option SyntaxNodePayload → Prop
-  | none (seen : List Offset) : ValidOptionSyntaxNodePayload arena h_wf seen none
-  | some (seen : List Offset) (p : SyntaxNodePayload) (h : ValidSyntaxNodePayload arena h_wf seen p) : ValidOptionSyntaxNodePayload arena h_wf seen (some p)
+inductive ValidOptionSyntaxNodePayload (arena : Arena)
+    (h_wf : ArenaWellFormed arena) : List Offset →
+    Option SyntaxNodePayload → Prop
+  | none (seen : List Offset) :
+      ValidOptionSyntaxNodePayload arena h_wf seen none
+  | some (seen : List Offset) (p : SyntaxNodePayload)
+      (h : ValidSyntaxNodePayload arena h_wf seen p) :
+      ValidOptionSyntaxNodePayload arena h_wf seen (some p)
 
-inductive ValidIntValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → Offset → Prop
+inductive ValidIntValue (arena : Arena) (h_wf : ArenaWellFormed arena) :
+  List Offset → Offset → Prop
   | i64 (seen : List Offset) (o : Offset) (payload : Int64)
       (h_cell : arena.resolve o = some (Value.I64Value payload))
       (h_valid : ValidValue arena h_wf seen o) :
       ValidIntValue arena h_wf seen o
-  | int (seen : List Offset) (o : Offset) (sign : Bool) (nlimbs : UInt32) (limbs : List UInt32)
+  | int (seen : List Offset) (o : Offset) (sign : Bool) (nlimbs : UInt32)
+      (limbs : List UInt32)
       (h_cell : arena.resolve o = some (Value.IntValue sign nlimbs limbs))
       (h_valid : ValidValue arena h_wf seen o) :
       ValidIntValue arena h_wf seen o
 
-inductive ValidStringValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → Offset → Prop
-  | ascii (seen : List Offset) (o : Offset) (l : UInt32) (payload : List UInt8)
+inductive ValidStringValue (arena : Arena) (h_wf : ArenaWellFormed arena) :
+  List Offset → Offset → Prop
+  | ascii (seen : List Offset) (o : Offset) (l : UInt32)
+      (payload : List UInt8)
       (h_cell : arena.resolve o = some (Value.AsciiStrValue l payload))
       (h_valid : ValidValue arena h_wf seen o) :
       ValidStringValue arena h_wf seen o
-  | full (seen : List Offset) (o : Offset) (lb : UInt32) (lc : UInt32) (payload : List UInt8)
+  | full (seen : List Offset) (o : Offset) (lb : UInt32) (lc : UInt32)
+      (payload : List UInt8)
       (h_cell : arena.resolve o = some (Value.StrValue lb lc payload))
       (h_valid : ValidValue arena h_wf seen o) :
       ValidStringValue arena h_wf seen o
@@ -406,28 +478,43 @@ inductive ValidStringValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List
       (h_valid : ValidValue arena h_wf seen o) :
       ValidStringValue arena h_wf seen o
 
-inductive ValidCodeUnitValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → Offset → Prop
-  | codeunit (seen : List Offset) (o : Offset) (name : Option Offset) (outer_codeunit : Option Offset) (parameters : Offset)
+inductive ValidCodeUnitValue (arena : Arena)
+    (h_wf : ArenaWellFormed arena) : List Offset → Offset → Prop
+  | codeunit (seen : List Offset) (o : Offset) (name : Option Offset)
+      (outer_codeunit : Option Offset) (parameters : Offset)
       (register_count : UInt32) (env_length : UInt32)
-      (inttable : Option Offset) (strtable : Option Offset) (codetable : Option Offset)
-      (instr_count : UInt32) (instructions : List Instruction)
-      (h_cell : arena.resolve o = some (Value.CodeUnit name outer_codeunit parameters register_count env_length inttable strtable codetable instr_count instructions))
+      (inttable : Option Offset) (strtable : Option Offset)
+      (codetable : Option Offset) (instr_count : UInt32)
+      (instructions : List Instruction)
+      (h_cell : arena.resolve o =
+        some (Value.CodeUnit name outer_codeunit parameters register_count
+          env_length inttable strtable codetable instr_count instructions))
       (h_valid : ValidValue arena h_wf seen o) :
       ValidCodeUnitValue arena h_wf seen o
 
-inductive ValidEnvironmentValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → Offset → Prop
-  | env (seen : List Offset) (o : Offset) (outer_env : Option Offset) (entry_count : UInt32) (entries : List (Bool × Option Offset))
-      (h_cell : arena.resolve o = some (Value.Environment outer_env entry_count entries))
+inductive ValidEnvironmentValue (arena : Arena)
+    (h_wf : ArenaWellFormed arena) : List Offset → Offset → Prop
+  | env (seen : List Offset) (o : Offset) (outer_env : Option Offset)
+      (entry_count : UInt32) (entries : List (Bool × Option Offset))
+      (h_cell : arena.resolve o =
+        some (Value.Environment outer_env entry_count entries))
       (h_valid : ValidValue arena h_wf seen o) :
       ValidEnvironmentValue arena h_wf seen o
 
-inductive ValidOptionEnvironmentValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → Option Offset → Prop
-  | none (seen : List Offset) : ValidOptionEnvironmentValue arena h_wf seen none
-  | some (seen : List Offset) (o : Offset) (h : ValidEnvironmentValue arena h_wf seen o) : ValidOptionEnvironmentValue arena h_wf seen (some o)
+inductive ValidOptionEnvironmentValue (arena : Arena)
+    (h_wf : ArenaWellFormed arena) : List Offset →
+    Option Offset → Prop
+  | none (seen : List Offset) :
+      ValidOptionEnvironmentValue arena h_wf seen none
+  | some (seen : List Offset) (o : Offset)
+      (h : ValidEnvironmentValue arena h_wf seen o) :
+      ValidOptionEnvironmentValue arena h_wf seen (some o)
 
-inductive ValidOptionValue (arena : Arena) (h_wf : ArenaWellFormed arena) : List Offset → Option Offset → Prop
+inductive ValidOptionValue (arena : Arena) (h_wf : ArenaWellFormed arena) :
+  List Offset → Option Offset → Prop
   | none (seen : List Offset) : ValidOptionValue arena h_wf seen none
-  | some (seen : List Offset) (o : Offset) (h : ValidValue arena h_wf seen o) : ValidOptionValue arena h_wf seen (some o)
+  | some (seen : List Offset) (o : Offset)
+      (h : ValidValue arena h_wf seen o) :
+      ValidOptionValue arena h_wf seen (some o)
 
 end
-
