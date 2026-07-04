@@ -14,6 +14,9 @@ that the value is defined/set.) The value used for "null" is actually
 Strings are in general handled with the `s8()` macro, which bundles the byte
 payload with the length in bytes.
 
+We do not use `const` in the code. Instead there is a ubiquitous focus on
+preserving invariants and validity throughout.
+
 In code in the value layer and the instruction layer, there are three types of
 error handling, each with a different purpose:
 
