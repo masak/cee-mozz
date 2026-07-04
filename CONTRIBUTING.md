@@ -1,7 +1,7 @@
 Contributions from other humans are welcome.
 
 The project uses spaces for indentation. The C code uses 4 spaces, and the Lean
-code uses 2 spaces.
+code uses 2 spaces. Lines are kept at most 79 characters long.
 
 Typedefs such as `u32` and `i64` are declared to avoid the platform-dependent
 sizes of types such as `unsigned int` and `long`.
