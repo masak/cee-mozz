@@ -28,7 +28,7 @@ defining the various types of the runtime:
 | `CodeUnit` | ✅ | (✅) | ✅ |
 | `SyntaxNodeValue` | | | |
 | `IntValue` | ✅ | ✅ | ✅ `add sub mul floordiv mod` |
-| `StrValue` | | | `concat` |
+| `StrValue` | ✅ | ✅ | ✅ `concat` |
 | `SmallStrValue` | | | `concat` |
 | `IntTable` | ✅ | ✅ | ✅ |
 | `StrTable` | ✅ | ✅ | ✅ |

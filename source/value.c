@@ -9,9 +9,12 @@
 #include "../include/environment.h"
 #include "../include/func-value.h"
 #include "../include/i64-value.h"
+#include "../include/int-value.h"
 #include "../include/int-table.h"
 #include "../include/macro-value.h"
+#include "../include/parameters.h"
 #include "../include/str-table.h"
+#include "../include/str-value.h"
 #include "../include/value.h"
 #include "../include/tags.h"
 
@@ -26,7 +29,7 @@ bool generic_validate(Arena *a, Offset offset, SeenSet *seenset) {
             return i64_validate(a, offset, seenset);
         case TAG_ASCII_STR:
             return ascii_str_validate(a, offset, seenset);
-        /* skipping bool 0x03, none 0x04, uninitialized 0x05 for now */
+        /* skipping bool 0x03, none 0x04 for now */
         case TAG_ARRAY:
             return array_validate(a, offset, seenset);
         case TAG_ARRAY_ELEMENTS:
@@ -39,12 +42,18 @@ bool generic_validate(Arena *a, Offset offset, SeenSet *seenset) {
             return environment_validate(a, offset, seenset);
         case TAG_CODE_UNIT:
             return codeunit_validate(a, offset, seenset);
+        case TAG_INT:
+            return int_validate(a, offset, seenset);
+        case TAG_STR:
+            return str_validate(a, offset, seenset);
         case TAG_INT_TABLE:
             return inttable_validate(a, offset, seenset);
         case TAG_STR_TABLE:
             return strtable_validate(a, offset, seenset);
         case TAG_CODE_TABLE:
             return codetable_validate(a, offset, seenset);
+        case TAG_PARAMETERS:
+            return parameters_validate(a, offset, seenset);
         default:
             assert(0 && "unsupported type tag in generic_validate");
             return 0; /* unreachable */
@@ -82,9 +91,13 @@ Offset generic_to_str(Arena *a, Offset offset) {
         }
         case TAG_ASCII_STR:
             return offset;
+        case TAG_STR:
+            return offset;
         default:
             assert(0 && "unsupported type tag in generic_to_str");
             return 0; /* unreachable */
     }
 }
+
+/* XXX: Implement generic_string_concat() */
 

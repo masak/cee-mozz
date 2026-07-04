@@ -48,8 +48,9 @@ bool strtable_validate(Arena *a, Offset offset, SeenSet *seenset) {
         if (item_offset == UNSET) {
             return false;
         }
-        /* extend this with StrValue and SmallStrValue later */
-        if (value_tag(a, item_offset) != TAG_ASCII_STR) {
+        u32 tag = value_tag(a, item_offset);
+        /* extend this with SmallStrValue later */
+        if (tag != TAG_ASCII_STR && tag != TAG_STR) {
             return false;
         }
         if (!generic_validate(a, item_offset, seenset)) {
