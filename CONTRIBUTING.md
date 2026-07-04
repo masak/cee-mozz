@@ -14,9 +14,25 @@ that the value is defined/set.) The value used for "null" is actually
 Strings are in general handled with the `s8()` macro, which bundles the byte
 payload with the length in bytes.
 
-The functions ending in `_new` which create new values tend to `assert()` any
-inputs that can be invalid, preferring to panic rather than creating an invalid
-value.
+In code in the value layer and the instruction layer, there are three types of
+error handling, each with a different purpose:
+
+* Invariants and postconditions can be indicated with `assert()` calls. This
+  most severe level should only be used for code that is expected never to fail
+  regardless of user input and function parameters.
+
+* Function preconditions of `_new` functions and value-related functions are
+  diligently tested by the functions themselves; if found to be false, the
+  `vm_crash(reason)` function is called. Code in the instruction layer that
+  calls these functions are expected to respect these preconditions, and
+  failure to do so is considered an error in the caller code.
+
+* When an instruction or a value-related function fails for reasons not related
+  to the above two items &mdash; such as a type error, a division by zero, or
+  an index out of bounds &mdash; the value-related function returns immediately
+  with an enum value that indicates which type of runtime error occurred. In
+  the instruction layer, this return value is diligently checked, and
+  propagated upwards as a VM error, stopping execution.
 
 The functions ending in `_validate` return a `bool` to indicate value validity.
 It is an invariant of the arena and all the values in it that a `_validate`
