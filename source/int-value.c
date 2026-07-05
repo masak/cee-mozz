@@ -5,6 +5,7 @@
 
 #include "../include/arena.h"
 #include "../include/ascii-str-value.h"
+#include "../include/crash.h"
 #include "../include/int-value.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
@@ -283,13 +284,24 @@ Offset int_new(Arena *a, u32 sign, u32 length, u32 payload[]) {
     v->tag = TAG_INT;
     v->sign = sign;
     v->length = length;
-    assert(payload != NULL);
+
+    if (payload == NULL) {
+        vm_crash(CRASH_NULL);
+    }
     memcpy(v->payload, payload, length * sizeof(u32));
     int_normalize(v);
     return (Offset)((unsigned char *)v - a->bytes);
 }
 
+/* Returns a pointer to an IntValue, given an offset into an arena.
+ *
+ * Precondition: `offset` points to an IntValue.
+ */
 IntValue *int_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_INT) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(IntValue));
     return (IntValue *)(a->bytes + offset);
 }
@@ -318,6 +330,10 @@ bool int_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+/* Add two IntValues `m` and `n`, yielding an IntValue result.
+ *
+ * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ */
 Offset int_add(Arena *a, Offset m, Offset n) {
     IntValue *lhs = int_resolve(a, m);
     IntValue *rhs = int_resolve(a, n);
@@ -352,6 +368,10 @@ Offset int_add(Arena *a, Offset m, Offset n) {
     }
 }
 
+/* Subtract two IntValues `m` and `n`, yielding an IntValue result.
+ *
+ * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ */
 Offset int_subtract(Arena *a, Offset m, Offset n) {
     IntValue *lhs = int_resolve(a, m);
     IntValue *rhs = int_resolve(a, n);
@@ -386,6 +406,10 @@ Offset int_subtract(Arena *a, Offset m, Offset n) {
     }
 }
 
+/* Multiply two IntValues `m` and `n`, yielding an IntValue result.
+ *
+ * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ */
 Offset int_multiply(Arena *a, Offset m, Offset n) {
     IntValue *lhs = int_resolve(a, m);
     IntValue *rhs = int_resolve(a, n);
@@ -427,6 +451,12 @@ Offset int_multiply(Arena *a, Offset m, Offset n) {
     return (Offset)((unsigned char *)result - a->bytes);
 }
 
+/* Divide two IntValues `m` and `n`, yielding an IntValues result. The
+ * resulting quotient is rounded towards negative infinity. The `fallback` is
+ * returned instead of doing the division, in case the denominator is zero.
+ *
+ * Preconditions: `m` is a valid IntValue. `n` is a valid IntValue.
+ */
 Offset int_divide(Arena *a, Offset m, Offset n, Offset fallback) {
     IntValue *lhs = int_resolve(a, m);
     IntValue *rhs = int_resolve(a, n);
@@ -463,6 +493,14 @@ Offset int_divide(Arena *a, Offset m, Offset n, Offset fallback) {
     return quot_offset;
 }
 
+/* Get the remainder of a division of two IntValues `m` and `n`, yielding an
+ * IntValue result. The remainder `r` has the same sign as the divisor `n`,
+ * and `|r| < |n|`, uniquely such that `m = q * n + r`. The `fallback` is
+ * returned instead of computing the remainder, in case the denominator is
+ * zero.
+ *
+ * Preconditions: `m` is a valid IntValue. `n` is a valid IntValue.
+ */
 Offset int_modulo(Arena *a, Offset m, Offset n, Offset fallback) {
     IntValue *lhs = int_resolve(a, m);
     IntValue *rhs = int_resolve(a, n);
@@ -515,6 +553,11 @@ Offset int_modulo(Arena *a, Offset m, Offset n, Offset fallback) {
     return rem_offset;
 }
 
+/* Return a string representation (in the form of an AsciiStrValue) of the
+ * IntValue `offset`.
+ *
+ * Preconditions: `offset` is a valid IntValue.
+ */
 Offset int_to_str(Arena *a, Offset offset) {
     IntValue *v = int_resolve(a, offset);
     if (int_is_zero(v)) {
@@ -525,13 +568,17 @@ Offset int_to_str(Arena *a, Offset offset) {
     /* Copy magnitude so we can destroy it with repeated divmod10 */
     u32 len = v->length;
     u32 *tmp = malloc(len * sizeof(u32));
-    assert(tmp != NULL);
+    if (tmp == NULL) {
+        vm_crash(CRASH_MALLOC);
+    }
     memcpy(tmp, v->payload, len * sizeof(u32));
 
     /* Each u32 is at most 10 decimal digits */
     u32 max_digits = len * 10 + 1;  /* + 1 for sign */
     char *rev = malloc(max_digits);
-    assert(rev != NULL);
+    if (rev == NULL) {
+        vm_crash(CRASH_MALLOC);
+    }
     u32 n = 0;
 
     while (magnitude_is_nonzero(tmp, len)) {

@@ -4,6 +4,7 @@
 
 #include "../include/arena.h"
 #include "../include/code-table.h"
+#include "../include/crash.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
 #include "../include/value.h"
@@ -17,11 +18,22 @@ Offset codetable_new(Arena *a, u32 length, Offset elements[]) {
     );
     codetable->tag = TAG_CODE_TABLE;
     codetable->length = length;
+    /* XXX: Should loop through all elements and `vm_crash` if any one of them
+            isn't a CodeUnit. This is required to guarantee the postcondition
+            in `codetable_get` later. */
     memcpy(codetable->elements, elements, elements_size);
     return (Offset)((unsigned char *)codetable - a->bytes);
 }
 
+/* Returns a pointer to a CodeTable, given an offset into an arena.
+ *
+ * Precondition: `offset` points to a CodeTable.
+ */
 CodeTable *codetable_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_CODE_TABLE) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(CodeTable));
     return (CodeTable *)(a->bytes + offset);
 }
@@ -60,9 +72,19 @@ bool codetable_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+/* Return an entry from the CodeTable at `offset`, at the index `index`.
+ *
+ * Precondition: `offset` points to a valid CodeTable.
+ * Additional expectation: `index` is within bounds; that is, it falls
+ *                         within the range 0 ..^ N, N being the number of
+ *                         entries in the CodeTable.
+ * Postcondition: the returned entry is a `CodeUnit`.
+ */
 Offset codetable_get(Arena *a, Offset offset, u32 index) {
     CodeTable *codetable = codetable_resolve(a, offset);
-    assert(index < codetable->length);
+    if (index >= codetable->length) {
+        vm_crash(CRASH_OUT_OF_BOUNDS);
+    }
     return codetable->elements[index];
 }
 

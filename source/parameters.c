@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../include/arena.h"
+#include "../include/crash.h"
 #include "../include/parameters.h"
 #include "../include/seenset.h"
 #include "../include/typedefs.h"
@@ -33,7 +34,15 @@ Offset parameters_new(
     return (Offset)((unsigned char *)parameters - a->bytes);
 }
 
+/* Returns a pointer to a Parameters, given an offset into an arena.
+ *
+ * Precondition: `offset` points to a Parameters.
+ */
 Parameters *parameters_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_PARAMETERS) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(Parameters));
     return (Parameters *)(a->bytes + offset);
 }

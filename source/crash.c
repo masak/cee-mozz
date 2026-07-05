@@ -2,7 +2,7 @@
 
 #include "../include/crash.h"
 
-void vm_crash(CrashReason reason) {
+_Noreturn void vm_crash(CrashReason reason) {
     (void)reason;
     abort();
 }

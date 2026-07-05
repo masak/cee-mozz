@@ -5,6 +5,7 @@
 #include "../include/arena.h"
 #include "../include/code-table.h"
 #include "../include/codeunit.h"
+#include "../include/crash.h"
 #include "../include/environment.h"
 #include "../include/int-table.h"
 #include "../include/parameters.h"
@@ -45,7 +46,15 @@ Offset codeunit_new(
     return (Offset)((unsigned char *)codeunit - a->bytes);
 }
 
+/* Returns a pointer to a CodeUnit, given an offset into an arena.
+ *
+ * Precondition: `offset` points to a CodeUnit.
+ */
 CodeUnit *codeunit_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_CODE_UNIT) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(CodeUnit));
     return (CodeUnit *)(a->bytes + offset);
 }

@@ -3,6 +3,7 @@
 
 #include "../include/arena.h"
 #include "../include/codeunit.h"
+#include "../include/crash.h"
 #include "../include/environment.h"
 #include "../include/func-value.h"
 #include "../include/seenset.h"
@@ -21,7 +22,15 @@ Offset func_new(Arena *a, Offset env_offset, Offset codeunit_offset) {
     return (Offset)((unsigned char *)func_value - a->bytes);
 }
 
+/* Returns a pointer to a FuncValue, given an offset into an arena.
+ *
+ * Precondition: `offset` points to a FuncValue.
+ */
 FuncValue *func_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_FUNC) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(FuncValue));
     return (FuncValue *)(a->bytes + offset);
 }
@@ -32,7 +41,6 @@ bool func_validate(Arena *a, Offset offset, SeenSet *seenset) {
     }
     seenset_add(seenset, offset);
 
-    assert(offset <= ARENA_SIZE - sizeof(FuncValue));
     FuncValue *func_value = func_resolve(a, offset);
 
     Offset env_offset = func_value->env_offset;

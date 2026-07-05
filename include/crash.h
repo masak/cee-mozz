@@ -3,10 +3,20 @@
 
 typedef enum {
     CRASH_OK = 0,
+    CRASH_ALIGN_NOT_POW2,
+    CRASH_ARRAY_TOO_LONG,
+    CRASH_FULL_ARENA,
     CRASH_INVALID_TAG,
+    CRASH_MALLOC,
+    CRASH_NULL,
+    CRASH_OUT_OF_BOUNDS,
+    CRASH_SHOULD_BE_RUNTIME_ERROR,
+    CRASH_STORE_READONLY,
+    CRASH_STORE_UNSET,
+    CRASH_STRING_TOO_LONG,
 } CrashReason;
 
-void vm_crash(CrashReason reason);
+_Noreturn void vm_crash(CrashReason reason);
 
 #endif
 

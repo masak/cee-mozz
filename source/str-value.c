@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "../include/arena.h"
+#include "../include/crash.h"
 #include "../include/seenset.h"
 #include "../include/str-value.h"
 #include "../include/tags.h"
@@ -97,7 +98,15 @@ Offset str_new(Arena *a, s8 *str) {
     return (Offset)((unsigned char *)str_value - a->bytes);
 }
 
+/* Returns a pointer to a StrValue, given an offset into an arena.
+ *
+ * Precondition: `offset` points to a StrValue.
+ */
 StrValue *str_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_STR) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(StrValue));
     return (StrValue *)(a->bytes + offset);
 }
@@ -129,6 +138,12 @@ bool str_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+/* Return an StrValue which is the concatenation of `offset1` and `offset2`.
+ *
+ * Preconditions: `offset1` points to a valid StrValue; `offset2` points to a
+ *                valid StrValue. Their combined length (in bytes) fits in a
+ *                `u32`.
+ */
 Offset str_concat(Arena *a, Offset offset1, Offset offset2) {
     StrValue *lhs = str_resolve(a, offset1);
     StrValue *rhs = str_resolve(a, offset2);
@@ -137,6 +152,9 @@ Offset str_concat(Arena *a, Offset offset1, Offset offset2) {
     u32 length_in_codepoints
         = lhs->length_in_codepoints + rhs->length_in_codepoints;
     u32 total_size = sizeof(StrValue) + length_in_bytes;
+    if (total_size < lhs->length_in_bytes) {
+        vm_crash(CRASH_STRING_TOO_LONG);
+    }
 
     StrValue *result = arena_alloc(a, total_size, alignof(StrValue));
     result->tag = TAG_STR;

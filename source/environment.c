@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../include/arena.h"
+#include "../include/crash.h"
 #include "../include/environment.h"
 #include "../include/seenset.h"
 #include "../include/typedefs.h"
@@ -31,7 +32,15 @@ Offset environment_new(
     return (Offset)((unsigned char *)environment - a->bytes);
 }
 
+/* Returns a pointer to an Environment, given an offset into an arena.
+ *
+ * Precondition: `offset` points to a Environment.
+ */
 Environment *environment_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_ENVIRONMENT) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(Environment));
     return (Environment *)(a->bytes + offset);
 }
@@ -67,6 +76,14 @@ bool environment_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+/* Return an entry from the Environment at `env_offset`, at the index
+ * `entry_index`.
+ *
+ * Precondition: `env_offset` points to a valid Environment.
+ * Additional expectation: `entry_index` is within bounds; that is, it falls
+ *                         within the range 0 ..^ N, N being the number of
+ *                         entries in the Environment.
+ */
 static Offset environment_direct_load(
     Arena *a,
     Offset env_offset,
@@ -75,6 +92,7 @@ static Offset environment_direct_load(
 ) {
     Environment *environment = environment_resolve(a, env_offset);
     if (entry_index >= environment->entry_count) {
+        /* XXX: Turn this into a vm_crash() (and remove `fallback_outset`) */
         return fallback_offset;
     }
 
@@ -86,6 +104,15 @@ static Offset environment_direct_load(
     return cell;
 }
 
+/* Return an entry from `outer_steps` outer environments up from the
+ * Environment at `env_offset`, at the index `entry_index`.
+ *
+ * Precondition: `env_offset` points to a valid Environment.
+ * Additional expectation: There actually `outer_steps` of environments to
+ *                         follow. `entry_index` is within bounds; that is, it
+ *                         falls within the range 0 ..^ N, N being the number
+ *                         of entries in the indicated Environment.
+ */
 Offset environment_load(
     Arena *a,
     Offset env_offset,
@@ -112,6 +139,15 @@ Offset environment_load(
     );
 }
 
+/* Store `value_offset` into an entry from the Environment at `env_offset`,
+ * at the index `entry_index`.
+ *
+ * Precondition: `env_offset` points to a valid Environment.
+ * Additional expectations: `entry_index` is within bounds; that is, it falls
+ *                          within the range 0 ..^ N, N being the number of
+ *                          entries in the Environment. The entry being stored
+ *                          into needs to be writable.
+ */
 static void environment_direct_store(
     Arena *a,
     Offset env_offset,
@@ -119,24 +155,31 @@ static void environment_direct_store(
     Offset value_offset
 ) {
     if (value_offset == UNSET) {
-        assert(0 && "Trying to store UNSET in environment_store");
-        return;
+        vm_crash(CRASH_STORE_UNSET);
     }
 
     Environment *environment = environment_resolve(a, env_offset);
     if (entry_index >= environment->entry_count) {
-        assert(0 && "entry_index exceeds entry_count in environment_store");
-        return;
+        vm_crash(CRASH_OUT_OF_BOUNDS);
     }
 
     if (!environment->entries[entry_index].writable) {
-        assert(0 && "entry is readonly in environment_store");
-        return;
+        vm_crash(CRASH_STORE_READONLY);
     }
 
     environment->entries[entry_index].cell = value_offset;
 }
 
+/* Store `value_offset` into an entry from the `outer_steps` outer environments
+ * up from the Environment at `env_offset`, at the index `entry_index`.
+ *
+ * Precondition: `env_offset` points to a valid Environment.
+ * Additional expectations: There are actually `outer_steps` of environments
+ *                          to follow. `entry_index` is within bounds; that is,
+ *                          it falls within the range 0 ..^ N, N being the
+ *                          number of entries in the indicated Environment. The
+ *                          entry being stored into needs to be writable.
+ */
 void environment_store(
     Arena *a,
     Offset env_offset,
@@ -150,8 +193,7 @@ void environment_store(
         Environment *environment = environment_resolve(a, current_env_offset);
         MaybeOffset outer_env_offset = environment->outer_env_offset;
         if (outer_env_offset == UNSET) {
-            assert(0 && "Too many outer_steps in environment_store");
-            return;
+            vm_crash(CRASH_OUT_OF_BOUNDS);
         }
         current_env_offset = outer_env_offset;
     }

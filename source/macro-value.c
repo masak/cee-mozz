@@ -3,6 +3,7 @@
 
 #include "../include/arena.h"
 #include "../include/codeunit.h"
+#include "../include/crash.h"
 #include "../include/environment.h"
 #include "../include/macro-value.h"
 #include "../include/seenset.h"
@@ -21,7 +22,15 @@ Offset macro_new(Arena *a, Offset env_offset, Offset codeunit_offset) {
     return (Offset)((unsigned char *)macro_value - a->bytes);
 }
 
+/* Returns a pointer to a MacroValue, given an offset into an arena.
+ *
+ * Precondition: `offset` points to a MacroValue.
+ */
 MacroValue *macro_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_MACRO) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(MacroValue));
     return (MacroValue *)(a->bytes + offset);
 }
@@ -32,7 +41,6 @@ bool macro_validate(Arena *a, Offset offset, SeenSet *seenset) {
     }
     seenset_add(seenset, offset);
 
-    assert(offset <= ARENA_SIZE - sizeof(MacroValue));
     MacroValue *macro_value = macro_resolve(a, offset);
 
     Offset env_offset = macro_value->env_offset;

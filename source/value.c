@@ -6,6 +6,7 @@
 #include "../include/ascii-str-value.h"
 #include "../include/code-table.h"
 #include "../include/codeunit.h"
+#include "../include/crash.h"
 #include "../include/environment.h"
 #include "../include/func-value.h"
 #include "../include/i64-value.h"
@@ -19,7 +20,9 @@
 #include "../include/tags.h"
 
 Tag value_tag(Arena *a, Offset offset) {
-    assert(offset <= ARENA_SIZE - sizeof(Value));
+    if (offset >= ARENA_SIZE) {
+        vm_crash(CRASH_OUT_OF_BOUNDS);
+    }
     return ((Value *)(a->bytes + offset))->tag;
 }
 
@@ -60,7 +63,7 @@ bool generic_validate(Arena *a, Offset offset, SeenSet *seenset) {
     }
 }
 
-/* Convert any Value to its AsciiStrValue representation */
+/* Convert any Value to its string representation */
 Offset generic_to_str(Arena *a, Offset offset) {
     switch (value_tag(a, offset)) {
         case TAG_I64: {
@@ -91,6 +94,8 @@ Offset generic_to_str(Arena *a, Offset offset) {
         }
         case TAG_ASCII_STR:
             return offset;
+        case TAG_INT:
+            return int_to_str(a, offset);
         case TAG_STR:
             return offset;
         default:

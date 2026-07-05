@@ -2,9 +2,11 @@
 #include <stdint.h>
 
 #include "../include/arena.h"
+#include "../include/crash.h"
 #include "../include/i64-value.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
+#include "../include/value.h"
 
 Offset i64_new(Arena *a, i64 payload) {
     I64Value *i64_value = arena_alloc(a, sizeof(I64Value), alignof(I64Value));
@@ -13,8 +15,15 @@ Offset i64_new(Arena *a, i64 payload) {
     return (Offset)((unsigned char *)i64_value - a->bytes);
 }
 
-/* Resolve an offset back to a pointer. */
+/* Returns a pointer to an I64Value, given an offset into an arena.
+ *
+ * Precondition: `offset` points to a I64Value.
+ */
 I64Value *i64_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_I64) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(I64Value));
     return (I64Value *)(a->bytes + offset);
 }
@@ -30,7 +39,11 @@ bool i64_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
-/* Addition overflow is silent and wraps */
+/* Add two I64Values `m` and `n`, yielding an I64Value result. Overflow is
+ * silent and wraps.
+ *
+ * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ */
 Offset i64_add(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
@@ -38,7 +51,11 @@ Offset i64_add(Arena *a, Offset m, Offset n) {
     return i64_new(a, (i64)sum);
 }
 
-/* Subtraction overflow is silent and wraps */
+/* Subtract two I64Values `m` and `n`, yielding an I64Value result. Overflow is
+ * silent and wraps.
+ *
+ * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ */
 Offset i64_subtract(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
@@ -46,7 +63,11 @@ Offset i64_subtract(Arena *a, Offset m, Offset n) {
     return i64_new(a, (i64)difference);
 }
 
-/* Multiplication overflow is silent and wraps */
+/* Multiply two I64Values `m` and `n`, yielding an I64Value result. Overflow is
+ * silent and wraps.
+ *
+ * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ */
 Offset i64_multiply(Arena *a, Offset m, Offset n) {
     I64Value *lhs = i64_resolve(a, m);
     I64Value *rhs = i64_resolve(a, n);
@@ -54,6 +75,13 @@ Offset i64_multiply(Arena *a, Offset m, Offset n) {
     return i64_new(a, (i64)product);
 }
 
+/* Divide two I64Values `m` and `n`, yielding an I64Value result. The resulting
+ * quotient is rounded towards negative infinity. The `fallback` is returned
+ * instead of doing the division, in case the denominator is zero or in the
+ * special case of (INT64_MIN, -1).
+ *
+ * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ */
 Offset i64_divide(Arena *a, Offset m, Offset n, Offset fallback) {
     I64Value *numerator = i64_resolve(a, m);
     I64Value *denominator = i64_resolve(a, n);
@@ -84,6 +112,14 @@ Offset i64_divide(Arena *a, Offset m, Offset n, Offset fallback) {
     return i64_new(a, quotient);
 }
 
+/* Get the remainder of a division of two I64Values `m` and `n`, yielding an
+ * I64Value result. The remainder `r` has the same sign as the divisor `n`, and
+ * `|r| < |n|`, uniquely such that `m = q * n + r`. The `fallback` is returned
+ * instead of computing the remainder, in case the denominator is zero or in
+ * the special case of (INT64_MIN, -1).
+ *
+ * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ */
 Offset i64_modulo(Arena *a, Offset m, Offset n, Offset fallback) {
     I64Value *numerator = i64_resolve(a, m);
     I64Value *denominator = i64_resolve(a, n);

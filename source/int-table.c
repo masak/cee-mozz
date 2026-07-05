@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../include/arena.h"
+#include "../include/crash.h"
 #include "../include/int-table.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
@@ -17,11 +18,22 @@ Offset inttable_new(Arena *a, u32 length, Offset elements[]) {
     );
     inttable->tag = TAG_INT_TABLE;
     inttable->length = length;
+    /* XXX: Should loop through all elements and `vm_crash` if any one of them
+            isn't an integer. This is required to guarantee the postcondition
+            in `inttable_get` later. */
     memcpy(inttable->elements, elements, elements_size);
     return (Offset)((unsigned char *)inttable - a->bytes);
 }
 
+/* Returns a pointer to an IntTable, given an offset into an arena.
+ *
+ * Precondition: `offset` points to an IntTable.
+ */
 IntTable *inttable_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_INT_TABLE) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(IntTable));
     return (IntTable *)(a->bytes + offset);
 }
@@ -60,9 +72,19 @@ bool inttable_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+/* Return an entry from the IntTable at `offset`, at the index `index`.
+ *
+ * Precondition: `offset` points to a valid IntTable.
+ * Additional expectation: `index` is within bounds; that is, it falls
+ *                         within the range 0 ..^ N, N being the number of
+ *                         entries in the IntTable.
+ * Postcondition: the returned entry is an integer.
+ */
 Offset inttable_get(Arena *a, Offset offset, u32 index) {
     IntTable *inttable = inttable_resolve(a, offset);
-    assert(index < inttable->length);
+    if (index >= inttable->length) {
+        vm_crash(CRASH_OUT_OF_BOUNDS);
+    }
     return inttable->elements[index];
 }
 

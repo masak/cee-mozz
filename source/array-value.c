@@ -4,11 +4,13 @@
 
 #include "../include/array-value.h"
 #include "../include/arena.h"
+#include "../include/crash.h"
 #include "../include/i64-value.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
 #include "../include/value.h"
 
+/* Allocate a new ArrayValue. */
 Offset array_new(Arena *a, u32 capacity) {
     Offset elements_offset = array_elements_new(a, capacity);
     ArrayValue *array_value = arena_alloc(
@@ -23,7 +25,15 @@ Offset array_new(Arena *a, u32 capacity) {
     return (Offset)((unsigned char *)array_value - a->bytes);
 }
 
+/* Returns a pointer to an ArrayValue, given an offset into an arena.
+ *
+ * Precondition: `offset` points to an ArrayValue.
+ */
 ArrayValue *array_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_ARRAY) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(ArrayValue));
     return (ArrayValue *)(a->bytes + offset);
 }
@@ -65,6 +75,12 @@ bool array_validate(Arena *a, Offset offset, SeenSet *seenset) {
     return true;
 }
 
+/* Add a value to the end of an ArrayValue.
+ *
+ * Precondition: `array_offset` points to a valid ArrayValue.
+ * Postcondition: The array has been extended with one element at the end,
+ *                namely `value_offset`.
+ */
 void array_push(Arena *a, Offset array_offset, Offset value_offset) {
     ArrayValue *array_value = array_resolve(a, array_offset);
     ArrayElements *elems
@@ -95,19 +111,42 @@ void array_push(Arena *a, Offset array_offset, Offset value_offset) {
     ++array_value->length;
 }
 
+/* Return an element from the ArrayValue at `array_offset`, at the index
+ * indicated by `index_offset`.
+ *
+ * Precondition: `array_offset` points to a valid ArrayValue; `index_offset`
+ *               points to a valid integer value.
+ * Additional expectation: `index_offset` is within bounds; that is, it falls
+ *                         within the range 0 ..^ N, N being the length of the
+ *                         array.
+ */
 Offset array_get(Arena *a, Offset array_offset, Offset index_offset) {
     ArrayValue *array_value = array_resolve(a, array_offset);
+    /* XXX: `index_value` can be an `IntValue`, not just an `I64Value`. We
+       should extend the code here, but also add a test for it. */
     I64Value *index_value = i64_resolve(a, index_offset);
     i64 index = index_value->payload;
 
-    assert(index >= 0);
-    assert((u32)index < array_value->length);
+    /* XXX: In the fullness of time, this should be a runtime error, not a
+       not a VM crash. */
+    if (index < 0 || (u32)index >= array_value->length) {
+        vm_crash(CRASH_SHOULD_BE_RUNTIME_ERROR);
+    }
 
     ArrayElements *elems
         = array_elements_resolve(a, array_value->elements_offset);
     return elems->elements[index];
 }
 
+/* Store a value from `value_offset` into an element slot in the ArrayValue at
+ * `array_offset`, at the index indicated by `index_offset`.
+ *
+ * Precondition: `array_offset` points to a valid ArrayValue; `index_offset`
+ *               points to a valid integer value.
+ * Additional expectation: `index_offset` is within bounds; that is, it falls
+ *                         within the range 0 ..^ N, N being the length of the
+ *                         array.
+ */
 void array_set(
     Arena *a,
     Offset array_offset,
@@ -115,22 +154,38 @@ void array_set(
     Offset value_offset
 ) {
     ArrayValue *array_value = array_resolve(a, array_offset);
+    /* XXX: `index_value` can be an `IntValue`, not just an `I64Value`. We
+       should extend the code here, but also add a test for it. */
     I64Value *index_value = i64_resolve(a, index_offset);
     i64 index = index_value->payload;
 
-    assert(index >= 0);
-    assert((u32)index < array_value->length);
+    /* XXX: In the fullness of time, this should be a runtime error, not a
+       not a VM crash. */
+    if (index < 0 || (u32)index >= array_value->length) {
+        vm_crash(CRASH_SHOULD_BE_RUNTIME_ERROR);
+    }
 
     ArrayElements *elems
         = array_elements_resolve(a, array_value->elements_offset);
     elems->elements[index] = value_offset;
 }
 
+/* Return the length of the ArrayValue at `array_offset`.
+ *
+ * Precondition: `array_offset` points to a valid ArrayValue.
+ */
 Offset array_length(Arena *a, Offset array_offset) {
     ArrayValue *array_value = array_resolve(a, array_offset);
     return i64_new(a, (i64)array_value->length);
 }
 
+/* Return an ArrayValue whose elements are those of `array_offset`, followed by
+ * those of `array_offset2`.
+ *
+ * Preconditions: `array_offset1` points to a valid ArrayValue; `array_offset2`
+ *                points to a valid ArrayValue. Their combined length fits in a
+ *                `u32`.
+ */
 Offset array_concat(Arena *a, Offset array_offset1, Offset array_offset2) {
     ArrayValue *array_value1 = array_resolve(a, array_offset1);
     ArrayValue *array_value2 = array_resolve(a, array_offset2);
@@ -140,6 +195,9 @@ Offset array_concat(Arena *a, Offset array_offset1, Offset array_offset2) {
         = array_elements_resolve(a, array_value2->elements_offset);
 
     u32 total_length = array_value1->length + array_value2->length;
+    if (total_length < array_value1->length) {
+        vm_crash(CRASH_ARRAY_TOO_LONG);
+    }
 
     Offset result = array_new(a, total_length);
     ArrayValue *result_array_value = array_resolve(a, result);
@@ -161,6 +219,7 @@ Offset array_concat(Arena *a, Offset array_offset1, Offset array_offset2) {
     return result;
 }
 
+/* Allocate a new ArrayElements. */
 Offset array_elements_new(Arena *a, u32 capacity) {
     size_t elements_size = capacity * sizeof(Offset);
     ArrayElements *elems = arena_alloc(
@@ -174,7 +233,15 @@ Offset array_elements_new(Arena *a, u32 capacity) {
     return (Offset)((unsigned char *)elems - a->bytes);
 }
 
+/* Returns a pointer to an ArrayElements, given an offset into an arena.
+ *
+ * Precondition: `offset` points to an ArrayElements.
+ */
 ArrayElements *array_elements_resolve(Arena *a, Offset offset) {
+    if (value_tag(a, offset) != TAG_ARRAY_ELEMENTS) {
+        vm_crash(CRASH_INVALID_TAG);
+    }
+
     assert(offset <= ARENA_SIZE - sizeof(ArrayElements));
     return (ArrayElements *)(a->bytes + offset);
 }
