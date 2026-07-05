@@ -10,6 +10,7 @@ SRC_OBJS = \
  build/ascii-str-value.o \
  build/code-table.o \
  build/codeunit.o \
+ build/crash.o \
  build/environment.o \
  build/func-value.o \
  build/i64-value.o \
@@ -80,6 +81,9 @@ build/code-table.o: source/code-table.c include/arena.h include/code-table.h inc
 
 build/codeunit.o: source/codeunit.c include/arena.h include/code-table.h include/codeunit.h include/environment.h include/int-table.h include/parameters.h include/seenset.h include/str-table.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/codeunit.c
+
+build/crash.o: source/crash.c include/crash.h
+	$(CC) $(CFLAGS) -c -o $@ source/crash.c
 
 build/environment.o: source/environment.c include/arena.h include/environment.h include/seenset.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/environment.c
