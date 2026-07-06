@@ -375,7 +375,8 @@ void divide_magnitude_less_opposite_sign(void) {
     ASSERT_INT_DIVIDE(a, b, fallback, expected);
 }
 
-/* Regression test: error introduced in 9e5d113 (2026-06-14). */
+/* Regression test: error introduced in 9e5d113 (2026-06-14). Fixed in 9115821
+   (2026-07-06). */
 void divide_2_pow_32_by_2(void) {
     arena_init(&arena);
     u32 payload[] = {0, 1};
@@ -389,7 +390,8 @@ void divide_2_pow_32_by_2(void) {
     ASSERT_INT_MODULO(dividend, divisor, fallback, expected_remainder);
 }
 
-/* Regression test: error introduced in 9e5d113 (2026-06-14). */
+/* Regression test: error introduced in 9e5d113 (2026-06-14). Fixed in 9115821
+   (2026-07-06). */
 void divide_2_pow_32_plus_1_by_7(void) {
     arena_init(&arena);
     u32 payload[] = {1, 1};
