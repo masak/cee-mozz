@@ -1,4 +1,23 @@
-Contributions from other humans are welcome.
+Inspired by https://godotengine.org/article/contribution-policy-2026/ we fully
+endorse the following human-centric priorities:
+
+> Our focus will be on:
+>
+> * **Encouraging new contributors to become future maintainers, that involves
+>   teaching and growing the understanding of new contributors.**
+>     * LLMs can’t learn from specific feedback and thus can’t benefit from
+>       maintainers providing feedback.
+>
+> * **Ensuring all contributions are made by humans who can take responsibility
+>   for their code and be able and willing to fix it when needed.**
+>     * AI cannot take responsibility, and we can’t trust heavy users of AI to
+>       understand their code enough to fix it.
+
+In short: feel free to use LLMs to help write implementation code and test
+code, comments and documentation &mdash; but commits and pull requests can only
+be made by humans. Please write commit messages and pull request descriptions
+yourself, with your uniquely human voice. In online discussion (for example in
+a pull request), please use your own human words, not those of an LLM.
 
 The project uses spaces for indentation. The C code uses 4 spaces, and the Lean
 code uses 2 spaces. Lines are kept at most 79 characters long.
