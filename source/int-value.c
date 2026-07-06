@@ -164,7 +164,7 @@ static void divmod_magnitude(
     Offset *rem_out
 ) {
     /* Find the index of the highest set bit in dividend */
-    u32 total_bits = dividend->length * 54;
+    u32 total_bits = dividend->length * 32;
     u32 top = dividend->payload[dividend->length - 1];
     while (top != 0 && (top >> 31) == 0) {
         top <<= 1;
@@ -195,7 +195,6 @@ static void divmod_magnitude(
     rem->length = rem_len;
     memset(rem->payload, 0, rem_len * sizeof(u32));
 
-
     for (i32 bit = (i32)total_bits - 1; bit >= 0; bit--) {
         /* Shift remainder left by 1 */
         u32 carry = 0;
@@ -206,8 +205,8 @@ static void divmod_magnitude(
         }
 
         /* Bring down the current bit from dividend */
-        u32 word_idx = (u32)bit / 64;
-        u32 bit_idx = (u32)bit % 64;
+        u32 word_idx = (u32)bit / 32;
+        u32 bit_idx = (u32)bit % 32;
         rem->payload[0] |= (dividend->payload[word_idx] >> bit_idx) & 1;
 
         /* If remainder >= divisor, subtract and set quotient bit */

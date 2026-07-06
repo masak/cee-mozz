@@ -375,6 +375,44 @@ void divide_magnitude_less_opposite_sign(void) {
     ASSERT_INT_DIVIDE(a, b, fallback, expected);
 }
 
+/* Regression test: error introduced in 9e5d113 (2026-06-14). */
+void divide_2_pow_32_by_2(void) {
+    arena_init(&arena);
+    u32 payload[] = {0, 1};
+    Offset dividend = int_new(&arena, 0, 2, payload); /* 4_294_967_296 */
+    Offset divisor = i32_int(2);
+    Offset fallback = i32_int(999);
+    u32 half_payload[] = {2147483648ul};
+    Offset expected_quotient = int_new(&arena, 0, 1, half_payload);
+    Offset expected_remainder = i32_int(0);
+    ASSERT_INT_DIVIDE(dividend, divisor, fallback, expected_quotient);
+    ASSERT_INT_MODULO(dividend, divisor, fallback, expected_remainder);
+}
+
+/* Regression test: error introduced in 9e5d113 (2026-06-14). */
+void divide_2_pow_32_plus_1_by_7(void) {
+    arena_init(&arena);
+    u32 payload[] = {1, 1};
+    Offset dividend = int_new(&arena, 0, 2, payload); /* 4_294_967_297 */
+    Offset divisor = i32_int(7);
+    Offset fallback = i32_int(999);
+    Offset expected_quotient = i32_int(613566756);
+    Offset expected_remainder = i32_int(5);
+    ASSERT_INT_DIVIDE(dividend, divisor, fallback, expected_quotient);
+    ASSERT_INT_MODULO(dividend, divisor, fallback, expected_remainder);
+}
+
+/* Regression test. */
+void divide_2_pow_32_plus_1_by_3(void) {
+    arena_init(&arena);
+    u32 payload[] = {1, 1};
+    Offset dividend = int_new(&arena, 0, 2, payload); /* 4_294_967_297 */
+    Offset divisor = i32_int(3);
+    Offset fallback = i32_int(999);
+    Offset expected_quotient = i32_int(1431655765);
+    ASSERT_INT_DIVIDE(dividend, divisor, fallback, expected_quotient);
+}
+
 void modulo_positive_exact(void) {
     arena_init(&arena);
     Offset a = i32_int(42);
@@ -507,7 +545,7 @@ void one_hundred_factorial(void) {
 }
 
 int main(void) {
-    PLAN(48);
+    PLAN(51);
 
     RUN_TEST(create_zero);
     RUN_TEST(create_positive_one_limb);
@@ -546,6 +584,9 @@ int main(void) {
     RUN_TEST(divide_zero_numerator);
     RUN_TEST(divide_magnitude_less_than_one);
     RUN_TEST(divide_magnitude_less_opposite_sign);
+    RUN_TEST(divide_2_pow_32_by_2);
+    RUN_TEST(divide_2_pow_32_plus_1_by_7);
+    RUN_TEST(divide_2_pow_32_plus_1_by_3);
 
     RUN_TEST(modulo_positive_exact);
     RUN_TEST(modulo_positive_with_remainder);
