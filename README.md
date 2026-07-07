@@ -40,7 +40,7 @@ defining the various types of the runtime:
 - [Instructions](https://github.com/masak/cee-mozz/blob/main/docs/02-instructions.md)
 - [Environments](https://github.com/masak/cee-mozz/blob/main/docs/03-environments.md)
 - [Instruction semantics](https://github.com/masak/cee-mozz/blob/main/docs/04-instruction-semantics.md)
-- Execution of functions (tbw)
+- [Execution of routines](https://github.com/masak/cee-mozz/blob/main/docs/05-execution-of-routines.md)
 - Execution of a program (tbw)
 - Converting AST to instructions (tbw)
 - Three types of compilation unit (tbw)
