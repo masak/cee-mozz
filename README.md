@@ -26,7 +26,7 @@ defining the various types of the runtime:
 | `MacroValue` | ✅ | (✅) | ✅ |
 | `Environment` | ✅ | (✅) | ✅ |
 | `CodeUnit` | ✅ | (✅) | ✅ |
-| `SyntaxNodeValue` | | | |
+| `SyntaxNodeValue` | ✅ | ✅ | ✅ |
 | `IntValue` | ✅ | ✅ | ✅ `add sub mul floordiv mod` |
 | `StrValue` | ✅ | ✅ | ✅ `concat` |
 | `SmallStrValue` | | | `concat` |
