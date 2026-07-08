@@ -45,5 +45,6 @@ defining the various types of the runtime:
 - Converting AST to instructions (tbw)
 - Three types of compilation unit (tbw)
 - [Mark-and-compact garbage collection](https://github.com/masak/cee-mozz/blob/main/docs/09-garbage-collection.md)
-
+- Representing immediate values using unaligned offsets (tbw)
+- A small relational database (tbw)
 
