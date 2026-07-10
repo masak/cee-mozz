@@ -14,7 +14,7 @@
 #define TAG_SYNTAX_NODE     0x0c
 #define TAG_INT             0x0d
 #define TAG_STR             0x0e
-/* skipping smallstr 0x0f */
+#define TAG_SMALL_STR       0x0f
 #define TAG_INT_TABLE       0x10
 #define TAG_STR_TABLE       0x11
 #define TAG_CODE_TABLE      0x12

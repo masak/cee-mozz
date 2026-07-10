@@ -13,12 +13,14 @@ SRC_OBJS = \
  build/crash.o \
  build/environment.o \
  build/func-value.o \
+ build/generic-string.o \
  build/i64-value.o \
  build/int-table.o \
  build/int-value.o \
  build/macro-value.o \
  build/parameters.o \
  build/seenset.o \
+ build/small-str-value.o \
  build/str-table.o \
  build/str-value.o \
  build/syntax-node-value.o \
@@ -31,7 +33,8 @@ TEST_EXECUTABLES = \
  build/value-07-func \
  build/value-08-int \
  build/value-09-str \
- build/value-10-syntax-node
+ build/value-10-syntax-node \
+ build/value-11-small-str
 
 all: $(TEST_EXECUTABLES)
 
@@ -43,6 +46,7 @@ test: all
 	./build/value-08-int
 	./build/value-09-str
 	./build/value-10-syntax-node
+	./build/value-11-small-str
 
 # -----------------------------------------------------------------------------
 # Test executables
@@ -68,6 +72,9 @@ build/value-09-str: build/value-09-str.o $(SRC_OBJS)
 
 build/value-10-syntax-node: build/value-10-syntax-node.o $(SRC_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ build/value-10-syntax-node.o $(SRC_OBJS)
+
+build/value-11-small-str: build/value-11-small-str.o $(SRC_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ build/value-11-small-str.o $(SRC_OBJS)
 
 # -----------------------------------------------------------------------------
 # Source objects
@@ -97,6 +104,9 @@ build/environment.o: source/environment.c include/arena.h include/crash.h includ
 build/func-value.o: source/func-value.c include/arena.h include/codeunit.h include/crash.h include/environment.h include/func-value.h include/parameters.h include/seenset.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/func-value.c
 
+build/generic-string.o: source/generic-string.c include/generic-string.h include/typedefs.h
+	$(CC) $(CFLAGS) -c -o $@ source/generic-string.c
+
 build/i64-value.o: source/i64-value.c include/arena.h include/crash.h include/i64-value.h include/seenset.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/i64-value.c
 
@@ -115,10 +125,13 @@ build/parameters.o: source/parameters.c include/arena.h include/crash.h include/
 build/seenset.o: source/seenset.c include/arena.h include/crash.h include/seenset.h include/typedefs.h
 	$(CC) $(CFLAGS) -c -o $@ source/seenset.c
 
+build/small-str-value.o: source/small-str-value.c include/arena.h include/crash.h include/generic-string.h include/seenset.h include/small-str-value.h include/str-value.h include/tags.h include/typedefs.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ source/small-str-value.c
+
 build/str-table.o: source/str-table.c include/arena.h include/crash.h include/seenset.h include/str-table.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/str-table.c
 
-build/str-value.o: source/str-value.c include/arena.h include/crash.h include/seenset.h include/str-value.h include/tags.h include/typedefs.h include/value.h
+build/str-value.o: source/str-value.c include/arena.h include/crash.h include/generic-string.h include/seenset.h include/str-value.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/str-value.c
 
 build/syntax-node-value.o: source/syntax-node-value.c include/arena.h include/crash.h include/seenset.h include/syntax-node-value.h include/tags.h include/typedefs.h include/value.h
@@ -149,8 +162,11 @@ build/value-08-int.o: test/value-08-int.c include/arena.h include/ascii-str-valu
 build/value-09-str.o: test/value-09-str.c include/arena.h include/seenset.h include/str-value.h include/tags.h include/test.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ test/value-09-str.c
 
-build/value-10-syntax-node.o: test/value-10-syntax-node.c include/arena.h include/ascii-str-value.h include/i64-value.h include/seenset.h include/syntax-node-value.h include/tags.h include/test.h include/typedefs.h include/value.h
+build/value-10-syntax-node.o: test/value-10-syntax-node.c include/arena.h include/array-value.h include/ascii-str-value.h include/i64-value.h include/seenset.h include/syntax-node-value.h include/tags.h include/test.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ test/value-10-syntax-node.c
+
+build/value-11-small-str.o: test/value-11-small-str.c include/arena.h include/seenset.h include/small-str-value.h include/str-value.h include/tags.h include/test.h include/typedefs.h include/value.h
+	$(CC) $(CFLAGS) -c -o $@ test/value-11-small-str.c
 
 # -----------------------------------------------------------------------------
 # Cleanup
