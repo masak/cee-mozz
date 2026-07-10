@@ -4,16 +4,10 @@
 #include <stdbool.h>
 
 #include "arena.h"
+#include "instruction.h"
 #include "parameters.h"
 #include "seenset.h"
 #include "typedefs.h"
-
-typedef struct {
-    u8 operator;
-    u8 operand1;
-    u8 operand2;
-    u8 operand3;
-} Instruction;
 
 typedef struct {
     Tag tag;

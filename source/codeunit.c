@@ -7,6 +7,7 @@
 #include "../include/codeunit.h"
 #include "../include/crash.h"
 #include "../include/environment.h"
+#include "../include/instruction.h"
 #include "../include/int-table.h"
 #include "../include/parameters.h"
 #include "../include/seenset.h"
