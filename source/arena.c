@@ -13,7 +13,7 @@ void arena_init(Arena *a) {
 
 /* Bump-allocate `size` bytes with a given power-of-two alignment.
  *
- * Precondition: `arena` should be a power of 2.
+ * Precondition: `align` should be a power of 2.
  * Additional requirement: There should be sufficient space at the end of the
  *                         arena for the new value of size `size`.
  * Postcondition: The new value has been allocated and sits within the arena,
