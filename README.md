@@ -29,7 +29,7 @@ defining the various types of the runtime:
 | `SyntaxNodeValue` | ✅ | ✅ | ✅ |
 | `IntValue` | ✅ | ✅ | ✅ `add sub mul floordiv mod` |
 | `StrValue` | ✅ | ✅ | ✅ `concat` |
-| `SmallStrValue` | | | `concat` |
+| `SmallStrValue` | ✅ | ✅ | ✅ `concat` |
 | `IntTable` | ✅ | ✅ | ✅ |
 | `StrTable` | ✅ | ✅ | ✅ |
 | `CodeTable` | ✅ | ✅ | ✅ |
