@@ -16,7 +16,7 @@ defining the various types in the runtime:
 
 | Type | Implemented | New error model |
 |------|-------------|-----------------|
-| `I64Value` | ✅ | |
+| `I64Value` | ✅ | ✅ |
 | `AsciiStrValue` | ✅ | |
 | `BoolValue` | | |
 | `NoneValue` | | |

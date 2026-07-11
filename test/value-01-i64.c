@@ -2,6 +2,7 @@
 
 #include "../include/arena.h"
 #include "../include/i64-value.h"
+#include "../include/outcome.h"
 #include "../include/seenset.h"
 #include "../include/test.h"
 
@@ -10,7 +11,9 @@
     arena_init(&arena); \
     Offset x = i64_new(&arena, xv); \
     Offset y = i64_new(&arena, yv); \
-    Offset z = i64_add(&arena, x, y); \
+    Offset z; \
+    Outcome oc = i64_add(&arena, x, y, &z); \
+    ASSERT_U32_EQ(oc, OUTCOME_OK); \
     i64 actual = i64_resolve(&arena, z)->payload; \
     i64 expected = zv; \
     ASSERT_I64_EQ(actual, expected); \
@@ -53,7 +56,9 @@ void large_opposite_values(void) {
     arena_init(&arena); \
     Offset x = i64_new(&arena, xv); \
     Offset y = i64_new(&arena, yv); \
-    Offset z = i64_subtract(&arena, x, y); \
+    Offset z; \
+    Outcome oc = i64_subtract(&arena, x, y, &z); \
+    ASSERT_U32_EQ(oc, OUTCOME_OK); \
     i64 actual = i64_resolve(&arena, z)->payload; \
     i64 expected = zv; \
     ASSERT_I64_EQ(actual, expected); \
@@ -96,7 +101,9 @@ void big_self_subtraction(void) {
     arena_init(&arena); \
     Offset x = i64_new(&arena, xv); \
     Offset y = i64_new(&arena, yv); \
-    Offset z = i64_multiply(&arena, x, y); \
+    Offset z; \
+    Outcome oc = i64_multiply(&arena, x, y, &z); \
+    ASSERT_U32_EQ(oc, OUTCOME_OK); \
     i64 actual = i64_resolve(&arena, z)->payload; \
     i64 expected = zv; \
     ASSERT_I64_EQ(actual, expected); \
@@ -134,92 +141,114 @@ void extreme_values_that_just_overflow(void) {
     ASSERT_I64_MULTIPLY(4294967296LL, 2147483648LL, INT64_MIN);
 }
 
-#define ASSERT_I64_DIVIDE(xv, yv, zv, wv) do { \
+#define ASSERT_I64_DIVIDE(xv, yv, zv) do { \
     Arena arena; \
     arena_init(&arena); \
     Offset x = i64_new(&arena, xv); \
     Offset y = i64_new(&arena, yv); \
-    Offset z = i64_new(&arena, zv); \
-    Offset w = i64_divide(&arena, x, y, z); \
-    i64 actual = i64_resolve(&arena, w)->payload; \
-    i64 expected = wv; \
+    Offset z; \
+    Outcome oc = i64_divide(&arena, x, y, &z); \
+    ASSERT_U32_EQ(oc, OUTCOME_OK); \
+    i64 actual = i64_resolve(&arena, z)->payload; \
+    i64 expected = zv; \
     ASSERT_I64_EQ(actual, expected); \
+} while (0)
+
+#define ASSERT_I64_DIVIDE_BY_ZERO(xv, yv) do { \
+    Arena arena; \
+    arena_init(&arena); \
+    Offset x = i64_new(&arena, xv); \
+    Offset y = i64_new(&arena, yv); \
+    Offset z; \
+    Outcome oc = i64_divide(&arena, x, y, &z); \
+    ASSERT_U32_EQ(oc, OUTCOME_E601_ZERO_DIVISION); \
 } while (0)
 
 void positive_exact_division(void) {
-    ASSERT_I64_DIVIDE(42, 6, 999, 7);
+    ASSERT_I64_DIVIDE(42, 6, 7);
 }
 
 void positive_floored_division(void) {
-    ASSERT_I64_DIVIDE(17, 5, 999, 3);
+    ASSERT_I64_DIVIDE(17, 5, 3);
 }
 
 void negative_floored_division(void) {
-    ASSERT_I64_DIVIDE(-17, 5, 999, -4);
+    ASSERT_I64_DIVIDE(-17, 5, -4);
 }
 
 void positive_numerator_negative_denominator_floored(void) {
-    ASSERT_I64_DIVIDE(17, -5, 999, -4);
+    ASSERT_I64_DIVIDE(17, -5, -4);
 }
 
 void negative_div_negative_is_positive_floored(void) {
-    ASSERT_I64_DIVIDE(-17, -5, 999, 3);
+    ASSERT_I64_DIVIDE(-17, -5, 3);
 }
 
-void denominator_is_zero_fallback(void) {
-    ASSERT_I64_DIVIDE(42, 0, -1, -1);
+void denominator_is_zero(void) {
+    ASSERT_I64_DIVIDE_BY_ZERO(42, 0);
 }
 
 void zero_numerator(void) {
-    ASSERT_I64_DIVIDE(0, 5, 999, 0);
+    ASSERT_I64_DIVIDE(0, 5, 0);
 }
 
-void min_divide_overflow_trap(void) {
-    ASSERT_I64_DIVIDE(INT64_MIN, -1, 999, 999);
+void min_divide_by_negative_one_is_fine(void) {
+    ASSERT_I64_DIVIDE(INT64_MIN, -1, INT64_MIN);
 }
 
-#define ASSERT_I64_MODULO(xv, yv, zv, wv) do { \
+#define ASSERT_I64_MODULO(xv, yv, zv) do { \
     Arena arena; \
     arena_init(&arena); \
     Offset x = i64_new(&arena, xv); \
     Offset y = i64_new(&arena, yv); \
-    Offset z = i64_new(&arena, zv); \
-    Offset w = i64_modulo(&arena, x, y, z); \
-    i64 actual = i64_resolve(&arena, w)->payload; \
-    i64 expected = wv; \
+    Offset z; \
+    Outcome oc = i64_modulo(&arena, x, y, &z); \
+    ASSERT_U32_EQ(oc, OUTCOME_OK); \
+    i64 actual = i64_resolve(&arena, z)->payload; \
+    i64 expected = zv; \
     ASSERT_I64_EQ(actual, expected); \
 } while (0)
 
+#define ASSERT_I64_MODULO_BY_ZERO(xv, yv) do { \
+    Arena arena; \
+    arena_init(&arena); \
+    Offset x = i64_new(&arena, xv); \
+    Offset y = i64_new(&arena, yv); \
+    Offset z; \
+    Outcome oc = i64_modulo(&arena, x, y, &z); \
+    ASSERT_U32_EQ(oc, OUTCOME_E601_ZERO_DIVISION); \
+} while (0)
+
 void positive_modulo_exact(void) {
-    ASSERT_I64_MODULO(42, 6, 999, 0);
+    ASSERT_I64_MODULO(42, 6, 0);
 }
 
 void positive_modulo_with_remainder(void) {
-    ASSERT_I64_MODULO(17, 5, 999, 2);
+    ASSERT_I64_MODULO(17, 5, 2);
 }
 
 void negative_mod_positive(void) {
-    ASSERT_I64_MODULO(-17, 5, 999, 3);
+    ASSERT_I64_MODULO(-17, 5, 3);
 }
 
 void positive_mod_negative(void) {
-    ASSERT_I64_MODULO(17, -5, 999, -3);
+    ASSERT_I64_MODULO(17, -5, -3);
 }
 
 void negative_mod_negative(void) {
-    ASSERT_I64_MODULO(-17, -5, 999, -2);
+    ASSERT_I64_MODULO(-17, -5, -2);
 }
 
-void mod_denominator_zero_fallback(void) {
-    ASSERT_I64_MODULO(42, 0, -1, -1);
+void mod_denominator_zero(void) {
+    ASSERT_I64_MODULO_BY_ZERO(42, 0);
 }
 
 void zero_mod_positive(void) {
-    ASSERT_I64_MODULO(0, 5, 999, 0);
+    ASSERT_I64_MODULO(0, 5, 0);
 }
 
 void minimum_mod_negative_one(void) {
-    ASSERT_I64_MODULO(INT64_MIN, -1, 999, 999);
+    ASSERT_I64_MODULO(INT64_MIN, -1, 0);
 }
 
 #define ASSERT_I64_VALIDATE(xv) do { \
@@ -271,15 +300,15 @@ int main(void) {
     RUN_TEST(negative_floored_division);
     RUN_TEST(positive_numerator_negative_denominator_floored);
     RUN_TEST(negative_div_negative_is_positive_floored);
-    RUN_TEST(denominator_is_zero_fallback);
+    RUN_TEST(denominator_is_zero);
     RUN_TEST(zero_numerator);
-    RUN_TEST(min_divide_overflow_trap);
+    RUN_TEST(min_divide_by_negative_one_is_fine);
     RUN_TEST(positive_modulo_exact);
     RUN_TEST(positive_modulo_with_remainder);
     RUN_TEST(negative_mod_positive);
     RUN_TEST(positive_mod_negative);
     RUN_TEST(negative_mod_negative);
-    RUN_TEST(mod_denominator_zero_fallback);
+    RUN_TEST(mod_denominator_zero);
     RUN_TEST(zero_mod_positive);
     RUN_TEST(minimum_mod_negative_one);
     RUN_TEST(validate_some_i64s);

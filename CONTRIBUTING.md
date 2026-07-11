@@ -5,12 +5,12 @@ endorse the following human-centric priorities:
 >
 > * **Encouraging new contributors to become future maintainers, that involves
 >   teaching and growing the understanding of new contributors.**
->     * LLMs can’t learn from specific feedback and thus can’t benefit from
+>     * LLMs can't learn from specific feedback and thus can't benefit from
 >       maintainers providing feedback.
 >
 > * **Ensuring all contributions are made by humans who can take responsibility
 >   for their code and be able and willing to fix it when needed.**
->     * AI cannot take responsibility, and we can’t trust heavy users of AI to
+>     * AI cannot take responsibility, and we can't trust heavy users of AI to
 >       understand their code enough to fix it.
 
 In short: feel free to use LLMs to help write implementation code and test
@@ -26,8 +26,8 @@ Typedefs such as `u32` and `i64` are declared to avoid the platform-dependent
 sizes of types such as `unsigned int` and `long`.
 
 The typedef `Offset` is used for non-nullable offsets, and `MaybeOffset` for
-nullable offsets. (In the case of non-nullable offsets, we often `assert()`
-that the value is defined/set.) The value used for "null" is actually
+nullable offsets. (In the case of non-nullable offsets, we often `vm_crash()`
+unless the value is defined/set.) The value used for "null"/unset is actually
 `0xA3A3A3A3`.
 
 Strings are in general handled with the `s8()` macro, which bundles the byte
@@ -52,20 +52,21 @@ error handling, each with a different purpose:
 * When an instruction or a value-related function fails for reasons not related
   to the above two items &mdash; such as a type error, a division by zero, or
   an index out of bounds &mdash; the value-related function returns immediately
-  with an enum value that indicates which type of runtime error occurred. In
-  the instruction layer, this return value is diligently checked, and
+  with an `Outcome` value that indicates which type of runtime error occurred.
+  In the instruction layer, this return value is diligently checked, and
   propagated upwards as a VM error, stopping execution.
 
 The functions ending in `_validate` return a `bool` to indicate value validity.
 It is an invariant of the arena and all the values in it that a `_validate`
-function should never return `false`.
+function should always return `true`. No `_new` constructor or value action
+should be capable of creating an invalid object in the arena.
 
-Other functions reading or updating values only `assert()` things where
-validity is already expected. In the case of inputs that _could_ be invalid in
-an otherwise valid program (such as an index out of bounds), these functions
-tend to return an error code upwards to the instruction layer instead. Again,
-the distinction is whether a program that compiles could cause the error; in
-that case, it should be a returned error code.
+Other functions reading or updating values only `vm_crash()` where validity is
+already expected. In the case of inputs that _could_ be invalid in an otherwise
+valid program (such as an index out of bounds), these functions tend to return
+an erroneous `Outcome` upwards to the instruction layer instead. Again, the
+distinction is whether a program that compiles could cause the error; in that
+case, it should be a returned error code.
 
 Function names are prefixed with their type. If a function dispatches on the
 type of something, it's prefixed with `generic_`.
