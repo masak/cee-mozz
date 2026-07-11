@@ -12,27 +12,27 @@ $ make test
 ## Plan
 
 See further planning among the documents below. Here is the current progress
-defining the various types of the runtime:
+defining the various types in the runtime:
 
-| Type | Definition | Validation | Operations |
-|------|------------|------------|------------|
-| `I64Value` | ✅ | ✅ | ✅ `add sub mul floordiv mod` |
-| `AsciiStrValue` | ✅ | ✅ | ✅ `concat to_string` |
-| `BoolValue` | | | `to_bool` |
-| `NoneValue` | | | |
-| `ArrayValue` | ✅ | ✅ | ✅ `push get set length concat` |
-| `ArrayElements` | ✅ | ✅ | ✅ |
-| `FuncValue` | ✅ | (✅) | ✅ |
-| `MacroValue` | ✅ | (✅) | ✅ |
-| `Environment` | ✅ | (✅) | ✅ |
-| `CodeUnit` | ✅ | (✅) | ✅ |
-| `SyntaxNodeValue` | ✅ | ✅ | ✅ |
-| `IntValue` | ✅ | ✅ | ✅ `add sub mul floordiv mod` |
-| `StrValue` | ✅ | ✅ | ✅ `concat` |
-| `SmallStrValue` | ✅ | ✅ | ✅ `concat` |
-| `IntTable` | ✅ | ✅ | ✅ |
-| `StrTable` | ✅ | ✅ | ✅ |
-| `CodeTable` | ✅ | ✅ | ✅ |
+| Type | Implemented | New error model |
+|------|-------------|-----------------|
+| `I64Value` | ✅ | |
+| `AsciiStrValue` | ✅ | |
+| `BoolValue` | | |
+| `NoneValue` | | |
+| `ArrayValue` | ✅ | |
+| `ArrayElements` | ✅ | |
+| `FuncValue` | ✅ | |
+| `MacroValue` | ✅ | |
+| `Environment` | ✅ | |
+| `CodeUnit` | ✅ | |
+| `SyntaxNodeValue` | ✅ | |
+| `IntValue` | ✅ | |
+| `StrValue` | ✅ | |
+| `SmallStrValue` | ✅ | |
+| `IntTable` | ✅ | |
+| `StrTable` | ✅ | |
+| `CodeTable` | ✅ | |
 
 ## Design documents
 
