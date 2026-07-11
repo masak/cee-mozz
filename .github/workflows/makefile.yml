@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Install dependencies
+    - name: Build project
       run: make
 
     - name: Run tests
