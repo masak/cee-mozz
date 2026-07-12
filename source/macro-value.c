@@ -22,7 +22,7 @@ Offset macro_new(Arena *a, Offset env_offset, Offset codeunit_offset) {
     return (Offset)((unsigned char *)macro_value - a->bytes);
 }
 
-/* Returns a pointer to a MacroValue, given an offset into an arena.
+/* Return a pointer to a MacroValue, given an offset into an arena.
  *
  * Precondition: `offset` points to a MacroValue.
  */

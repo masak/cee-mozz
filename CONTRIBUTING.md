@@ -71,3 +71,12 @@ case, it should be a returned error code.
 Function names are prefixed with their type. If a function dispatches on the
 type of something, it's prefixed with `generic_`.
 
+A comment immediately preceding a function is an API documentation comment,
+similar to Javadoc. The first sentence is considered a summary; it is written
+in the imperative mood: "Return a pointer...", not "Returns a pointer...".
+When relevant these documentation comments also mentions Preconditions,
+Postconditions, and Additional expectations. Preconditions are checked and
+fail with `vm_crash()` if they are not satisfied; additional expectations are
+checked and fail with an erroneous `Outcome`. Postconditions are guaranteed
+but not checked.
+
