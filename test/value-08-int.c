@@ -4,6 +4,7 @@
 #include "../include/arena.h"
 #include "../include/ascii-str-value.h"
 #include "../include/int-value.h"
+#include "../include/outcome.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
 #include "../include/test.h"
@@ -19,30 +20,50 @@
 } while (0)
 
 #define ASSERT_INT_ADD(m_offset, n_offset, expected_offset) do { \
-    Offset result = int_add(&arena, m_offset, n_offset); \
-    ASSERT_INT_EQ(result, expected_offset); \
+    Offset _result; \
+    Outcome _oc = int_add(&arena, m_offset, n_offset, &_result); \
+    ASSERT_U32_EQ(_oc, OUTCOME_OK); \
+    ASSERT_INT_EQ(_result, expected_offset); \
 } while (0)
 
 #define ASSERT_INT_SUBTRACT(m_offset, n_offset, expected_offset) do { \
-    Offset result = int_subtract(&arena, m_offset, n_offset); \
-    ASSERT_INT_EQ(result, expected_offset); \
+    Offset _result; \
+    Outcome _oc = int_subtract(&arena, m_offset, n_offset, &_result); \
+    ASSERT_U32_EQ(_oc, OUTCOME_OK); \
+    ASSERT_INT_EQ(_result, expected_offset); \
 } while (0)
 
 #define ASSERT_INT_MULTIPLY(m_offset, n_offset, expected_offset) do { \
-    Offset result = int_multiply(&arena, m_offset, n_offset); \
-    ASSERT_INT_EQ(result, expected_offset); \
+    Offset _result; \
+    Outcome _oc = int_multiply(&arena, m_offset, n_offset, &_result); \
+    ASSERT_U32_EQ(_oc, OUTCOME_OK); \
+    ASSERT_INT_EQ(_result, expected_offset); \
 } while (0)
 
-#define ASSERT_INT_DIVIDE(m_offset, n_offset, fallback_offset, \
-        expected_offset) do { \
-    Offset result = int_divide(&arena, m_offset, n_offset, fallback_offset); \
-    ASSERT_INT_EQ(result, expected_offset); \
+#define ASSERT_INT_DIVIDE(m_offset, n_offset, expected_offset) do { \
+    Offset _result; \
+    Outcome _oc = int_divide(&arena, m_offset, n_offset, &_result); \
+    ASSERT_U32_EQ(_oc, OUTCOME_OK); \
+    ASSERT_INT_EQ(_result, expected_offset); \
 } while (0)
 
-#define ASSERT_INT_MODULO(m_offset, n_offset, fallback_offset, \
-        expected_offset) do { \
-    Offset result = int_modulo(&arena, m_offset, n_offset, fallback_offset); \
-    ASSERT_INT_EQ(result, expected_offset); \
+#define ASSERT_INT_DIVIDE_BY_ZERO(m_offset, n_offset) do { \
+    Offset _result; \
+    Outcome _oc = int_divide(&arena, m_offset, n_offset, &_result); \
+    ASSERT_U32_EQ(_oc, OUTCOME_E601_ZERO_DIVISION); \
+} while (0)
+
+#define ASSERT_INT_MODULO(m_offset, n_offset, expected_offset) do { \
+    Offset _result; \
+    Outcome _oc = int_modulo(&arena, m_offset, n_offset, &_result); \
+    ASSERT_U32_EQ(_oc, OUTCOME_OK); \
+    ASSERT_INT_EQ(_result, expected_offset); \
+} while (0)
+
+#define ASSERT_INT_MODULO_BY_ZERO(m_offset, n_offset) do { \
+    Offset _result; \
+    Outcome _oc = int_modulo(&arena, m_offset, n_offset, &_result); \
+    ASSERT_U32_EQ(_oc, OUTCOME_E601_ZERO_DIVISION); \
 } while (0)
 
 static Arena arena;
@@ -299,80 +320,71 @@ void divide_positive_exact(void) {
     arena_init(&arena);
     Offset a = i32_int(42);
     Offset b = i32_int(6);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(7);
-    ASSERT_INT_DIVIDE(a, b, fallback, expected);
+    ASSERT_INT_DIVIDE(a, b, expected);
 }
 
 void divide_positive_floored(void) {
     arena_init(&arena);
     Offset a = i32_int(17);
     Offset b = i32_int(5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(3);
-    ASSERT_INT_DIVIDE(a, b, fallback, expected);
+    ASSERT_INT_DIVIDE(a, b, expected);
 }
 
 void divide_negative_floored(void) {
     arena_init(&arena);
     Offset a = i32_int(-17);
     Offset b = i32_int(5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(-4);
-    ASSERT_INT_DIVIDE(a, b, fallback, expected);
+    ASSERT_INT_DIVIDE(a, b, expected);
 }
 
 void divide_positive_num_negative_den(void) {
     arena_init(&arena);
     Offset a = i32_int(17);
     Offset b = i32_int(-5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(-4);
-    ASSERT_INT_DIVIDE(a, b, fallback, expected);
+    ASSERT_INT_DIVIDE(a, b, expected);
 }
 
 void divide_negative_both(void) {
     arena_init(&arena);
     Offset a = i32_int(-17);
     Offset b = i32_int(-5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(3);
-    ASSERT_INT_DIVIDE(a, b, fallback, expected);
+    ASSERT_INT_DIVIDE(a, b, expected);
 }
 
 void divide_by_zero_fallback(void) {
     arena_init(&arena);
     Offset a = i32_int(42);
     Offset b = i32_int(0);
-    Offset fallback = i32_int(999);
-    ASSERT_INT_DIVIDE(a, b, fallback, fallback);
+    ASSERT_INT_DIVIDE_BY_ZERO(a, b);
 }
 
 void divide_zero_numerator(void) {
     arena_init(&arena);
     Offset a = i32_int(0);
     Offset b = i32_int(5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(0);
-    ASSERT_INT_DIVIDE(a, b, fallback, expected);
+    ASSERT_INT_DIVIDE(a, b, expected);
 }
 
 void divide_magnitude_less_than_one(void) {
     arena_init(&arena);
     Offset a = i32_int(3);
     Offset b = i32_int(5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(0);
-    ASSERT_INT_DIVIDE(a, b, fallback, expected);
+    ASSERT_INT_DIVIDE(a, b, expected);
 }
 
 void divide_magnitude_less_opposite_sign(void) {
     arena_init(&arena);
     Offset a = i32_int(3);
     Offset b = i32_int(-5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(-1);
-    ASSERT_INT_DIVIDE(a, b, fallback, expected);
+    ASSERT_INT_DIVIDE(a, b, expected);
 }
 
 /* Regression test: error introduced in 9e5d113 (2026-06-14). Fixed in 9115821
@@ -382,12 +394,11 @@ void divide_2_pow_32_by_2(void) {
     u32 payload[] = {0, 1};
     Offset dividend = int_new(&arena, 0, 2, payload); /* 4_294_967_296 */
     Offset divisor = i32_int(2);
-    Offset fallback = i32_int(999);
     u32 half_payload[] = {2147483648ul};
     Offset expected_quotient = int_new(&arena, 0, 1, half_payload);
     Offset expected_remainder = i32_int(0);
-    ASSERT_INT_DIVIDE(dividend, divisor, fallback, expected_quotient);
-    ASSERT_INT_MODULO(dividend, divisor, fallback, expected_remainder);
+    ASSERT_INT_DIVIDE(dividend, divisor, expected_quotient);
+    ASSERT_INT_MODULO(dividend, divisor, expected_remainder);
 }
 
 /* Regression test: error introduced in 9e5d113 (2026-06-14). Fixed in 9115821
@@ -397,11 +408,10 @@ void divide_2_pow_32_plus_1_by_7(void) {
     u32 payload[] = {1, 1};
     Offset dividend = int_new(&arena, 0, 2, payload); /* 4_294_967_297 */
     Offset divisor = i32_int(7);
-    Offset fallback = i32_int(999);
     Offset expected_quotient = i32_int(613566756);
     Offset expected_remainder = i32_int(5);
-    ASSERT_INT_DIVIDE(dividend, divisor, fallback, expected_quotient);
-    ASSERT_INT_MODULO(dividend, divisor, fallback, expected_remainder);
+    ASSERT_INT_DIVIDE(dividend, divisor, expected_quotient);
+    ASSERT_INT_MODULO(dividend, divisor, expected_remainder);
 }
 
 /* Regression test. */
@@ -410,90 +420,80 @@ void divide_2_pow_32_plus_1_by_3(void) {
     u32 payload[] = {1, 1};
     Offset dividend = int_new(&arena, 0, 2, payload); /* 4_294_967_297 */
     Offset divisor = i32_int(3);
-    Offset fallback = i32_int(999);
     Offset expected_quotient = i32_int(1431655765);
-    ASSERT_INT_DIVIDE(dividend, divisor, fallback, expected_quotient);
+    ASSERT_INT_DIVIDE(dividend, divisor, expected_quotient);
 }
 
 void modulo_positive_exact(void) {
     arena_init(&arena);
     Offset a = i32_int(42);
     Offset b = i32_int(6);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(0);
-    ASSERT_INT_MODULO(a, b, fallback, expected);
+    ASSERT_INT_MODULO(a, b, expected);
 }
 
 void modulo_positive_with_remainder(void) {
     arena_init(&arena);
     Offset a = i32_int(17);
     Offset b = i32_int(5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(2);
-    ASSERT_INT_MODULO(a, b, fallback, expected);
+    ASSERT_INT_MODULO(a, b, expected);
 }
 
 void modulo_negative_dividend(void) {
     arena_init(&arena);
     Offset a = i32_int(-17);
     Offset b = i32_int(5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(3);
-    ASSERT_INT_MODULO(a, b, fallback, expected);
+    ASSERT_INT_MODULO(a, b, expected);
 }
 
 void modulo_negative_divisor(void) {
     arena_init(&arena);
     Offset a = i32_int(17);
     Offset b = i32_int(-5);
-    Offset fallback = i32_int(999);
     /* 17 = (-4) * (-5) + (-3) */
     Offset expected = i32_int(-3);
-    ASSERT_INT_MODULO(a, b, fallback, expected);
+    ASSERT_INT_MODULO(a, b, expected);
 }
 
 void modulo_negative_both(void) {
     arena_init(&arena);
     Offset a = i32_int(-17);
     Offset b = i32_int(-5);
-    Offset fallback = i32_int(999);
     /* 17 = (-4) * (-5) + (-3) */
     Offset expected = i32_int(-2);
-    ASSERT_INT_MODULO(a, b, fallback, expected);
+    ASSERT_INT_MODULO(a, b, expected);
 }
 
 void modulo_by_zero_fallback(void) {
     arena_init(&arena);
     Offset a = i32_int(42);
     Offset b = i32_int(0);
-    Offset fallback = i32_int(-1);
-    ASSERT_INT_MODULO(a, b, fallback, fallback);
+    ASSERT_INT_MODULO_BY_ZERO(a, b);
 }
 
 void modulo_zero_numerator(void) {
     arena_init(&arena);
     Offset a = i32_int(0);
     Offset b = i32_int(5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(0);
-    ASSERT_INT_MODULO(a, b, fallback, expected);
+    ASSERT_INT_MODULO(a, b, expected);
 }
 
 void modulo_magnitude_less_same_sign(void) {
     arena_init(&arena);
     Offset a = i32_int(3);
     Offset b = i32_int(5);
-    Offset fallback = i32_int(999);
-    ASSERT_INT_MODULO(a, b, fallback, a);
+    ASSERT_INT_MODULO(a, b, a);
 }
 
 void modulo_magnitude_less_opposite_sign(void) {
     arena_init(&arena);
     Offset a = i32_int(3);
     Offset b = i32_int(-5);
-    Offset fallback = i32_int(999);
     Offset expected = i32_int(-2);
-    ASSERT_INT_MODULO(a, b, fallback, expected);
+    ASSERT_INT_MODULO(a, b, expected);
 }
 
 void to_str_zero(void) {
@@ -531,7 +531,13 @@ void one_hundred_factorial(void) {
     Offset product_offset = i32_int(1);
     for (i32 i = 2; i <= 100; i++) {
         Offset factor_offset = i32_int(i);
-        product_offset = int_multiply(&arena, product_offset, factor_offset);
+        Outcome oc = int_multiply(
+            &arena,
+            product_offset,
+            factor_offset,
+            &product_offset
+        );
+        ASSERT_U32_EQ(oc, OUTCOME_OK);
     }
     IntValue *actual = int_resolve(&arena, product_offset);
     ASSERT_U32_EQ(actual->sign, 0);

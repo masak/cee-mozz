@@ -40,7 +40,7 @@ Offset syntax_node_new(
 
 /* Return a pointer to a SyntaxNodeValue, given an offset into an arena.
  *
- * Precondition: `offset` points to a valid SyntaxNodeValue.
+ * Precondition: `offset` points to a SyntaxNodeValue.
  */
 SyntaxNodeValue *syntax_node_resolve(Arena *a, Offset offset) {
     if (value_tag(a, offset) != TAG_SYNTAX_NODE) {

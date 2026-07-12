@@ -39,7 +39,7 @@ Offset small_str_new(Arena *a, s8 *str) {
 
 /* Return a pointer to a SmallStrValue.
  *
- * Precondition: `offset` points to a valid SmallStrValue.
+ * Precondition: `offset` points to a SmallStrValue.
  */
 SmallStrValue *small_str_resolve(Arena *a, Offset offset) {
     if (value_tag(a, offset) != TAG_SMALL_STR) {

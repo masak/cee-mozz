@@ -27,7 +27,7 @@ defining the various types in the runtime:
 | `Environment` | ✅ | ✅ |
 | `CodeUnit` | ✅ | ✅ |
 | `SyntaxNodeValue` | ✅ | ✅ |
-| `IntValue` | ✅ | |
+| `IntValue` | ✅ | ✅ |
 | `StrValue` | ✅ | |
 | `SmallStrValue` | ✅ | |
 | `IntTable` | ✅ | |

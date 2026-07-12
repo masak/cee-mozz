@@ -35,7 +35,7 @@ Offset environment_new(
 
 /* Return a pointer to an Environment, given an offset into an arena.
  *
- * Precondition: `offset` points to a valid Environment.
+ * Precondition: `offset` points to an Environment.
  */
 Environment *environment_resolve(Arena *a, Offset offset) {
     if (value_tag(a, offset) != TAG_ENVIRONMENT) {

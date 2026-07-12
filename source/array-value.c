@@ -28,7 +28,7 @@ Offset array_new(Arena *a, u32 capacity) {
 
 /* Return a pointer to an ArrayValue, given an offset into an arena.
  *
- * Precondition: `offset` points to a valid ArrayValue.
+ * Precondition: `offset` points to an ArrayValue.
  */
 ArrayValue *array_resolve(Arena *a, Offset offset) {
     if (value_tag(a, offset) != TAG_ARRAY) {

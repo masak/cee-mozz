@@ -37,7 +37,7 @@ Offset ascii_str_new(Arena *a, s8 *str) {
 
 /* Return a pointer to an AsciiStrValue, given an offset into an arena.
  *
- * Precondition: `offset` points to a valid AsciiStrValue.
+ * Precondition: `offset` points to an AsciiStrValue.
  */
 AsciiStrValue *ascii_str_resolve(Arena *a, Offset offset) {
     if (value_tag(a, offset) != TAG_ASCII_STR) {

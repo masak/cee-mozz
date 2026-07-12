@@ -19,7 +19,7 @@ Offset i64_new(Arena *a, i64 payload) {
 
 /* Return a pointer to an I64Value, given an offset into an arena.
  *
- * Precondition: `offset` points to a valid I64Value.
+ * Precondition: `offset` points to an I64Value.
  */
 I64Value *i64_resolve(Arena *a, Offset offset) {
     if (value_tag(a, offset) != TAG_I64) {

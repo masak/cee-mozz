@@ -7,6 +7,7 @@
 #include "../include/ascii-str-value.h"
 #include "../include/crash.h"
 #include "../include/int-value.h"
+#include "../include/outcome.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
 #include "../include/typedefs.h"
@@ -265,7 +266,6 @@ static Offset int_from_i32(Arena *a, i32 payload) {
     return int_new(a, sign, 1, &limb);
 }
 
-
 Offset int_new(Arena *a, u32 sign, u32 length, u32 payload[]) {
     if (length == 0) {
         IntValue *v = arena_alloc(a, sizeof(IntValue), alignof(IntValue));
@@ -292,7 +292,7 @@ Offset int_new(Arena *a, u32 sign, u32 length, u32 payload[]) {
     return (Offset)((unsigned char *)v - a->bytes);
 }
 
-/* Returns a pointer to an IntValue, given an offset into an arena.
+/* Return a pointer to an IntValue, given an offset into an arena.
  *
  * Precondition: `offset` points to an IntValue.
  */
@@ -323,7 +323,7 @@ bool int_validate(Arena *a, Offset offset, SeenSet *seenset) {
         return false;
     }
     if (v->length > 0 && v->payload[v->length - 1] == 0) {
-        return false;   /* leading zero limb */
+        return false;   /* most-significant zero limb */
     }
 
     return true;
@@ -333,36 +333,42 @@ bool int_validate(Arena *a, Offset offset, SeenSet *seenset) {
  *
  * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
  */
-Offset int_add(Arena *a, Offset m, Offset n) {
+Outcome int_add(Arena *a, Offset m, Offset n, Offset *out_offset) {
     IntValue *lhs = int_resolve(a, m);
     IntValue *rhs = int_resolve(a, n);
 
     if (int_is_zero(lhs)) {
-        return n;
+        *out_offset = n;
+        return OUTCOME_OK;
     }
     if (int_is_zero(rhs)) {
-        return m;
+        *out_offset = m;
+        return OUTCOME_OK;
     }
 
     if (lhs->sign == rhs->sign) {
         Offset result = add_magnitude(a, lhs, rhs);
         int_resolve(a, result)->sign = lhs->sign;
-        return result;
+        *out_offset = result;
+        return OUTCOME_OK;
     }
     else {
         int cmp = compare_magnitude(lhs, rhs);
         if (cmp == 0) {
-            return int_from_i32(a, 0);
+            *out_offset = int_from_i32(a, 0);
+            return OUTCOME_OK;
         }
         else if (cmp > 0) {
             Offset result = sub_magnitude(a, lhs, rhs);
             int_resolve(a, result)->sign = lhs->sign;
-            return result;
+            *out_offset = result;
+            return OUTCOME_OK;
         }
         else {
             Offset result = sub_magnitude(a, rhs, lhs);
             int_resolve(a, result)->sign = rhs->sign;
-            return result;
+            *out_offset = result;
+            return OUTCOME_OK;
         }
     }
 }
@@ -371,36 +377,42 @@ Offset int_add(Arena *a, Offset m, Offset n) {
  *
  * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
  */
-Offset int_subtract(Arena *a, Offset m, Offset n) {
+Outcome int_subtract(Arena *a, Offset m, Offset n, Offset *out_offset) {
     IntValue *lhs = int_resolve(a, m);
     IntValue *rhs = int_resolve(a, n);
 
     if (int_is_zero(rhs)) {
-        return m;
+        *out_offset = m;
+        return OUTCOME_OK;
     }
     if (int_is_zero(lhs)) {
-        return int_negate(a, n);
+        *out_offset = int_negate(a, n);
+        return OUTCOME_OK;
     }
 
     if (lhs->sign != rhs->sign) {
         Offset result = add_magnitude(a, lhs, rhs);
         int_resolve(a, result)->sign = lhs->sign;
-        return result;
+        *out_offset = result;
+        return OUTCOME_OK;
     }
     else {
         int cmp = compare_magnitude(lhs, rhs);
         if (cmp == 0) {
-            return int_from_i32(a, 0);
+            *out_offset = int_from_i32(a, 0);
+            return OUTCOME_OK;
         }
         else if (cmp > 0) {
             Offset result = sub_magnitude(a, lhs, rhs);
             int_resolve(a, result)->sign = lhs->sign;
-            return result;
+            *out_offset = result;
+            return OUTCOME_OK;
         }
         else {
             Offset result = sub_magnitude(a, rhs, lhs);
             int_resolve(a, result)->sign = !lhs->sign;
-            return result;
+            *out_offset = result;
+            return OUTCOME_OK;
         }
     }
 }
@@ -409,12 +421,13 @@ Offset int_subtract(Arena *a, Offset m, Offset n) {
  *
  * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
  */
-Offset int_multiply(Arena *a, Offset m, Offset n) {
+Outcome int_multiply(Arena *a, Offset m, Offset n, Offset *out_offset) {
     IntValue *lhs = int_resolve(a, m);
     IntValue *rhs = int_resolve(a, n);
 
     if (int_is_zero(lhs) || int_is_zero(rhs)) {
-        return int_from_i32(a, 0);
+        *out_offset = int_from_i32(a, 0);
+        return OUTCOME_OK;
     }
 
     u32 result_len = lhs->length + rhs->length;
@@ -447,33 +460,38 @@ Offset int_multiply(Arena *a, Offset m, Offset n) {
     }
 
     int_normalize(result);
-    return (Offset)((unsigned char *)result - a->bytes);
+    *out_offset = (Offset)((unsigned char *)result - a->bytes);
+    return OUTCOME_OK;
 }
 
 /* Divide two IntValues `m` and `n`, yielding an IntValues result. The
- * resulting quotient is rounded towards negative infinity. The `fallback` is
- * returned instead of doing the division, in case the denominator is zero.
+ * resulting quotient is rounded towards negative infinity. The Outcome
+ * OUTCOME_E601_ZERO_DIVISION is returned instead of doing the division, in
+ * case the denominator is zero.
  *
  * Preconditions: `m` is a valid IntValue. `n` is a valid IntValue.
  */
-Offset int_divide(Arena *a, Offset m, Offset n, Offset fallback) {
+Outcome int_divide(Arena *a, Offset m, Offset n, Offset *out_offset) {
     IntValue *lhs = int_resolve(a, m);
     IntValue *rhs = int_resolve(a, n);
 
     if (int_is_zero(rhs)) {
-        return fallback;
+        return OUTCOME_E601_ZERO_DIVISION;
     }
     if (int_is_zero(lhs)) {
-        return m;
+        *out_offset = m;
+        return OUTCOME_OK;
     }
 
     if (compare_magnitude(lhs, rhs) < 0) {
         /* |lhs| < |rhs|  =>  truncating quotient is 0
            Flooring: if signs differ, quotient is -1; otherwise 0. */
         if (lhs->sign != rhs->sign) {
-            return int_from_i32(a, -1);
+            *out_offset = int_from_i32(a, -1);
+            return OUTCOME_OK;
         }
-        return int_from_i32(a, 0);
+        *out_offset = int_from_i32(a, 0);
+        return OUTCOME_OK;
     }
 
     Offset quot_offset, rem_offset;
@@ -486,10 +504,12 @@ Offset int_divide(Arena *a, Offset m, Offset n, Offset fallback) {
     if (!int_is_zero(rem) && lhs->sign != rhs->sign) {
         /* Adjust truncating quotient to flooring quotient: |q| += 1 */
         Offset one = int_from_i32(a, 1);
-        return int_subtract(a, quot_offset, one);   /* e.g. -3 becomes -4 */
+        return int_subtract(a, quot_offset, one, out_offset);
+                                                    /* e.g. -3 becomes -4 */
     }
 
-    return quot_offset;
+    *out_offset = quot_offset;
+    return OUTCOME_OK;
 }
 
 /* Get the remainder of a division of two IntValues `m` and `n`, yielding an
@@ -500,15 +520,16 @@ Offset int_divide(Arena *a, Offset m, Offset n, Offset fallback) {
  *
  * Preconditions: `m` is a valid IntValue. `n` is a valid IntValue.
  */
-Offset int_modulo(Arena *a, Offset m, Offset n, Offset fallback) {
+Outcome int_modulo(Arena *a, Offset m, Offset n, Offset *out_offset) {
     IntValue *lhs = int_resolve(a, m);
     IntValue *rhs = int_resolve(a, n);
 
     if (int_is_zero(rhs)) {
-        return fallback;
+        return OUTCOME_E601_ZERO_DIVISION;
     }
     if (int_is_zero(lhs)) {
-        return m;
+        *out_offset = m;
+        return OUTCOME_OK;
     }
 
     if (compare_magnitude(lhs, rhs) < 0) {
@@ -516,7 +537,8 @@ Offset int_modulo(Arena *a, Offset m, Offset n, Offset fallback) {
            If signs agree, remainder is lhs.
            If signs differ, remainder is |rhs| - |lhs| with sign of rhs. */
         if (lhs->sign == rhs->sign) {
-            return m;
+            *out_offset = m;
+            return OUTCOME_OK;
         }
         else {
             Offset abs_rhs = int_abs(a, n);
@@ -527,7 +549,8 @@ Offset int_modulo(Arena *a, Offset m, Offset n, Offset fallback) {
                 int_resolve(a, abs_lhs)
             );
             int_resolve(a, new_rem)->sign = rhs->sign;
-            return new_rem;
+            *out_offset = new_rem;
+            return OUTCOME_OK;
         }
     }
 
@@ -536,7 +559,8 @@ Offset int_modulo(Arena *a, Offset m, Offset n, Offset fallback) {
 
     IntValue *rem = int_resolve(a, rem_offset);
     if (int_is_zero(rem)) {
-        return rem_offset;
+        *out_offset = rem_offset;
+        return OUTCOME_OK;
     }
 
     if (lhs->sign != rhs->sign) {
@@ -545,11 +569,13 @@ Offset int_modulo(Arena *a, Offset m, Offset n, Offset fallback) {
         Offset abs_rhs = int_abs(a, n);
         Offset new_rem = sub_magnitude(a, int_resolve(a, abs_rhs), rem);
         int_resolve(a, new_rem)->sign = rhs->sign;
-        return new_rem;
+        *out_offset = new_rem;
+        return OUTCOME_OK;
     }
 
     rem->sign = lhs->sign;
-    return rem_offset;
+    *out_offset = rem_offset;
+    return OUTCOME_OK;
 }
 
 /* Return a string representation (in the form of an AsciiStrValue) of the

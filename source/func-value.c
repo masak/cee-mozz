@@ -24,7 +24,7 @@ Offset func_new(Arena *a, Offset env_offset, Offset codeunit_offset) {
 
 /* Return a pointer to a FuncValue, given an offset into an arena.
  *
- * Precondition: `offset` points to a valid FuncValue.
+ * Precondition: `offset` points to a FuncValue.
  */
 FuncValue *func_resolve(Arena *a, Offset offset) {
     if (value_tag(a, offset) != TAG_FUNC) {
