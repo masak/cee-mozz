@@ -6,6 +6,7 @@
 #include "../include/array-value.h"
 #include "../include/ascii-str-value.h"
 #include "../include/i64-value.h"
+#include "../include/outcome.h"
 #include "../include/seenset.h"
 #include "../include/syntax-node-value.h"
 #include "../include/tags.h"
@@ -89,7 +90,9 @@ void kind_is_ascii_str(void) {
     s8 kind_str = s8("foo");
     Offset kind_offset = ascii_str_new(&arena, &kind_str);
     Offset node = syntax_node_new(&arena, kind_offset, UNSET, 0, NULL);
-    Offset retrieved = syntax_node_kind(&arena, node);
+    Offset retrieved;
+    Outcome oc = syntax_node_kind(&arena, node, &retrieved);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     ASSERT_OFFSET_EQ(retrieved, kind_offset);
 }
 
@@ -107,7 +110,9 @@ void payload_roundtrip(void) {
         0,
         NULL
     );
-    Offset retrieved = syntax_node_payload(&arena, node);
+    MaybeOffset retrieved;
+    Outcome oc = syntax_node_payload(&arena, node, &retrieved);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     ASSERT_OFFSET_EQ(retrieved, payload_offset);
 }
 
@@ -117,7 +122,9 @@ void no_payload_is_unset(void) {
     s8 kind_str = s8("Identifier");
     Offset kind_offset = ascii_str_new(&arena, &kind_str);
     Offset node = syntax_node_new(&arena, kind_offset, UNSET, 0, NULL);
-    Offset retrieved = syntax_node_payload(&arena, node);
+    MaybeOffset retrieved;
+    Outcome oc = syntax_node_payload(&arena, node, &retrieved);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     ASSERT_OFFSET_EQ(retrieved, UNSET);
 }
 
@@ -166,8 +173,12 @@ void get_child_by_index(void) {
     );
     Offset children[] = { first, second };
     Offset node = syntax_node_new(&arena, kind_offset, UNSET, 2, children);
-    Offset retrieved_first = syntax_node_child(&arena, node, 0);
-    Offset retrieved_second = syntax_node_child(&arena, node, 1);
+    Offset retrieved_first;
+    Outcome oc1 = syntax_node_child(&arena, node, 0, &retrieved_first);
+    ASSERT_U32_EQ(oc1, OUTCOME_OK);
+    Offset retrieved_second;
+    Outcome oc2 = syntax_node_child(&arena, node, 1, &retrieved_second);
+    ASSERT_U32_EQ(oc2, OUTCOME_OK);
     ASSERT_OFFSET_EQ(retrieved_first, first);
     ASSERT_OFFSET_EQ(retrieved_second, second);
 }

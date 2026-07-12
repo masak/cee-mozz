@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "arena.h"
+#include "outcome.h"
 #include "tags.h"
 #include "typedefs.h"
 
@@ -27,10 +28,15 @@ Offset syntax_node_new(
 SyntaxNodeValue *syntax_node_resolve(Arena *a, Offset offset);
 bool syntax_node_validate(Arena *a, Offset offset, SeenSet *seenset);
 
-Offset syntax_node_kind(Arena *a, Offset offset);
-MaybeOffset syntax_node_payload(Arena *a, Offset offset);
+Outcome syntax_node_kind(Arena *a, Offset offset, Offset *out_offset);
+Outcome syntax_node_payload(Arena *a, Offset offset, MaybeOffset *out_offset);
 u32 syntax_node_child_count(Arena *a, Offset offset);
-u32 syntax_node_child(Arena *a, Offset offset, u32 index);
+Outcome syntax_node_child(
+    Arena *a,
+    Offset offset,
+    u32 index,
+    Offset *out_offset
+);
 
 #endif
 

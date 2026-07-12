@@ -26,7 +26,7 @@ defining the various types in the runtime:
 | `MacroValue` | ✅ | ✅ |
 | `Environment` | ✅ | ✅ |
 | `CodeUnit` | ✅ | ✅ |
-| `SyntaxNodeValue` | ✅ | |
+| `SyntaxNodeValue` | ✅ | ✅ |
 | `IntValue` | ✅ | |
 | `StrValue` | ✅ | |
 | `SmallStrValue` | ✅ | |

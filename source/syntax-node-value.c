@@ -4,6 +4,7 @@
 
 #include "../include/arena.h"
 #include "../include/crash.h"
+#include "../include/outcome.h"
 #include "../include/seenset.h"
 #include "../include/syntax-node-value.h"
 #include "../include/tags.h"
@@ -112,9 +113,10 @@ bool syntax_node_validate(Arena *a, Offset offset, SeenSet *seenset) {
  *
  * Precondition: `offset` points to a valid SyntaxNodeValue.
  */
-Offset syntax_node_kind(Arena *a, Offset offset) {
+Outcome syntax_node_kind(Arena *a, Offset offset, Offset *out_offset) {
     SyntaxNodeValue *node = syntax_node_resolve(a, offset);
-    return node->kind_offset;
+    *out_offset = node->kind_offset;
+    return OUTCOME_OK;
 }
 
 /* Return the (possibly UNSET) payload offset of the SyntaxNodeValue at
@@ -122,9 +124,10 @@ Offset syntax_node_kind(Arena *a, Offset offset) {
  *
  * Precondition: `offset` points to a valid SyntaxNodeValue.
  */
-MaybeOffset syntax_node_payload(Arena *a, Offset offset) {
+Outcome syntax_node_payload(Arena *a, Offset offset, MaybeOffset *out_offset) {
     SyntaxNodeValue *node = syntax_node_resolve(a, offset);
-    return node->payload_offset;
+    *out_offset = node->payload_offset;
+    return OUTCOME_OK;
 }
 
 /* Return the number of children of the SyntaxNodeValue at `offset`.
@@ -141,10 +144,19 @@ u32 syntax_node_child_count(Arena *a, Offset offset) {
  * Precondition: `offset` points to a valid SyntaxNodeValue.
  * Additional expectation: `index` is within bounds.
  */
-u32 syntax_node_child(Arena *a, Offset offset, u32 index) {
+Outcome syntax_node_child(
+    Arena *a,
+    Offset offset,
+    u32 index,
+    Offset *out_offset
+) {
     SyntaxNodeValue *node = syntax_node_resolve(a, offset);
+
     if (index >= node->child_count) {
-        vm_crash(CRASH_OUT_OF_BOUNDS);
+        return OUTCOME_E604_INDEX;
     }
-    return node->children[index];
+
+    *out_offset = node->children[index];
+    return OUTCOME_OK;
 }
+
