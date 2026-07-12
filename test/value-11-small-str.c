@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "../include/arena.h"
+#include "../include/outcome.h"
 #include "../include/seenset.h"
 #include "../include/small-str-value.h"
 #include "../include/str-value.h"
@@ -95,7 +96,9 @@ void concat_two_small_strings(void) {
     arena_init(&arena);
     Offset m = small_str_new(&arena, &s8("hi"));
     Offset n = small_str_new(&arena, &s8("ya"));
-    Offset result = small_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = small_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     SmallStrValue *val = small_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_SMALL_STR);
     ASSERT_SMALL_STR_EQ_BYTES(val, "hiya", 4);
@@ -106,7 +109,9 @@ void concat_with_empty_left(void) {
     arena_init(&arena);
     Offset m = small_str_new(&arena, &s8(""));
     Offset n = small_str_new(&arena, &s8("x"));
-    Offset result = small_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = small_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     SmallStrValue *val = small_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_SMALL_STR);
     ASSERT_SMALL_STR_EQ_BYTES(val, "x", 1);
@@ -117,7 +122,9 @@ void concat_with_empty_right(void) {
     arena_init(&arena);
     Offset m = small_str_new(&arena, &s8("x"));
     Offset n = small_str_new(&arena, &s8(""));
-    Offset result = small_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = small_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     SmallStrValue *val = small_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_SMALL_STR);
     ASSERT_SMALL_STR_EQ_BYTES(val, "x", 1);
@@ -128,7 +135,9 @@ void concat_both_empty(void) {
     arena_init(&arena);
     Offset m = small_str_new(&arena, &s8(""));
     Offset n = small_str_new(&arena, &s8(""));
-    Offset result = small_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = small_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     SmallStrValue *val = small_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_SMALL_STR);
     ASSERT_SMALL_STR_EQ_BYTES(val, "", 0);
@@ -139,7 +148,9 @@ void concat_exactly_eight(void) {
     arena_init(&arena);
     Offset m = small_str_new(&arena, &s8("ship"));
     Offset n = small_str_new(&arena, &s8("mate"));
-    Offset result = small_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = small_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     SmallStrValue *val = small_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_SMALL_STR);
     ASSERT_SMALL_STR_EQ_BYTES(val, "shipmate", 8);
@@ -150,7 +161,9 @@ void concat_seven_plus_one(void) {
     arena_init(&arena);
     Offset m = small_str_new(&arena, &s8("polygon"));
     Offset n = small_str_new(&arena, &s8("s"));
-    Offset result = small_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = small_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     SmallStrValue *val = small_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_SMALL_STR);
     ASSERT_SMALL_STR_EQ_BYTES(val, "polygons", 8);
@@ -161,7 +174,9 @@ void concat_eight_plus_empty(void) {
     arena_init(&arena);
     Offset m = small_str_new(&arena, &s8("garbanzo"));
     Offset n = small_str_new(&arena, &s8(""));
-    Offset result = small_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = small_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     SmallStrValue *val = small_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_SMALL_STR);
     ASSERT_SMALL_STR_EQ_BYTES(val, "garbanzo", 8);
@@ -172,7 +187,9 @@ void concat_overflow_to_str(void) {
     arena_init(&arena);
     Offset m = small_str_new(&arena, &s8("screw"));
     Offset n = small_str_new(&arena, &s8("driver"));
-    Offset result = small_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = small_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     /* 11 bytes overflows SmallStrValue; should promote to StrValue */
     ASSERT_TAG_EQ(value_tag(&arena, result), TAG_STR);
     StrValue *val = str_resolve(&arena, result);
@@ -186,7 +203,9 @@ void concat_with_multibyte(void) {
     arena_init(&arena);
     Offset m = small_str_new(&arena, &s8("\xC3\xA9"));
     Offset n = small_str_new(&arena, &s8("x"));
-    Offset result = small_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = small_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     SmallStrValue *val = small_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_SMALL_STR);
     u8 expected[] = { 0xC3, 0xA9, 'x' };
@@ -198,7 +217,9 @@ void concat_creates_distinct_value(void) {
     arena_init(&arena);
     Offset m = small_str_new(&arena, &s8("a"));
     Offset n = small_str_new(&arena, &s8("b"));
-    Offset result = small_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = small_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     ASSERT_OFFSET_NE(result, m);
     ASSERT_OFFSET_NE(result, n);
 }

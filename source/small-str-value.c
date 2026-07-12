@@ -4,6 +4,7 @@
 #include "../include/arena.h"
 #include "../include/crash.h"
 #include "../include/generic-string.h"
+#include "../include/outcome.h"
 #include "../include/seenset.h"
 #include "../include/small-str-value.h"
 #include "../include/str-value.h"
@@ -95,10 +96,13 @@ bool small_str_validate(Arena *a, Offset offset, SeenSet *seenset) {
  *
  * Preconditions: `offset1` points to a valid SmallStrValue. `offset2` points
  *                to a valid SmallStrValue.
- * Additional expectation: The combined length of the two strings fits in a
- *                         `u32`.
  */
-Offset small_str_concat(Arena *a, Offset offset1, Offset offset2) {
+Outcome small_str_concat(
+    Arena *a,
+    Offset offset1,
+    Offset offset2,
+    Offset *out_offset
+) {
     u8 payload1[SMALL_STR_MAX_BYTES];
     u8 payload2[SMALL_STR_MAX_BYTES];
     u32 length1 = 0;
@@ -118,9 +122,8 @@ Offset small_str_concat(Arena *a, Offset offset1, Offset offset2) {
     small_str_extract_payload(v2, payload2, &length2);
 
     u32 combined_length = length1 + length2;
-    if (combined_length < length1) { /* u32 overflow */
-        vm_crash(CRASH_STRING_TOO_LONG);
-    }
+    assert(combined_length >= length1);
+    assert(combined_length >= length2);
 
     u8 combined[SMALL_STR_MAX_BYTES * 2];
     memcpy(combined, payload1, length1);
@@ -128,9 +131,12 @@ Offset small_str_concat(Arena *a, Offset offset1, Offset offset2) {
     s8 str = { combined, combined_length };
 
     if (combined_length <= SMALL_STR_MAX_BYTES) {
-        return small_str_new(a, &str);
+        *out_offset = small_str_new(a, &str);
+        return OUTCOME_OK;
     }
     else {
-        return str_new(a, &str);
+        *out_offset = str_new(a, &str);
+        return OUTCOME_OK;
     }
 }
+

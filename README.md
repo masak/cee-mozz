@@ -29,7 +29,7 @@ defining the various types in the runtime:
 | `SyntaxNodeValue` | ✅ | ✅ |
 | `IntValue` | ✅ | ✅ |
 | `StrValue` | ✅ | ✅ |
-| `SmallStrValue` | ✅ | |
+| `SmallStrValue` | ✅ | ✅ |
 | `IntTable` | ✅ | |
 | `StrTable` | ✅ | |
 | `CodeTable` | ✅ | |
