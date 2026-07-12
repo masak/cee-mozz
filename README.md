@@ -28,7 +28,7 @@ defining the various types in the runtime:
 | `CodeUnit` | ✅ | ✅ |
 | `SyntaxNodeValue` | ✅ | ✅ |
 | `IntValue` | ✅ | ✅ |
-| `StrValue` | ✅ | |
+| `StrValue` | ✅ | ✅ |
 | `SmallStrValue` | ✅ | |
 | `IntTable` | ✅ | |
 | `StrTable` | ✅ | |

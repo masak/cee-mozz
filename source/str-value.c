@@ -4,6 +4,7 @@
 #include "../include/arena.h"
 #include "../include/crash.h"
 #include "../include/generic-string.h"
+#include "../include/outcome.h"
 #include "../include/seenset.h"
 #include "../include/str-value.h"
 #include "../include/tags.h"
@@ -33,7 +34,7 @@ Offset str_new(Arena *a, s8 *str) {
     return (Offset)((unsigned char *)str_value - a->bytes);
 }
 
-/* Returns a pointer to a StrValue, given an offset into an arena.
+/* Return a pointer to a StrValue, given an offset into an arena.
  *
  * Precondition: `offset` points to a StrValue.
  */
@@ -79,7 +80,12 @@ bool str_validate(Arena *a, Offset offset, SeenSet *seenset) {
  *                valid StrValue. Their combined length (in bytes) fits in a
  *                `u32`.
  */
-Offset str_concat(Arena *a, Offset offset1, Offset offset2) {
+Outcome str_concat(
+    Arena *a,
+    Offset offset1,
+    Offset offset2,
+    Offset *out_offset
+) {
     StrValue *lhs = str_resolve(a, offset1);
     StrValue *rhs = str_resolve(a, offset2);
 
@@ -103,5 +109,7 @@ Offset str_concat(Arena *a, Offset offset1, Offset offset2) {
         rhs->length_in_bytes
     );
 
-    return (Offset)((unsigned char *)result - a->bytes);
+    *out_offset = (Offset)((unsigned char *)result - a->bytes);
+    return OUTCOME_OK;
 }
+
