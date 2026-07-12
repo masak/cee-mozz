@@ -48,6 +48,10 @@ AsciiStrValue *ascii_str_resolve(Arena *a, Offset offset) {
     return (AsciiStrValue *)(a->bytes + offset);
 }
 
+/* Return true if `offset` is already seen, or valid.
+ *
+ * Precondition: `offset` points to an AsciiStrValue.
+ */
 bool ascii_str_validate(Arena *a, Offset offset, SeenSet *seenset) {
     if (seen(seenset, offset)) {
         return true;

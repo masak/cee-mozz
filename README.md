@@ -20,8 +20,8 @@ defining the various types in the runtime:
 | `AsciiStrValue` | ✅ | ✅ |
 | `BoolValue` | | |
 | `NoneValue` | | |
-| `ArrayValue` | ✅ | |
-| `ArrayElements` | ✅ | |
+| `ArrayValue` | ✅ | ✅ |
+| `ArrayElements` | ✅ | ✅ |
 | `FuncValue` | ✅ | |
 | `MacroValue` | ✅ | |
 | `Environment` | ✅ | |

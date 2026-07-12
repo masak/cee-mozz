@@ -6,6 +6,7 @@
 #include "../include/arena.h"
 #include "../include/crash.h"
 #include "../include/i64-value.h"
+#include "../include/outcome.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
 #include "../include/value.h"
@@ -25,9 +26,9 @@ Offset array_new(Arena *a, u32 capacity) {
     return (Offset)((unsigned char *)array_value - a->bytes);
 }
 
-/* Returns a pointer to an ArrayValue, given an offset into an arena.
+/* Return a pointer to an ArrayValue, given an offset into an arena.
  *
- * Precondition: `offset` points to an ArrayValue.
+ * Precondition: `offset` points to a valid ArrayValue.
  */
 ArrayValue *array_resolve(Arena *a, Offset offset) {
     if (value_tag(a, offset) != TAG_ARRAY) {
@@ -38,6 +39,10 @@ ArrayValue *array_resolve(Arena *a, Offset offset) {
     return (ArrayValue *)(a->bytes + offset);
 }
 
+/* Return true if `offset` is already seen, or valid.
+ *
+ * Precondition: `offset` points to an ArrayValue.
+ */
 bool array_validate(Arena *a, Offset offset, SeenSet *seenset) {
     if (seen(seenset, offset)) {
         return true;
@@ -77,14 +82,20 @@ bool array_validate(Arena *a, Offset offset, SeenSet *seenset) {
 
 /* Add a value to the end of an ArrayValue.
  *
- * Precondition: `array_offset` points to a valid ArrayValue.
+ * Preconditions: `array_offset` points to a valid ArrayValue. There's room for
+ *                at least one more element, without the `u32` length
+ *                overflowing.
  * Postcondition: The array has been extended with one element at the end,
  *                namely `value_offset`.
  */
-void array_push(Arena *a, Offset array_offset, Offset value_offset) {
+Outcome array_push(Arena *a, Offset array_offset, Offset value_offset) {
     ArrayValue *array_value = array_resolve(a, array_offset);
     ArrayElements *elems
         = array_elements_resolve(a, array_value->elements_offset);
+
+    if (array_value->length + 1 < array_value->length) { /* overflow */
+        vm_crash(CRASH_ARRAY_TOO_LONG);
+    }
 
     if (array_value->length >= elems->capacity) {
         u32 new_capacity = (elems->capacity == 0) ? 8 : elems->capacity * 2;
@@ -109,6 +120,8 @@ void array_push(Arena *a, Offset array_offset, Offset value_offset) {
 
     elems->elements[array_value->length] = value_offset;
     ++array_value->length;
+
+    return OUTCOME_OK;
 }
 
 /* Return an element from the ArrayValue at `array_offset`, at the index
@@ -120,22 +133,26 @@ void array_push(Arena *a, Offset array_offset, Offset value_offset) {
  *                         within the range 0 ..^ N, N being the length of the
  *                         array.
  */
-Offset array_get(Arena *a, Offset array_offset, Offset index_offset) {
+Outcome array_get(
+    Arena *a,
+    Offset array_offset,
+    Offset index_offset,
+    Offset *out_offset
+) {
     ArrayValue *array_value = array_resolve(a, array_offset);
     /* XXX: `index_value` can be an `IntValue`, not just an `I64Value`. We
        should extend the code here, but also add a test for it. */
     I64Value *index_value = i64_resolve(a, index_offset);
     i64 index = index_value->payload;
 
-    /* XXX: In the fullness of time, this should be a runtime error, not a
-       not a VM crash. */
     if (index < 0 || (u32)index >= array_value->length) {
-        vm_crash(CRASH_SHOULD_BE_RUNTIME_ERROR);
+        return OUTCOME_E604_INDEX;
     }
 
     ArrayElements *elems
         = array_elements_resolve(a, array_value->elements_offset);
-    return elems->elements[index];
+    *out_offset = elems->elements[index];
+    return OUTCOME_OK;
 }
 
 /* Store a value from `value_offset` into an element slot in the ArrayValue at
@@ -147,7 +164,7 @@ Offset array_get(Arena *a, Offset array_offset, Offset index_offset) {
  *                         within the range 0 ..^ N, N being the length of the
  *                         array.
  */
-void array_set(
+Outcome array_set(
     Arena *a,
     Offset array_offset,
     Offset index_offset,
@@ -159,24 +176,24 @@ void array_set(
     I64Value *index_value = i64_resolve(a, index_offset);
     i64 index = index_value->payload;
 
-    /* XXX: In the fullness of time, this should be a runtime error, not a
-       not a VM crash. */
     if (index < 0 || (u32)index >= array_value->length) {
-        vm_crash(CRASH_SHOULD_BE_RUNTIME_ERROR);
+        return OUTCOME_E604_INDEX;
     }
 
     ArrayElements *elems
         = array_elements_resolve(a, array_value->elements_offset);
     elems->elements[index] = value_offset;
+    return OUTCOME_OK;
 }
 
 /* Return the length of the ArrayValue at `array_offset`.
  *
  * Precondition: `array_offset` points to a valid ArrayValue.
  */
-Offset array_length(Arena *a, Offset array_offset) {
+Outcome array_length(Arena *a, Offset array_offset, Offset *out_offset) {
     ArrayValue *array_value = array_resolve(a, array_offset);
-    return i64_new(a, (i64)array_value->length);
+    *out_offset = i64_new(a, (i64)array_value->length);
+    return OUTCOME_OK;
 }
 
 /* Return an ArrayValue whose elements are those of `array_offset`, followed by
@@ -186,7 +203,12 @@ Offset array_length(Arena *a, Offset array_offset) {
  *                points to a valid ArrayValue. Their combined length fits in a
  *                `u32`.
  */
-Offset array_concat(Arena *a, Offset array_offset1, Offset array_offset2) {
+Outcome array_concat(
+    Arena *a,
+    Offset array_offset1,
+    Offset array_offset2,
+    Offset *out_offset
+) {
     ArrayValue *array_value1 = array_resolve(a, array_offset1);
     ArrayValue *array_value2 = array_resolve(a, array_offset2);
     ArrayElements *elems1
@@ -216,7 +238,8 @@ Offset array_concat(Arena *a, Offset array_offset1, Offset array_offset2) {
     );
 
     result_array_value->length = total_length;
-    return result;
+    *out_offset = result;
+    return OUTCOME_OK;
 }
 
 /* Allocate a new ArrayElements. */
@@ -235,7 +258,7 @@ Offset array_elements_new(Arena *a, u32 capacity) {
 
 /* Returns a pointer to an ArrayElements, given an offset into an arena.
  *
- * Precondition: `offset` points to an ArrayElements.
+ * Precondition: `offset` points to a valid ArrayElements.
  */
 ArrayElements *array_elements_resolve(Arena *a, Offset offset) {
     if (value_tag(a, offset) != TAG_ARRAY_ELEMENTS) {

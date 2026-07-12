@@ -3,21 +3,26 @@
 #include "../include/arena.h"
 #include "../include/array-value.h"
 #include "../include/i64-value.h"
+#include "../include/outcome.h"
 #include "../include/seenset.h"
 #include "../include/test.h"
 #include "../include/tags.h"
 #include "../include/value.h"
 
 #define ASSERT_ARRAY_LENGTH(arr, expected) do { \
-    Offset len_offset = array_length(&arena, arr); \
-    i64 actual = i64_resolve(&arena, len_offset)->payload; \
-    ASSERT_I64_EQ(actual, expected); \
+    Offset _len_offset; \
+    Outcome _oc = array_length(&arena, arr, &_len_offset); \
+    ASSERT_U32_EQ(_oc, OUTCOME_OK); \
+    i64 _actual = i64_resolve(&arena, _len_offset)->payload; \
+    ASSERT_I64_EQ(_actual, expected); \
 } while (0)
 
 #define ASSERT_ARRAY_GET(arr, idx, expected_offset) do { \
-    Offset idx_offset = i64_new(&arena, idx); \
-    Offset actual_offset = array_get(&arena, arr, idx_offset); \
-    ASSERT_OFFSET_EQ(actual_offset, expected_offset); \
+    Offset _idx_offset = i64_new(&arena, idx); \
+    Offset _actual_offset; \
+    Outcome _oc = array_get(&arena, arr, _idx_offset, &_actual_offset); \
+    ASSERT_U32_EQ(_oc, OUTCOME_OK); \
+    ASSERT_OFFSET_EQ(_actual_offset, expected_offset); \
 } while (0)
 
 static Arena arena;
@@ -50,7 +55,8 @@ void push_increases_length(void) {
     arena_init(&arena);
     Offset array_offset = array_new(&arena, 2);
     Offset element_offset = i64_new(&arena, 42);
-    array_push(&arena, array_offset, element_offset);
+    Outcome oc = array_push(&arena, array_offset, element_offset);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     ASSERT_ARRAY_LENGTH(array_offset, 1);
 }
 
@@ -58,7 +64,8 @@ void push_stores_value(void) {
     arena_init(&arena);
     Offset array_offset = array_new(&arena, 2);
     Offset element_offset = i64_new(&arena, 42);
-    array_push(&arena, array_offset, element_offset);
+    Outcome oc = array_push(&arena, array_offset, element_offset);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     ASSERT_ARRAY_GET(array_offset, 0, element_offset);
 }
 
@@ -67,8 +74,10 @@ void push_beyond_capacity_doubles(void) {
     Offset array_offset = array_new(&arena, 1);
     Offset el1_offset = i64_new(&arena, 1);
     Offset el2_offset = i64_new(&arena, 2);
-    array_push(&arena, array_offset, el1_offset);
-    array_push(&arena, array_offset, el2_offset);
+    Outcome oc1 = array_push(&arena, array_offset, el1_offset);
+    ASSERT_U32_EQ(oc1, OUTCOME_OK);
+    Outcome oc2 = array_push(&arena, array_offset, el2_offset);
+    ASSERT_U32_EQ(oc2, OUTCOME_OK);
     ASSERT_ARRAY_LENGTH(array_offset, 2);
     ASSERT_ARRAY_GET(array_offset, 0, el1_offset);
     ASSERT_ARRAY_GET(array_offset, 1, el2_offset);
@@ -80,7 +89,8 @@ void push_zero_capacity_grows_to_eight(void) {
     Offset element_offsets[9];
     for (int i = 0; i < 9; i++) {
         element_offsets[i] = i64_new(&arena, i);
-        array_push(&arena, array_offset, element_offsets[i]);
+        Outcome oc = array_push(&arena, array_offset, element_offsets[i]);
+        ASSERT_U32_EQ(oc, OUTCOME_OK);
     }
     ASSERT_ARRAY_LENGTH(array_offset, 9);
     for (int i = 0; i < 9; i++) {
@@ -93,8 +103,10 @@ void get_and_set(void) {
     Offset array_offset = array_new(&arena, 4);
     Offset el1_offset = i64_new(&arena, 10);
     Offset el2_offset = i64_new(&arena, 20);
-    array_push(&arena, array_offset, el1_offset);
-    array_push(&arena, array_offset, el2_offset);
+    Outcome oc1 = array_push(&arena, array_offset, el1_offset);
+    ASSERT_U32_EQ(oc1, OUTCOME_OK);
+    Outcome oc2 = array_push(&arena, array_offset, el2_offset);
+    ASSERT_U32_EQ(oc2, OUTCOME_OK);
 
     Offset index = i64_new(&arena, 0);
     array_set(&arena, array_offset, index, el2_offset);
@@ -108,11 +120,16 @@ void concatenate_two_arrays(void) {
     Offset a = i64_new(&arena, 1);
     Offset b = i64_new(&arena, 2);
     Offset c = i64_new(&arena, 3);
-    array_push(&arena, arr1_offset, a);
-    array_push(&arena, arr1_offset, b);
-    array_push(&arena, arr2_offset, c);
+    Outcome oc1 = array_push(&arena, arr1_offset, a);
+    ASSERT_U32_EQ(oc1, OUTCOME_OK);
+    Outcome oc2 = array_push(&arena, arr1_offset, b);
+    ASSERT_U32_EQ(oc2, OUTCOME_OK);
+    Outcome oc3 = array_push(&arena, arr2_offset, c);
+    ASSERT_U32_EQ(oc3, OUTCOME_OK);
 
-    Offset result = array_concat(&arena, arr1_offset, arr2_offset);
+    Offset result;
+    Outcome oc = array_concat(&arena, arr1_offset, arr2_offset, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     ASSERT_ARRAY_LENGTH(result, 3);
     ASSERT_ARRAY_GET(result, 0, a);
     ASSERT_ARRAY_GET(result, 1, b);
@@ -124,9 +141,12 @@ void concatenate_with_empty(void) {
     Offset arr1_offset = array_new(&arena, 2);
     Offset arr2_offset = array_new(&arena, 2);
     Offset a = i64_new(&arena, 1);
-    array_push(&arena, arr1_offset, a);
+    Outcome oc1 = array_push(&arena, arr1_offset, a);
+    ASSERT_U32_EQ(oc1, OUTCOME_OK);
 
-    Offset result = array_concat(&arena, arr1_offset, arr2_offset);
+    Offset result;
+    Outcome oc2 = array_concat(&arena, arr1_offset, arr2_offset, &result);
+    ASSERT_U32_EQ(oc2, OUTCOME_OK);
     ASSERT_ARRAY_LENGTH(result, 1);
     ASSERT_ARRAY_GET(result, 0, a);
 }
@@ -136,10 +156,14 @@ void concatenate_creates_distinct_array(void) {
     Offset arr1_offset = array_new(&arena, 2);
     Offset arr2_offset = array_new(&arena, 2);
     Offset a = i64_new(&arena, 1);
-    array_push(&arena, arr1_offset, a);
-    array_push(&arena, arr2_offset, a);
+    Outcome oc1 = array_push(&arena, arr1_offset, a);
+    ASSERT_U32_EQ(oc1, OUTCOME_OK);
+    Outcome oc2 = array_push(&arena, arr2_offset, a);
+    ASSERT_U32_EQ(oc2, OUTCOME_OK);
 
-    Offset result = array_concat(&arena, arr1_offset, arr2_offset);
+    Offset result;
+    Outcome oc = array_concat(&arena, arr1_offset, arr2_offset, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     ASSERT_OFFSET_NE(result, arr1_offset);
     ASSERT_OFFSET_NE(result, arr2_offset);
 }
