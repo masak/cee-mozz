@@ -77,7 +77,9 @@ void concat_two_strings(void) {
     arena_init(&arena);
     Offset m = ascii_str_new(&arena, &s8("hello"));
     Offset n = ascii_str_new(&arena, &s8("world"));
-    Offset result = ascii_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = ascii_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "helloworld");
@@ -88,7 +90,9 @@ void concat_with_empty_left(void) {
     arena_init(&arena);
     Offset m = ascii_str_new(&arena, &s8(""));
     Offset n = ascii_str_new(&arena, &s8("world"));
-    Offset result = ascii_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = ascii_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "world");
@@ -99,7 +103,9 @@ void concat_with_empty_right(void) {
     arena_init(&arena);
     Offset m = ascii_str_new(&arena, &s8("hello"));
     Offset n = ascii_str_new(&arena, &s8(""));
-    Offset result = ascii_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = ascii_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "hello");
@@ -110,7 +116,9 @@ void concat_both_empty(void) {
     arena_init(&arena);
     Offset m = ascii_str_new(&arena, &s8(""));
     Offset n = ascii_str_new(&arena, &s8(""));
-    Offset result = ascii_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = ascii_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_TAG_EQ(val->tag, TAG_ASCII_STR);
     ASSERT_ASCII_STR_EQ(val, "");
@@ -122,8 +130,12 @@ void concat_multiple(void) {
     Offset a = ascii_str_new(&arena, &s8("a"));
     Offset b = ascii_str_new(&arena, &s8("b"));
     Offset c = ascii_str_new(&arena, &s8("c"));
-    Offset ab = ascii_str_concat(&arena, a, b);
-    Offset abc = ascii_str_concat(&arena, ab, c);
+    Offset ab;
+    Outcome oc1 = ascii_str_concat(&arena, a, b, &ab);
+    ASSERT_U32_EQ(oc1, OUTCOME_OK);
+    Offset abc;
+    Outcome oc2 = ascii_str_concat(&arena, ab, c, &abc);
+    ASSERT_U32_EQ(oc2, OUTCOME_OK);
     AsciiStrValue *val = ascii_str_resolve(&arena, abc);
     ASSERT_ASCII_STR_EQ(val, "abc");
 }
@@ -135,7 +147,9 @@ void concat_preserves_lengths(void) {
     Offset n = ascii_str_new(&arena, &s8("world"));
     AsciiStrValue *lhs = ascii_str_resolve(&arena, m);
     AsciiStrValue *rhs = ascii_str_resolve(&arena, n);
-    Offset result = ascii_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = ascii_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     AsciiStrValue *val = ascii_str_resolve(&arena, result);
     ASSERT_I64_EQ(
         val->length_in_bytes,
@@ -148,7 +162,9 @@ void concat_creates_distinct_values(void) {
     arena_init(&arena);
     Offset m = ascii_str_new(&arena, &s8("x"));
     Offset n = ascii_str_new(&arena, &s8("y"));
-    Offset result = ascii_str_concat(&arena, m, n);
+    Offset result;
+    Outcome oc = ascii_str_concat(&arena, m, n, &result);
+    ASSERT_U32_EQ(oc, OUTCOME_OK);
     ASSERT_OFFSET_NE(result, m);
     ASSERT_OFFSET_NE(result, n);
 }

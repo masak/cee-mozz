@@ -10,9 +10,20 @@
 #include "../include/tags.h"
 #include "../include/value.h"
 
-/* Allocate a new AsciiStrValue. */
+/* Allocate a new AsciiStrValue.
+ *
+ * Precondition: The bytes in the string payload must all be in the range
+ *               0..127.
+ */
 Offset ascii_str_new(Arena *a, s8 *str) {
     u32 length_in_bytes = str->length_in_bytes;
+    for (u32 i = 0; i < length_in_bytes; i++) {
+        u8 c = (u8)str->payload[i];
+        if (c > 127) {
+            vm_crash(CRASH_INVALID_ASCII);
+        }
+    }
+
     AsciiStrValue *ascii_str_value = arena_alloc(
         a,
         sizeof(AsciiStrValue) + length_in_bytes,
@@ -24,9 +35,9 @@ Offset ascii_str_new(Arena *a, s8 *str) {
     return (Offset)((unsigned char *)ascii_str_value - a->bytes);
 }
 
-/* Returns a pointer to an AsciiStrValue, given an offset into an arena.
+/* Return a pointer to an AsciiStrValue, given an offset into an arena.
  *
- * Precondition: `offset` points to an AsciiStrValue.
+ * Precondition: `offset` points to a valid AsciiStrValue.
  */
 AsciiStrValue *ascii_str_resolve(Arena *a, Offset offset) {
     if (value_tag(a, offset) != TAG_ASCII_STR) {
@@ -65,7 +76,12 @@ bool ascii_str_validate(Arena *a, Offset offset, SeenSet *seenset) {
  *                to a valid AsciiStrValue. Their combined length fits in a
  *                `u32`.
  */
-Offset ascii_str_concat(Arena *a, Offset offset1, Offset offset2) {
+Outcome ascii_str_concat(
+    Arena *a,
+    Offset offset1,
+    Offset offset2,
+    Offset *out_offset
+) {
     AsciiStrValue *lhs = ascii_str_resolve(a, offset1);
     AsciiStrValue *rhs = ascii_str_resolve(a, offset2);
 
@@ -86,6 +102,7 @@ Offset ascii_str_concat(Arena *a, Offset offset1, Offset offset2) {
         rhs->length_in_bytes
     );
 
-    return (Offset)((unsigned char *)result - a->bytes);
+    *out_offset = (Offset)((unsigned char *)result - a->bytes);
+    return OUTCOME_OK;
 }
 
