@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "arena.h"
+#include "outcome.h"
 #include "seenset.h"
 #include "typedefs.h"
 
@@ -28,14 +29,14 @@ Offset environment_new(
 Environment *environment_resolve(Arena *a, Offset offset);
 bool environment_validate(Arena *a, Offset offset, SeenSet *seenset);
 
-Offset environment_load(
+Outcome environment_load(
     Arena *a,
     Offset env_offset,
     u32 outer_steps,
     u32 entry_index,
-    Offset fallback_offset
+    Offset *out_offset
 );
-void environment_store(
+Outcome environment_store(
     Arena *a,
     Offset env_offset,
     u32 outer_steps,

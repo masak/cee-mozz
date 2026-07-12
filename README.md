@@ -24,8 +24,8 @@ defining the various types in the runtime:
 | `ArrayElements` | ✅ | ✅ |
 | `FuncValue` | ✅ | ✅ |
 | `MacroValue` | ✅ | ✅ |
-| `Environment` | ✅ | |
-| `CodeUnit` | ✅ | |
+| `Environment` | ✅ | ✅ |
+| `CodeUnit` | ✅ | ✅ |
 | `SyntaxNodeValue` | ✅ | |
 | `IntValue` | ✅ | |
 | `StrValue` | ✅ | |
