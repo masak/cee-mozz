@@ -10,6 +10,13 @@
 #include "../include/value.h"
 
 Offset codetable_new(Arena *a, u32 length, Offset elements[]) {
+    for (u32 i = 0; i < length; i++) {
+        Offset item_offset = elements[i];
+        if (value_tag(a, item_offset) != TAG_CODE_UNIT) {
+            vm_crash(CRASH_INVALID_TAG);
+        }
+    }
+
     size_t elements_size = length * sizeof(Offset);
     CodeTable *codetable = arena_alloc(
         a,
@@ -18,9 +25,6 @@ Offset codetable_new(Arena *a, u32 length, Offset elements[]) {
     );
     codetable->tag = TAG_CODE_TABLE;
     codetable->length = length;
-    /* XXX: Should loop through all elements and `vm_crash` if any one of them
-            isn't a CodeUnit. This is required to guarantee the postcondition
-            in `codetable_get` later. */
     memcpy(codetable->elements, elements, elements_size);
     return (Offset)((unsigned char *)codetable - a->bytes);
 }

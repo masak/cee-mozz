@@ -30,9 +30,9 @@ defining the various types in the runtime:
 | `IntValue` | ✅ | ✅ |
 | `StrValue` | ✅ | ✅ |
 | `SmallStrValue` | ✅ | ✅ |
-| `IntTable` | ✅ | |
-| `StrTable` | ✅ | |
-| `CodeTable` | ✅ | |
+| `IntTable` | ✅ | ✅ |
+| `StrTable` | ✅ | ✅ |
+| `CodeTable` | ✅ | ✅ |
 
 ## Design documents
 

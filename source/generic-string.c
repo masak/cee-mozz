@@ -1,6 +1,8 @@
 #include <stdbool.h>
 
 #include "../include/generic-string.h"
+#include "../include/tags.h"
+#include "../include/value.h"
 
 /* Validate a UTF-8 byte sequence and count its code points.
    Returns true if well-formed, and writes the count to *out_count. */
@@ -66,5 +68,10 @@ bool utf8_validate_and_count(u8 *bytes, u32 length, u32 *out_count) {
 
     *out_count = count;
     return true;
+}
+
+bool is_generic_string(Arena *a, Offset offset) {
+    Tag tag = value_tag(a, offset);
+    return tag == TAG_ASCII_STR || tag == TAG_STR || tag == TAG_SMALL_STR;
 }
 

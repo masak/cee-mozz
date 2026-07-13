@@ -4,12 +4,23 @@
 
 #include "../include/arena.h"
 #include "../include/crash.h"
+#include "../include/generic-integer.h"
 #include "../include/int-table.h"
 #include "../include/seenset.h"
 #include "../include/tags.h"
 #include "../include/value.h"
 
+/* Allocate a new IntTable.
+ *
+ * Precondition: All the `elements` are integers. */
 Offset inttable_new(Arena *a, u32 length, Offset elements[]) {
+    for (u32 i = 0; i < length; i++) {
+        Offset item_offset = elements[i];
+        if (!is_generic_integer(a, item_offset)) {
+            vm_crash(CRASH_INVALID_TAG);
+        }
+    }
+
     size_t elements_size = length * sizeof(Offset);
     IntTable *inttable = arena_alloc(
         a,
@@ -18,14 +29,11 @@ Offset inttable_new(Arena *a, u32 length, Offset elements[]) {
     );
     inttable->tag = TAG_INT_TABLE;
     inttable->length = length;
-    /* XXX: Should loop through all elements and `vm_crash` if any one of them
-            isn't an integer. This is required to guarantee the postcondition
-            in `inttable_get` later. */
     memcpy(inttable->elements, elements, elements_size);
     return (Offset)((unsigned char *)inttable - a->bytes);
 }
 
-/* Returns a pointer to an IntTable, given an offset into an arena.
+/* Return a pointer to an IntTable, given an offset into an arena.
  *
  * Precondition: `offset` points to an IntTable.
  */
@@ -60,8 +68,7 @@ bool inttable_validate(Arena *a, Offset offset, SeenSet *seenset) {
         if (item_offset == UNSET) {
             return false;
         }
-        Tag tag = value_tag(a, item_offset);
-        if (tag != TAG_I64 && tag != TAG_INT) {
+        if (!is_generic_integer(a, item_offset)) {
             return false;
         }
         if (!generic_validate(a, item_offset, seenset)) {
