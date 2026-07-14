@@ -20,6 +20,7 @@ SRC_OBJS = \
  build/int-value.o \
  build/macro-value.o \
  build/parameters.o \
+ build/run-instruction.o \
  build/seenset.o \
  build/small-str-value.o \
  build/str-table.o \
@@ -105,10 +106,10 @@ build/environment.o: source/environment.c include/arena.h include/crash.h includ
 build/func-value.o: source/func-value.c include/arena.h include/codeunit.h include/crash.h include/environment.h include/func-value.h include/instruction.h include/outcome.h include/parameters.h include/seenset.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/func-value.c
 
-build/generic-integer.o: source/generic-integer.c include/arena.h include/seenset.h include/typedefs.h include/value.h
+build/generic-integer.o: source/generic-integer.c include/arena.h include/seenset.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/generic-integer.c
 
-build/generic-string.o: source/generic-string.c include/generic-string.h include/typedefs.h
+build/generic-string.o: source/generic-string.c include/arena.h include/generic-string.h include/seenset.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/generic-string.c
 
 build/i64-value.o: source/i64-value.c include/arena.h include/crash.h include/i64-value.h include/outcome.h include/seenset.h include/tags.h include/typedefs.h include/value.h
@@ -126,13 +127,16 @@ build/macro-value.o: source/macro-value.c include/arena.h include/codeunit.h inc
 build/parameters.o: source/parameters.c include/arena.h include/crash.h include/parameters.h include/seenset.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/parameters.c
 
+build/run-instruction.o: source/run-instruction.c include/activation-record.h include/arena.h include/crash.h include/instruction.h include/outcome.h include/run-instruction.h include/typedefs.h
+	$(CC) $(CFLAGS) -c -o $@ source/run-instruction.c
+
 build/seenset.o: source/seenset.c include/arena.h include/crash.h include/seenset.h include/typedefs.h
 	$(CC) $(CFLAGS) -c -o $@ source/seenset.c
 
 build/small-str-value.o: source/small-str-value.c include/arena.h include/crash.h include/generic-string.h include/outcome.h include/seenset.h include/small-str-value.h include/str-value.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/small-str-value.c
 
-build/str-table.o: source/str-table.c include/arena.h include/crash.h include/seenset.h include/str-table.h include/tags.h include/typedefs.h include/value.h
+build/str-table.o: source/str-table.c include/arena.h include/crash.h include/generic-string.h include/seenset.h include/str-table.h include/tags.h include/typedefs.h include/value.h
 	$(CC) $(CFLAGS) -c -o $@ source/str-table.c
 
 build/str-value.o: source/str-value.c include/arena.h include/crash.h include/generic-string.h include/outcome.h include/seenset.h include/str-value.h include/tags.h include/typedefs.h include/value.h
