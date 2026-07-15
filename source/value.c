@@ -14,8 +14,10 @@
 #include "../include/int-table.h"
 #include "../include/macro-value.h"
 #include "../include/parameters.h"
+#include "../include/small-str-value.h"
 #include "../include/str-table.h"
 #include "../include/str-value.h"
+#include "../include/syntax-node-value.h"
 #include "../include/value.h"
 #include "../include/tags.h"
 
@@ -49,6 +51,10 @@ bool generic_validate(Arena *a, Offset offset, SeenSet *seenset) {
             return int_validate(a, offset, seenset);
         case TAG_STR:
             return str_validate(a, offset, seenset);
+        case TAG_SYNTAX_NODE:
+            return syntax_node_validate(a, offset, seenset);
+        case TAG_SMALL_STR:
+            return small_str_validate(a, offset, seenset);
         case TAG_INT_TABLE:
             return inttable_validate(a, offset, seenset);
         case TAG_STR_TABLE:
