@@ -7,6 +7,10 @@
 
 #include "typedefs.h"
 
+/* 16 kB is really small. It's temporary; haven't run out of arena memory yet.
+ * Will embiggen it in time, but right now being really smol works. Also, will
+ * probably implement the GC before increasing the arena size.
+ */
 enum { ARENA_SIZE = 16 * 1024 };
 
 #define UNSET 0xA3A3A3A3ul
