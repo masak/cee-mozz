@@ -331,7 +331,7 @@ bool int_validate(Arena *a, Offset offset, SeenSet *seenset) {
 
 /* Add two IntValues `m` and `n`, yielding an IntValue result.
  *
- * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ * Preconditions: `m` is a valid IntValue. `n` is a valid IntValue.
  */
 Outcome int_add(Arena *a, Offset m, Offset n, Offset *out_offset) {
     IntValue *lhs = int_resolve(a, m);
@@ -375,7 +375,7 @@ Outcome int_add(Arena *a, Offset m, Offset n, Offset *out_offset) {
 
 /* Subtract two IntValues `m` and `n`, yielding an IntValue result.
  *
- * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ * Preconditions: `m` is a valid IntValue. `n` is a valid IntValue.
  */
 Outcome int_subtract(Arena *a, Offset m, Offset n, Offset *out_offset) {
     IntValue *lhs = int_resolve(a, m);
@@ -419,7 +419,7 @@ Outcome int_subtract(Arena *a, Offset m, Offset n, Offset *out_offset) {
 
 /* Multiply two IntValues `m` and `n`, yielding an IntValue result.
  *
- * Preconditions: `m` is a valid I64Value. `n` is a valid I64Value.
+ * Preconditions: `m` is a valid IntValue. `n` is a valid IntValue.
  */
 Outcome int_multiply(Arena *a, Offset m, Offset n, Offset *out_offset) {
     IntValue *lhs = int_resolve(a, m);
